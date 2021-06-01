@@ -14,7 +14,7 @@ import os
 
 nline = 8 # number of lines (it's a chess board)
 ncolumn = 8 # number of columns (it's a chess board)
-img = cv2.imread('C:/Users/User/Pictures/Pictures/Saved Pictures/Chess.png') # we read the image
+img = cv2.imread('Chess.png') # we read the image
 blur = cv2.GaussianBlur(img,(5,5),0) # we use the gaussian blur
 
 
