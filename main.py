@@ -1,10 +1,6 @@
 import numpy as np
 import cv2
 import sys
-
-# read command-line arguments
-
-
 import math
 import glob
 import scipy.spatial as spatial
@@ -18,12 +14,8 @@ import os
 
 nline = 8 # number of lines (it's a chess board)
 ncolumn = 8 # number of columns (it's a chess board)
-img = cv2.imread('C:/Users/User/Pictures/Pictures/Saved Pictures/Chess.png')
-blur = cv2.GaussianBlur(img,(5,5),0)
-import numpy as np
-import cv2
-
-imgSave = img
+img = cv2.imread('C:/Users/User/Pictures/Pictures/Saved Pictures/Chess.png') # we read the image
+blur = cv2.GaussianBlur(img,(5,5),0) # we use the gaussian blur
 
 
 gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
@@ -41,11 +33,6 @@ for i in range(a):
     cv2.line(img, pt1, pt2, (0, 255, 0), 2, cv2.LINE_AA)
 cv2.imshow('img', img)
 
-edges = cv2.Canny(img,50,150,apertureSize = 3)
-cv2.imwrite('edges-50-150.jpg',edges)
-minLineLength=100
-lines = cv2.HoughLinesP(image=edges,rho=1,theta=np.pi/180, threshold=70,lines=np.array([]), minLineLength=minLineLength,maxLineGap=80)
-imgSave = img
 
 #scale_percent = 50
 # resize by 50%
