@@ -14,7 +14,7 @@ import os
 
 nline = 8 # number of lines (it's a chess board)
 ncolumn = 8 # number of columns (it's a chess board)
-img = cv2.imread('Chess.png') # we read the image
+img = cv2.imread('C:/Users/User/Pictures/Pictures/Saved Pictures/Chess.png') # we read the image
 blur = cv2.GaussianBlur(img,(5,5),0) # we use the gaussian blur
 
 
@@ -33,6 +33,16 @@ for i in range(a):
     cv2.line(img, pt1, pt2, (0, 255, 0), 2, cv2.LINE_AA)
 cv2.imshow('img', img)
 
+im = cv2.imread('C:/Users/User/Pictures/Pictures/Saved Pictures/Chess.png') # we read the image
+imgray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+ret, thresh = cv2.threshold(imgray, 127, 255, 0)
+contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+for countor in contours:
+    if cv2.contourArea(countor) > 200 :
+        cv2.drawContours(im, countor, -1, (0,255,0), 3)
+        print(cv2.contourArea(countor))
+
+cv2.imshow('img', im)
 
 #scale_percent = 50
 # resize by 50%
