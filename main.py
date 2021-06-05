@@ -1,84 +1,83 @@
 import numpy as np
 import cv2
-import sys
-import math
-import glob
-import scipy.spatial as spatial
-import scipy.cluster as cluster
-from collections import defaultdict
-from statistics import mean
-import chess
-import chess.svg
-import sys
-import os
 
-nline = 8 # number of lines (it's a chess board)
-ncolumn = 8 # number of columns (it's a chess board)
-img = cv2.imread('C:/Users/User/Pictures/Pictures/Saved Pictures/Chess.png') # we read the image
-blur = cv2.GaussianBlur(img,(5,5),0) # we use the gaussian blur
+import matplotlib.pyplot as plt
+import numpy as np
+from skimage.filters import threshold_otsu
 
 
-gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-dst = cv2.Canny(gray, 50, 200)
-lines= cv2.HoughLines(dst, 1, math.pi/180.0, 150, np.array([]), 0, 0)
-a,b,c = lines.shape
-for i in range(a):
-    rho = lines[i][0][0]
-    theta = lines[i][0][1]
-    a = math.cos(theta)
-    b = math.sin(theta)
-    x0, y0 = a*rho, b*rho
-    pt1 = (int(x0+1000*(-b)), int(y0+1000*(a)) )
-    pt2 = (int(x0-1000*(-b)), int(y0-1000*(a)) )
-    cv2.line(img, pt1, pt2, (0, 255, 0), 2, cv2.LINE_AA)
-cv2.imshow('img', img)
+img = cv2.imread('C:/Users/User/Downloads/twomove.png') # we read the image
 
-im = cv2.imread('C:/Users/User/Pictures/Pictures/Saved Pictures/Chess.png') # we read the image
-imgray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
-ret, thresh = cv2.threshold(imgray, 127, 255, 0)
-contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-for countor in contours:
-    if cv2.contourArea(countor) > 200 :
-        cv2.drawContours(im, countor, -1, (0,255,0), 3)
-        print(cv2.contourArea(countor))
+# Round to next smaller multiple of 8
+# https://www.geeksforgeeks.org/round-to-next-smaller-multiple-of-8/
+def round_down_to_next_multiple_of_8(a):
+    return a & (-8) # rounds down to the next multiple of 8 using the algorithm above.
 
-cv2.imshow('img', im)
+# Read image, and shrink to quadratic shape with width and height of
+# next smaller multiple of 8
+wh = np.min(round_down_to_next_multiple_of_8(np.array(img.shape[:2]))) # we round the size of the image to the next multiple of 8
+img = cv2.resize(img, (wh, wh))
 
-#scale_percent = 50
-# resize by 50%
-#width = int(img.shape[1] * scale_percent / 100)
-#height = int(img.shape[0] * scale_percent / 100)
-# dsize
-#dsize = (width, height)
+# we prepare the visualization output.
+out = img.copy()
+plt.figure(1, figsize=(18, 6))
+plt.subplot(1, 3, 1), plt.imshow(img)
 
-# resize image
-#output = cv2.resize(img, dsize)
-output = img
+# we blur the image.
+img = cv2.blur(img, (5, 5))
 
+# we iterate over the tiles, and count unique colors inside
+# we use the following algorithm:
+# https://stackoverflow.com/a/56606457/11089932
+wh_t = wh // 8
+count_unique_colors = np.zeros((8, 8))
+for x in np.arange(8):
+    for y in np.arange(8):
+        tile = img[y*wh_t:(y+1)*wh_t, x*wh_t:(x+1)*wh_t]
+        tile = tile[3:-3, 3:-3]
+        count_unique_colors[y, x] = np.unique(tile.reshape(-1, tile.shape[-1]), axis=0).shape[0]
 
-sigma = 0.33
-v = np.median(img) #finding something I'm not sure what
-img = cv2.medianBlur(img, 5) # we use median blur on the image
-img = cv2.GaussianBlur(img, (7, 7), 2) # we use gaussian blur on the image to make it clear.
-lower = int(max(0, (1.0 - sigma) * v)) # we find the lower threshold.
-upper = int(min(255, (1.0 + sigma) * v)) # we find the higher threshold.
-img_edge = cv2.Canny(output, lower, upper) # we use the canny function to edge canny the image.
-cv2.imshow('im cool', img_edge) # we show the image.
+# we mask empty squares using cutoff from Otsu's method
+# reference: https://en.wikipedia.org/wiki/Otsu%27s_method
+val = threshold_otsu(count_unique_colors)
+mask = count_unique_colors < val
+chessBoard = np.array([["R", "N", "B", "K", "Q", "B", "N", "R"],
+                      ["P", "P", "P", "P", "P", "P", "P", "P"],
+                      ["", "", "", "", "", "", "", ""],
+                      ["", "", "", "", "", "", "", ""],
+                      ["", "", "", "", "", "", "", ""],
+                      ["", "", "", "", "", "", "", ""],
+                      ["p", "p", "p", "p", "p", "p", "p", "p"],
+                      ["r", "n", "b", "q", "k", "b", "n", "r"]])
 
+updatedChess = np.zeros((8,8))
+# we put more visualization output, although we can already find the empty tiles.
+for x in np.arange(8):
+    for y in np.arange(8):
+        if mask[y, x]:
+            cv2.rectangle(out, (x*wh_t+3, y*wh_t+3),
+                          ((x+1)*wh_t-3, (y+1)*wh_t-3), (255, 0, 0), 2) # just for visuals, it surrounds the square.
+            updatedChess[y, x] = 1
 
-# resize by 50%
-#width = int(img.shape[1] * scale_percent / 100)
-#height = int(img.shape[0] * scale_percent / 100)
+        print(updatedChess[y,x])
 
-# dsize
-#dsize = (width, height)
+plt.subplot(1, 3, 2), plt.imshow(count_unique_colors, cmap='gray')
+plt.subplot(1, 3, 3), plt.imshow(out)
+plt.tight_layout(), plt.show()
+# now, we have an array called updatedChess which holds the chess board.
+# all we need to do now is compare the two arrays, and see which piece moved.
+for x in np.arange(8):
+    for y in np.arange(8):
+        if updatedChess[x, y] == 1 and chessBoard[x, y] != "":
+            pieceThatMoved = chessBoard[x, y]
+            print(chessBoard[x,y] + " Moved")
+            chessBoard[x, y] = ""
 
-# resize image
-#output = cv2.resize(img, dsize)
-
-#use it if you ever find out how to make it work better
-#imgSave = cv2.drawChessboardCorners(imgSave, (7, 7), corners, ret)
-
+for x in np.arange(8):
+    for y in np.arange(8):
+        if updatedChess[x, y] == 0 and chessBoard[x, y] == "":
+            print("To Position: " + str(x) + " " + str(y))
+            chessBoard[x,y] = pieceThatMoved
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
