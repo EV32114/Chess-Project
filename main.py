@@ -4,14 +4,44 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 from skimage.filters import threshold_otsu
+# we create the before-change chessboard.
+chessBoard = np.array([["R", "N", "B", "K", "Q", "B", "N", "R"],
+                      ["P", "P", "P", "P", "P", "P", "P", "P"],
+                      ["", "", "", "", "", "", "", ""],
+                      ["", "", "", "", "", "", "", ""],
+                      ["", "", "", "", "", "", "", ""],
+                      ["", "", "", "", "", "", "", ""],
+                      ["p", "p", "p", "p", "p", "p", "p", "p"],
+                      ["r", "n", "b", "q", "k", "b", "n", "r"]])
 
+# vid = cv2.VideoCapture(0)
+#
+# while True:
+#     # Capture the video frame
+#     # by frame
+#     ret, frame = vid.read()
+#
+#     # Display the resulting frame
+#     cv2.imshow('frame', frame)
+#
+#     # the 'q' button is set as the
+#     # quitting button you may use any
+#     # desired button of your choice
+#     if cv2.waitKey(1) & 0xFF == ord('q'):
+#         break
 
-img = cv2.imread('C:/Users/User/Downloads/twomove.png') # we read the image
+img = cv2.imread('C:/Users/User/Downloads/onemove.png') # we read the image
 
 # Round to next smaller multiple of 8
 # https://www.geeksforgeeks.org/round-to-next-smaller-multiple-of-8/
 def round_down_to_next_multiple_of_8(a):
     return a & (-8) # rounds down to the next multiple of 8 using the algorithm above.
+
+# we convert the numbers to a proper chess position
+def convert(x, y):
+    strY = chr(97 + y)
+    returnStr = strY + str(8-x)
+    return returnStr
 
 # Read image, and shrink to quadratic shape with width and height of
 # next smaller multiple of 8
@@ -41,14 +71,7 @@ for x in np.arange(8):
 # reference: https://en.wikipedia.org/wiki/Otsu%27s_method
 val = threshold_otsu(count_unique_colors)
 mask = count_unique_colors < val
-chessBoard = np.array([["R", "N", "B", "K", "Q", "B", "N", "R"],
-                      ["P", "P", "P", "P", "P", "P", "P", "P"],
-                      ["", "", "", "", "", "", "", ""],
-                      ["", "", "", "", "", "", "", ""],
-                      ["", "", "", "", "", "", "", ""],
-                      ["", "", "", "", "", "", "", ""],
-                      ["p", "p", "p", "p", "p", "p", "p", "p"],
-                      ["r", "n", "b", "q", "k", "b", "n", "r"]])
+
 
 updatedChess = np.zeros((8,8))
 # we put more visualization output, although we can already find the empty tiles.
@@ -70,14 +93,15 @@ for x in np.arange(8):
     for y in np.arange(8):
         if updatedChess[x, y] == 1 and chessBoard[x, y] != "":
             pieceThatMoved = chessBoard[x, y]
-            print(chessBoard[x,y] + " Moved")
+            string = chessBoard[x,y] + " Moved from " + convert(x, y)
             chessBoard[x, y] = ""
 
 for x in np.arange(8):
     for y in np.arange(8):
         if updatedChess[x, y] == 0 and chessBoard[x, y] == "":
-            print("To Position: " + str(x) + " " + str(y))
+            string += " to position " + convert(x, y)
             chessBoard[x,y] = pieceThatMoved
 
+print(string)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
