@@ -50,10 +50,11 @@ def poggers(frame):
     # from teh image and display it
     if len(refPt) == 2:
         roi = clone[refPt[0][1]:refPt[1][1], refPt[0][0]:refPt[1][0]]
-        return roi
-        cv2.imshow("ROI", roi)
-        cv2.waitKey(0)
-    # close all open windows
-    cv2.destroyAllWindows()
+        cv2.destroyAllWindows()
+        return refPt
 
+
+    # close all open windows
+
+cv2.destroyAllWindows()
 
