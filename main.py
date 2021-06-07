@@ -20,17 +20,17 @@ vid = cv2.VideoCapture(0)
 ret, frame = vid.read()
 clone = frame.copy()
 refPt = crop.poggers(frame)
-roi = clone[177:401, 140: 485]
-cv2.imshow('frame', frame)
 print(refPt)
 # Display the resulting frame
-
-
 vid = cv2.VideoCapture(0)
+
 while True:
     ret, frame = vid.read()
     frame = frame[refPt[0][1]:refPt[1][1], refPt[0][0]:refPt[1][0]]
     cv2.imshow('frame', frame)
+    key = cv2.waitKey(1) & 0xFF
+    if key == ord('q'):
+        break
 
 
 scale_percent = 20  # percent of original size
