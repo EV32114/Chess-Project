@@ -1,10 +1,10 @@
 import numpy as np
 import cv2
-
 import matplotlib.pyplot as plt
 import numpy as np
 from skimage.filters import threshold_otsu
 # we create the before-change chessboard.
+import crop
 chessBoard = np.array([["R", "N", "B", "K", "Q", "B", "N", "R"],
                       ["P", "P", "P", "P", "P", "P", "P", "P"],
                       ["", "", "", "", "", "", "", ""],
@@ -14,24 +14,35 @@ chessBoard = np.array([["R", "N", "B", "K", "Q", "B", "N", "R"],
                       ["p", "p", "p", "p", "p", "p", "p", "p"],
                       ["r", "n", "b", "q", "k", "b", "n", "r"]])
 
-# vid = cv2.VideoCapture(0)
-#
-# while True:
-#     # Capture the video frame
-#     # by frame
-#     ret, frame = vid.read()
-#
-#     # Display the resulting frame
-#     cv2.imshow('frame', frame)
-#
-#     # the 'q' button is set as the
-#     # quitting button you may use any
-#     # desired button of your choice
-#     if cv2.waitKey(1) & 0xFF == ord('q'):
-#         break
+vid = cv2.VideoCapture(0)
 
-img = cv2.imread('C:/Users/User/Downloads/onemove.png') # we read the image
+while True:
+    # Capture the video frame
+    # by frame
+    ret, frame = vid.read()
 
+    # Display the resulting frame
+    cv2.imshow('frame', frame)
+
+     # the 'q' button is set as the
+     # quitting button you may use any
+     # desired button of your choice
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+frame = cv2.imread('yes.jpg')
+scale_percent = 20  # percent of original size
+width = int(frame.shape[1] * scale_percent / 100)
+height = int(frame.shape[0] * scale_percent / 100)
+dim = (width, height)
+
+# resize image
+frame = cv2.resize(frame, dim, interpolation=cv2.INTER_AREA)
+img = crop.poggers(frame)
+# img = cv2.imread('yes.jpg') # we read the image
+
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+ret, corners = cv2.findChessboardCorners(gray, (8,8), cv2.CALIB_CB_ADAPTIVE_THRESH)
+print(ret)
 # Round to next smaller multiple of 8
 # https://www.geeksforgeeks.org/round-to-next-smaller-multiple-of-8/
 def round_down_to_next_multiple_of_8(a):
@@ -103,5 +114,8 @@ for x in np.arange(8):
             chessBoard[x,y] = pieceThatMoved
 
 print(string)
+
 cv2.waitKey(0)
 cv2.destroyAllWindows()
+
+
