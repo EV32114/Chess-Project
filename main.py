@@ -174,11 +174,12 @@ def printMove(oldCenterArray, newCenterArray):
                     chessBoard[x, y] = pieceThatMoved
                     print(string)
                     return
-
-    for i, j in zip(oldCenterArray, newCenterArray):
-        for oldPos, newPos in zip(i, j):
-            if oldPos[0] not in range(newPos[0] - 50, newPos[0] + 50):
-                print('ATE')
+    else:
+        for i, j in zip(oldCenterArray, newCenterArray):
+            for oldPos, newPos in zip(i, j):
+                if oldPos[0] not in range(newPos[0] - 50, newPos[0] + 50):
+                    print('ATE')
+                    break
 
     print(string)
 
