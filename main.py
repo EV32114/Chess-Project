@@ -16,7 +16,7 @@ chessBoard = np.array([["R", "N", "B", "K", "Q", "B", "N", "R"],
 # array converying the empty spaces.
 updatedChess = np.zeros((8, 8))
 
-vid = cv2.VideoCapture(r'F:\Valorant_2021.06.12_-_12.20.20.01.mp4')
+vid = cv2.VideoCapture(r'Valorant_2021.06.12_-_12.20.20.01.mp4')
 
 # take a frame
 ret, frame = vid.read()
@@ -166,15 +166,15 @@ def printMove(oldCenterArray, newCenterArray):
                 chessBoard[x, y] = ""
                 break
 
-    if pieceThatMoved != 0:
-        for x in np.arange(8):
-            for y in np.arange(8):
-                if updatedChess[x, y] == 0 and chessBoard[x, y] == "":
-                    string += " to position " + convert(x, y)
-                    chessBoard[x, y] = pieceThatMoved
-                    print(string)
-                    return
-    else:
+    for x in np.arange(8):
+        for y in np.arange(8):
+            if updatedChess[x, y] == 0 and chessBoard[x, y] == "":
+                string += " to position " + convert(x, y)
+                chessBoard[x, y] = pieceThatMoved
+                print(string)
+                return
+
+    if len(string) < 20:
         for i, j in zip(oldCenterArray, newCenterArray):
             for oldPos, newPos in zip(i, j):
                 if oldPos[0] not in range(newPos[0] - 50, newPos[0] + 50):
@@ -218,19 +218,19 @@ def test():
 
 
 def main():
-    vid = cv2.VideoCapture(r'F:\Valorant_2021.06.12_-_12.20.20.01.mp4')  # we turn on the camera.
+    vid = cv2.VideoCapture(r'Valorant_2021.06.12_-_12.20.20.01.mp4')  # we turn on the camera.
     centerTaken = False
     while True:
         # this while true will eventually have a breakpoint, it will break when
         # the game is over.
         ret, frame = vid.read()
-        if not centerTaken:
-            firstCenterArray = getCenter(frame)
-            centerTaken = True
         # we have previously discovered our reference points, these are the points 
         # we need to crop our image to in order to find the chessboard and get the best
         # picture of it. As so, in this line we crop the image to our desired area.
         frame = frame[refPt[0][1]:refPt[1][1], refPt[0][0]:refPt[1][0]]
+        if not centerTaken:
+            firstCenterArray = getCenter(frame)
+            centerTaken = True
         # we resize and blur the image.
         frame = resizeImage(frame)
         frame = blurImg(frame)
@@ -259,7 +259,6 @@ def main():
             # we show the frame we got.
             cv2.imshow('frame', frame)
             # we print the final move.
-
             printMove(firstCenterArray, centerArray)
             firstCenterArray = centerArray
 
