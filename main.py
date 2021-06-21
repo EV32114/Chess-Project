@@ -5,7 +5,7 @@ from skimage.filters import threshold_otsu
 import crop
 
 # default chess board (before changes).
-chessBoard = np.array([["R", "N", "B", "K", "Q", "B", "N", "R"],
+chessBoard = np.array([["R", "N", "B", "Q", "K", "B", "N", "R"],
                        ["P", "P", "P", "P", "P", "P", "P", "P"],
                        ["", "", "", "", "", "", "", ""],
                        ["", "", "", "", "", "", "", ""],
@@ -17,7 +17,7 @@ chessBoard = np.array([["R", "N", "B", "K", "Q", "B", "N", "R"],
 updatedChess = np.zeros((8, 8))
 
 vid = cv2.VideoCapture(r'Valorant_2021.06.12_-_12.20.20.01.mp4')
-
+#vid = cv2.VideoCapture(0)
 # take a frame
 ret, frame = vid.read()
 clone = frame.copy()
@@ -83,6 +83,7 @@ def getUniqueColors(img):
     return count_unique_colors, wh_t
 
 
+# we iterate over the tiles, and get the center pixel of each tile.
 def getCenter(img):
     wh = np.min(round_down_to_next_multiple_of_8(
         np.array(img.shape[:2])))  # we round the size of the image to the next multiple of 8
@@ -96,17 +97,6 @@ def getCenter(img):
             tile = img[y * wh_t:(y + 1) * wh_t, x * wh_t:(x + 1) * wh_t]
             tile = tile[3:-3, 3:-3]
             centerPixel[y][x] = tile[int(tile.shape[0] / 2), int(tile.shape[1] / 2)]
-            # average = tile.mean(axis=0).mean(axis=0)
-            # pixels = np.float32(tile.reshape(-1, 3))
-            # n_colors = 5
-            # criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 200, .1)
-            # flags = cv2.KMEANS_RANDOM_CENTERS
-            # _, labels, palette = cv2.kmeans(pixels, n_colors, None, criteria, 10, flags)
-            # _, counts = np.unique(labels, return_counts=True)
-            # dominant = palette[np.argmax(counts)]
-            # Threshold the HSV image to get only blue colors
-            # define range of a color in HSV
-            # print(str(y) + " " + str(x) + " " + str(dominant) + str(average))
     return centerPixel
 
 
@@ -121,8 +111,32 @@ def threshAndMask(count_unique_colors):
     mask = count_unique_colors < val
     return mask
 
+def stabilizeMask(mask):
+    board1 = getStatus()
+    board2 = getStatus()
+    board3 = getStatus()
+    board4 = getStatus()
+    board5 = getStatus()
+    board6 = getStatus()
+    board7 = getStatus()
+    board8 = getStatus()
+    board9 = getStatus()
+    board10 = getStatus()
+    checkBoards = [board1, board2, board3, board4, board5, board6, board7, board8, board9, board10]
 
+    for x in np.arange(8):
+        for y in np.arange(8):
+            if not mask[y,x]:
+                for board in checkBoards:
+                    for board1 in checkBoards:
+                        if board[y,x] != board1[y,x]:
+                            mask[y,x] = not mask[y,x]
+    return mask
+
+            
+# we mark every empty square.
 def mark(out, mask, wh_t):
+    mask = stabilizeMask(mask)
     for x in np.arange(8):
         for y in np.arange(8):
             if mask[y, x]:
@@ -130,7 +144,29 @@ def mark(out, mask, wh_t):
                               ((x + 1) * wh_t - 3, (y + 1) * wh_t - 3), (255, 0, 0),
                               2)  # just for visuals, it surrounds the square.
 
+def getStatus():
+    ret, frame = vid.read()
+    # we have previously discovered our reference points, these are the points 
+    # we need to crop our image to in order to find the chessboard and get the best
+    # picture of it. As so, in this line we crop the image to our desired area.
+    frame = frame[refPt[0][1]:refPt[1][1], refPt[0][0]:refPt[1][0]]
+    # we resize and blur the image.
+    frame = resizeImage(frame)
+    frame = blurImg(frame)
+    # we get an array, or, more accurately an image representation of the unique
+    # colors in the frame. 
+    count_unique_colors, wh_t = getUniqueColors(frame)
+    # we threshold using Otsu's method and mask the recieved count of unique colors.
+    mask = threshAndMask(count_unique_colors)
+    currentBoard = np.zeros((8, 8))
+    for x in np.arange(8):
+        for y in np.arange(8):
+            if mask[y,x]:
+                currentBoard[y,x] = 1
+    return currentBoard
 
+                
+# we update the board and mark every empty square.
 def updateBoardAndMark(out, mask, wh_t):
     # we put more visualization output, although we can already find the empty tiles.
     # however, in this function we also update our chess board using 0`s and 1`s where 
@@ -142,6 +178,8 @@ def updateBoardAndMark(out, mask, wh_t):
                               ((x + 1) * wh_t - 3, (y + 1) * wh_t - 3), (255, 0, 0),
                               2)  # just for visuals, it surrounds the square.
                 updatedChess[y, x] = 1
+            else:
+                updatedChess[y,x] = 0
 
             print(updatedChess[y, x])
     return out
@@ -174,12 +212,13 @@ def printMove(oldCenterArray, newCenterArray):
                 print(string)
                 return
 
-    if len(string) < 20:
-        for i, j in zip(oldCenterArray, newCenterArray):
-            for oldPos, newPos in zip(i, j):
+    if 20 > len(string) > 5:
+        for i, j in range(zip(len(oldCenterArray), len(newCenterArray))):
+            for oldPos, newPos in zip(oldCenterArray[i], newCenterArray[j]):
                 if oldPos[0] not in range(newPos[0] - 50, newPos[0] + 50):
-                    print('ATE')
-                    break
+                    string += " and ate " + chessBoard[i][j] + " at position " + convert(i,j)
+                    print(string)
+
 
     print(string)
 
@@ -218,7 +257,9 @@ def test():
 
 
 def main():
-    vid = cv2.VideoCapture(r'Valorant_2021.06.12_-_12.20.20.01.mp4')  # we turn on the camera.
+    vid = cv2.VideoCapture(r'Valorant_2021.06.12_-_12.20.20.01.mp4')
+    #vid = cv2.VideoCapture(0) # we turn on the camera.
+    vid.set(cv2.CAP_PROP_CONVERT_RGB, 1)
     centerTaken = False
     while True:
         # this while true will eventually have a breakpoint, it will break when
@@ -239,6 +280,7 @@ def main():
         count_unique_colors, wh_t = getUniqueColors(frame)
         # we threshold using Otsu's method and mask the recieved count of unique colors.
         mask = threshAndMask(count_unique_colors)
+
         mark(frame, mask, wh_t)
         cv2.imshow('frame', frame)
         key = cv2.waitKey(1) & 0xFF
@@ -255,7 +297,7 @@ def main():
             mask = threshAndMask(count_unique_colors)
             # and we update the board and mark the free spaces.
             centerArray = getCenter(frame)
-            frame = updateBoardAndMark(frame, mask, wh_t)
+            updateBoardAndMark(frame, mask, wh_t)
             # we show the frame we got.
             cv2.imshow('frame', frame)
             # we print the final move.
