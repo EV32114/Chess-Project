@@ -18,6 +18,7 @@ updatedChess = np.zeros((8, 8))
 
 vid = cv2.VideoCapture(r'Valorant_2021.06.12_-_12.20.20.01.mp4')
 #vid = cv2.VideoCapture(0)
+#vid = cv2.VideoCapture(0)
 # take a frame
 ret, frame = vid.read()
 clone = frame.copy()
@@ -111,32 +112,19 @@ def threshAndMask(count_unique_colors):
     mask = count_unique_colors < val
     return mask
 
-def stabilizeMask(mask):
-    board1 = getStatus()
-    board2 = getStatus()
-    board3 = getStatus()
-    board4 = getStatus()
-    board5 = getStatus()
-    board6 = getStatus()
-    board7 = getStatus()
-    board8 = getStatus()
-    board9 = getStatus()
-    board10 = getStatus()
-    checkBoards = [board1, board2, board3, board4, board5, board6, board7, board8, board9, board10]
-
-    for x in np.arange(8):
-        for y in np.arange(8):
-            if not mask[y,x]:
-                for board in checkBoards:
-                    for board1 in checkBoards:
-                        if board[y,x] != board1[y,x]:
-                            mask[y,x] = not mask[y,x]
     return mask
 
             
 # we mark every empty square.
+def markWithBoard(out, board, wh_t):
+    for x in np.arange(8):
+        for y in np.arange(8):
+            if board[y,x] == 1:
+                cv2.rectangle(out, (x * wh_t + 3, y * wh_t + 3),
+                              ((x + 1) * wh_t - 3, (y + 1) * wh_t - 3), (255, 0, 0),
+                              2)  # just for visuals, it surrounds the square.
+# we mark every empty square.
 def mark(out, mask, wh_t):
-    mask = stabilizeMask(mask)
     for x in np.arange(8):
         for y in np.arange(8):
             if mask[y, x]:
@@ -144,28 +132,33 @@ def mark(out, mask, wh_t):
                               ((x + 1) * wh_t - 3, (y + 1) * wh_t - 3), (255, 0, 0),
                               2)  # just for visuals, it surrounds the square.
 
-def getStatus():
-    ret, frame = vid.read()
-    # we have previously discovered our reference points, these are the points 
-    # we need to crop our image to in order to find the chessboard and get the best
-    # picture of it. As so, in this line we crop the image to our desired area.
-    frame = frame[refPt[0][1]:refPt[1][1], refPt[0][0]:refPt[1][0]]
-    # we resize and blur the image.
-    frame = resizeImage(frame)
-    frame = blurImg(frame)
-    # we get an array, or, more accurately an image representation of the unique
-    # colors in the frame. 
-    count_unique_colors, wh_t = getUniqueColors(frame)
-    # we threshold using Otsu's method and mask the recieved count of unique colors.
-    mask = threshAndMask(count_unique_colors)
-    currentBoard = np.zeros((8, 8))
+def updatedChessboard(prevBoards):
+    global updatedChess
     for x in np.arange(8):
         for y in np.arange(8):
-            if mask[y,x]:
-                currentBoard[y,x] = 1
-    return currentBoard
+            for board in prevBoards:
+                for board2 in prevBoards:
+                    if board[y,x] != board2[y,x]:
+                        updatedChess[y,x] = 1
+                    else:
+                        if board[y,x] == 1:
+                            board[y,x] = 1
+                        board[y,x] = 0
 
-                
+def getUpdatedBoard(mask, wh_t):
+    # we put more visualization output, although we can already find the empty tiles.
+    # however, in this function we also update our chess board using 0`s and 1`s where 
+    # 1 signifies an empty space while 0 signifies a space that's taken.
+    updatedBoard = np.zeros((8,8))
+    for x in np.arange(8):
+        for y in np.arange(8):
+            if mask[y, x]:
+                updatedBoard[y, x] = 1
+            else:
+                updatedBoard[y,x] = 0
+    return updatedBoard
+
+
 # we update the board and mark every empty square.
 def updateBoardAndMark(out, mask, wh_t):
     # we put more visualization output, although we can already find the empty tiles.
@@ -222,6 +215,19 @@ def printMove(oldCenterArray, newCenterArray):
 
     print(string)
 
+def stabilizeMask(prevMasks):
+    mask = np.zeros((8,8), dtype=bool)
+    countOfDiffer = np.zeros((8,8))
+    for mask1 in prevMasks:
+        for mask2 in prevMasks:
+            for x in np.arange(8):
+                for y in np.arange(8):
+                    if(mask1[x,y] == True and mask2[x,y] == False or mask1[x,y] == False and mask2[x,y] == True or mask2[x,y] == True and mask1[x,y] == True):
+                        mask[x,y] = True
+                    else:
+                        if mask[x,y] != True:
+                            mask[x,y] = False
+    return mask
 
 def test():
     # this while true will eventually have a breakpoint, it will break when
@@ -257,9 +263,11 @@ def test():
 
 
 def main():
+    prevBoard = []
     vid = cv2.VideoCapture(r'Valorant_2021.06.12_-_12.20.20.01.mp4')
     #vid = cv2.VideoCapture(0) # we turn on the camera.
     vid.set(cv2.CAP_PROP_CONVERT_RGB, 1)
+    prevMasks = []
     centerTaken = False
     while True:
         # this while true will eventually have a breakpoint, it will break when
@@ -280,11 +288,15 @@ def main():
         count_unique_colors, wh_t = getUniqueColors(frame)
         # we threshold using Otsu's method and mask the recieved count of unique colors.
         mask = threshAndMask(count_unique_colors)
-
-        mark(frame, mask, wh_t)
+        prevMasks.append(mask)
+        if len(prevMasks) == 20:
+            mask = stabilizeMask(prevMasks)
+            prevMasks.pop()
+        mark(out= frame, mask= mask, wh_t= wh_t)
         cv2.imshow('frame', frame)
         key = cv2.waitKey(1) & 0xFF
         if key == ord('q'):
+            prevMasks = []
             # this key click means the player had played his turn and we can scan the
             # board. Therefore, we will now scan the board again, find the differences
             # between the array of the start of the turn, and the aftermath, and display
