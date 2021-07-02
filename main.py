@@ -13,44 +13,40 @@ chessBoard = np.array([["R", "N", "B", "Q", "K", "B", "N", "R"],
                        ["", "", "", "", "", "", "", ""],
                        ["p", "p", "p", "p", "p", "p", "p", "p"],
                        ["r", "n", "b", "q", "k", "b", "n", "r"]])
-# array converying the empty spaces.
+
+# array conveying the empty spaces.
 updatedChess = np.zeros((8, 8))
 
 vid = cv2.VideoCapture(r'Valorant_2021.06.12_-_12.20.20.01.mp4')
-#vid = cv2.VideoCapture(0)
-#vid = cv2.VideoCapture(0)
+
 # take a frame
 ret, frame = vid.read()
 clone = frame.copy()
 refPt = crop.poggers(frame)
 
-
-# gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-# gray = np.float32(gray)
-# dst = cv2.cornerHarris(gray, 2, 3, 0.04)
-# result is dilated for marking the corners, not important
-# dst = cv2.dilate(dst, None)
-# # Threshold for an optimal value, it may vary depending on the image.
-# frame[dst > 0.01 * dst.max()] = [0, 0, 255]
-# cv2.imshow('dst', frame)
-# img = cv2.imread('yes.jpg') # we read the image
-
 # Round to next smaller multiple of 8
 # https://www.geeksforgeeks.org/round-to-next-smaller-multiple-of-8/
+# Explanation: the last three bits in the binary representation of a number will be 0.
 def round_down_to_next_multiple_of_8(a):
     return a & (-8)  # rounds down to the next multiple of 8 using the algorithm above.
 
-
-# we convert the numbers to a proper chess position for printing.
 def convert(x, y):
+    '
+    we convert the numbers to a proper chess position for printing.
+    '
     strY = chr(97 + y)
     returnStr = strY + str(8 - x)
     return returnStr
 
-
-# Read image, and shrink to quadratic shape with width and height of
-# next smaller multiple of 8
 def resizeImage(img):
+    '
+    Read image, and shrink to quadratic shape with width and height of
+    next smaller multiple of 8
+    Explanation: img.shape[:2] holds the width and height of the image.
+    We make the width and height into an array and round each down to the next
+    multiple of 8. after that, we use np.min to get the minimum from the array 
+    (as the picture should hypotethically be a square).
+    '
     wh = np.min(round_down_to_next_multiple_of_8(
         np.array(img.shape[:2])))  # we round the size of the image to the next multiple of 8
     img = cv2.resize(img, (wh, wh))
@@ -63,7 +59,9 @@ def resizeImage(img):
 # plt.subplot(1, 3, 1), plt.imshow(img)
 
 def blurImg(img):
-    # we blur the image.
+    '
+    blurs the image.
+    '
     img = cv2.blur(img, (5, 5))
     return img
 
@@ -74,7 +72,7 @@ def blurImg(img):
 def getUniqueColors(img):
     wh = np.min(round_down_to_next_multiple_of_8(
         np.array(img.shape[:2])))  # we round the size of the image to the next multiple of 8
-    wh_t = wh // 8
+    wh_t = wh // 8 # we use floor division and thus find size of each tile. (wh_t x wh_t)
     count_unique_colors = np.zeros((8, 8))
     for x in np.arange(8):
         for y in np.arange(8):
@@ -83,8 +81,9 @@ def getUniqueColors(img):
             count_unique_colors[y, x] = np.unique(tile.reshape(-1, tile.shape[-1]), axis=0).shape[0]
     return count_unique_colors, wh_t
 
-
-# we iterate over the tiles, and get the center pixel of each tile.
+'
+we iterate over the tiles, and get the center pixel of each tile.
+'
 def getCenter(img):
     wh = np.min(round_down_to_next_multiple_of_8(
         np.array(img.shape[:2])))  # we round the size of the image to the next multiple of 8
@@ -112,9 +111,6 @@ def threshAndMask(count_unique_colors):
     mask = count_unique_colors < val
     return mask
 
-    return mask
-
-            
 # we mark every empty square.
 def markWithBoard(out, board, wh_t):
     for x in np.arange(8):
@@ -123,6 +119,7 @@ def markWithBoard(out, board, wh_t):
                 cv2.rectangle(out, (x * wh_t + 3, y * wh_t + 3),
                               ((x + 1) * wh_t - 3, (y + 1) * wh_t - 3), (255, 0, 0),
                               2)  # just for visuals, it surrounds the square.
+
 # we mark every empty square.
 def mark(out, mask, wh_t):
     for x in np.arange(8):
@@ -228,38 +225,6 @@ def stabilizeMask(prevMasks):
                         if mask[x,y] != True:
                             mask[x,y] = False
     return mask
-
-def test():
-    # this while true will eventually have a breakpoint, it will break when
-    # the game is over.
-    frame = cv2.imread('chess.png')
-    # Convert BGR to HSV
-    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    # refPt = crop.poggers(frame)
-    # we have previously discovered our reference points, these are the points
-    # we need to crop our image to in order to find the chessboard and get the best
-    # picture of it. As so, in this line we crop the image to our desired area.
-    # frame = frame[refPt[0][1]:refPt[1][1], refPt[0][0]:refPt[1][0]]
-    # we resize and blur the image.
-    frame = resizeImage(frame)
-    out = frame.copy()
-    plt.figure(1, figsize=(18, 6))
-    plt.subplot(1, 3, 1), plt.imshow(frame)
-    frame = blurImg(frame)
-    # we get an array, or, more accurately an image representation of the unique
-    # colors in the frame.
-    count_unique_colors, wh_t = getUniqueColors(frame)
-    centerArray = getCenter(frame)
-    plt.subplot(1, 3, 2), plt.imshow(count_unique_colors, cmap='gray')
-    plt.tight_layout(), plt.show()
-    # we threshold using Otsu's method and mask the recieved count of unique colors.
-    mask = threshAndMask(count_unique_colors)
-    mark(frame, mask, wh_t)
-    cv2.imshow('frame', frame)
-    printMove(centerArray, centerArray)
-
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
 
 
 def main():
