@@ -219,30 +219,30 @@ def printMove(oldCenterArray, newCenterArray):
                         if oldPos[0] not in range(newPos[0] - 50, newPos[0] + 50):
                             string += " and ate " + chessBoard[i][j] + " at position " + convert(i, j)
 
-
     print(string)
 
 
 def stabilizeMask(prevMasks):
-    mask = np.zeros((8,8), dtype=bool)
-    countOfDiffer = np.zeros((8,8))
+    mask = np.zeros((8, 8), dtype=bool)
+    countOfDiffer = np.zeros((8, 8))
     for mask1 in prevMasks:
         for mask2 in prevMasks:
             for x in np.arange(8):
                 for y in np.arange(8):
-                    if mask1[x,y] == True and mask2[x,y] == False or mask1[x,y] == False and mask2[x,y] == True or mask2[x,y] == True and mask1[x,y] == True:
-                        mask[x,y] = True
+                    if (mask1[x, y] and not mask2[x, y]) or (not mask1[x, y] and mask2[x, y]) or (mask2[x, y] and mask1[x, y]):
+                        mask[x, y] = True
                     else:
-                        if mask[x,y] != True:
-                            mask[x,y] = False
+                        if not mask[x, y]:
+                            mask[x, y] = False
     return mask
 
 
 def compareMasks(mask1, mask2):
-    mask = np.zeros((8,8), dtype=bool)
+    mask = np.zeros((8, 8), dtype=bool)
     for x in np.arange(8):
         for y in np.arange(8):
-            if mask1[x,y] == True and mask2[x,y] == False or mask1[x,y] == False and mask2[x,y] == True or mask2[x,y] == True and mask1[x,y] == True:
+            if mask1[x, y] == True and mask2[x, y] == False or mask1[x, y] == False and mask2[x, y] == True or mask2[
+                x, y] == True and mask1[x, y] == True:
                 mask[x][y] = True
             else:
                 if mask[x][y] != True:
@@ -289,7 +289,7 @@ def main():
         mark(out=frame, mask=mask, wh_t=wh_t)
         cv2.imshow('frame', frame)
 
-        #if stabilized:
+        # if stabilized:
         #   compareMasks(mask)
         #    mask = boardMask
         mark(out=frame, mask=mask, wh_t=wh_t)
@@ -302,7 +302,8 @@ def main():
             # board. Therefore, we will now scan the board again, find the differences
             # between the array of the start of the turn, and the aftermath, and display
             # what we found the move was.
-            while(len(prevMasks) != 5):
+            prevMasks = []
+            while (len(prevMasks) != 10):
                 ret, frame = vid.read()
                 frame = frame[refPt[0][1]:refPt[1][1], refPt[0][0]:refPt[1][0]]
                 frame = resizeImage(frame)
@@ -311,10 +312,10 @@ def main():
                 mask = threshAndMask(count_unique_colors)
                 prevMasks.append(mask)
 
-            boardMask = stabilizeMask(prevMasks)# replace with mask if needed
+            boardMask = stabilizeMask(prevMasks)  # replace with mask if needed
             # and we update the board and mark the free spaces.
             centerArray = getCenter(frame)
-            updateBoardAndMark(frame, boardMask, wh_t) # replace with mask if needed
+            updateBoardAndMark(frame, boardMask, wh_t)  # replace with mask if needed
             # we show the frame we got.
             cv2.imshow('frame', frame)
             # we print the final move.
