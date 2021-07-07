@@ -1,5 +1,5 @@
 import cv2
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import numpy as np
 from skimage.filters import threshold_otsu
 import crop
@@ -34,23 +34,23 @@ def round_down_to_next_multiple_of_8(a):
 
 
 def convert(x, y):
-    """""
+    """
     we convert the numbers to a proper chess position for printing.
-    """""
+    """
     strY = chr(97 + y)
     returnStr = strY + str(8 - x)
     return returnStr
 
 
 def resizeImage(img):
-    """""
+    """
     Read image, and shrink to quadratic shape with width and height of
     next smaller multiple of 8
     Explanation img.shape[:2] holds the width and height of the image.
     We make the width and height into an array and round each down to the next
     multiple of 8. after that, we use np.min to get the minimum from the array 
     (as the picture should hypotethically be a square).
-    """""
+    """
     wh = np.min(round_down_to_next_multiple_of_8(
         np.array(img.shape[:2])))  # we round the size of the image to the next multiple of 8
     img = cv2.resize(img, (wh, wh))
@@ -63,9 +63,9 @@ def resizeImage(img):
 # plt.subplot(1, 3, 1), plt.imshow(img)
 
 def blurImg(img):
-    """""
+    """
     blurs the image.
-    """""
+    """
     img = cv2.blur(img, (5, 5))
     return img
 
@@ -86,9 +86,7 @@ def getUniqueColors(img):
     return count_unique_colors, wh_t
 
 
-"""""
-we iterate over the tiles, and get the center pixel of each tile.
-"""""
+# we iterate over the tiles, and get the center pixel of each tile.
 
 
 def getCenter(img):
@@ -152,7 +150,7 @@ def updatedChessboard(prevBoards):
                         board[y, x] = 0
 
 
-def getUpdatedBoard(mask, wh_t):
+def getUpdatedBoard(mask):
     # we put more visualization output, although we can already find the empty tiles.
     # however, in this function we also update our chess board using 0`s and 1`s where 
     # 1 signifies an empty space while 0 signifies a space that's taken.
@@ -224,12 +222,12 @@ def printMove(oldCenterArray, newCenterArray):
 
 def stabilizeMask(prevMasks):
     mask = np.zeros((8, 8), dtype=bool)
-    countOfDiffer = np.zeros((8, 8))
     for mask1 in prevMasks:
         for mask2 in prevMasks:
             for x in np.arange(8):
                 for y in np.arange(8):
-                    if (mask1[x, y] and not mask2[x, y]) or (not mask1[x, y] and mask2[x, y]) or (mask2[x, y] and mask1[x, y]):
+                    if (mask1[x, y] and not mask2[x, y]) or (not mask1[x, y] and mask2[x, y]) or (
+                            mask2[x, y] and mask1[x, y]):
                         mask[x, y] = True
                     else:
                         if not mask[x, y]:
@@ -241,11 +239,10 @@ def compareMasks(mask1, mask2):
     mask = np.zeros((8, 8), dtype=bool)
     for x in np.arange(8):
         for y in np.arange(8):
-            if mask1[x, y] == True and mask2[x, y] == False or mask1[x, y] == False and mask2[x, y] == True or mask2[
-                x, y] == True and mask1[x, y] == True:
+            if mask1[x, y] == True and mask2[x, y] == False or mask1[x, y] == False and mask2[x, y] == True or mask2[x, y] == True and mask1[x, y] == True:
                 mask[x][y] = True
             else:
-                if mask[x][y] != True:
+                if not mask[x][y]:
                     mask[x][y] = False
     return mask
 
@@ -254,28 +251,27 @@ def main():
     global boardMask
     prevBoard = []
     stabilized = False
-    vid = cv2.VideoCapture(r'Valorant_2021.06.12_-_12.20.20.01.mp4')
+    vid_main = cv2.VideoCapture(r'Valorant_2021.06.12_-_12.20.20.01.mp4')
     # vid = cv2.VideoCapture(0) # we turn on the camera.
-    vid.set(cv2.CAP_PROP_CONVERT_RGB, 1)
+    vid_main.set(cv2.CAP_PROP_CONVERT_RGB, 1)
     prevMasks = []
     centerTaken = False
     while True:
-        # this while true will eventually have a breakpoint, it will break when
-        # the game is over.
-        ret, frame = vid.read()
+        # this while true will eventually have a breakpoint, it will break when the game is over.
+        ret, frame_main = vid_main.read()
         # we have previously discovered our reference points, these are the points 
         # we need to crop our image to in order to find the chessboard and get the best
         # picture of it. As so, in this line we crop the image to our desired area.
-        frame = frame[refPt[0][1]:refPt[1][1], refPt[0][0]:refPt[1][0]]
+        frame_main = frame_main[refPt[0][1]:refPt[1][1], refPt[0][0]:refPt[1][0]]
         if not centerTaken:
-            firstCenterArray = getCenter(frame)
+            firstCenterArray = getCenter(frame_main)
             centerTaken = True
         # we resize and blur the image.
-        frame = resizeImage(frame)
-        frame = blurImg(frame)
+        frame_main = resizeImage(frame_main)
+        frame_main = blurImg(frame_main)
         # we get an array, or, more accurately an image representation of the unique
         # colors in the frame. 
-        count_unique_colors, wh_t = getUniqueColors(frame)
+        count_unique_colors, wh_t = getUniqueColors(frame_main)
         # we threshold using Otsu's method and mask the recieved count of unique colors.
         mask = threshAndMask(count_unique_colors)
         if not stabilized:
@@ -286,14 +282,14 @@ def main():
         if stabilized:
             boardMask = compareMasks(mask, boardMask)
             mask = boardMask
-        mark(out=frame, mask=mask, wh_t=wh_t)
-        cv2.imshow('frame', frame)
+        mark(out=frame_main, mask=mask, wh_t=wh_t)
+        cv2.imshow('frame', frame_main)
 
         # if stabilized:
         #   compareMasks(mask)
         #    mask = boardMask
-        mark(out=frame, mask=mask, wh_t=wh_t)
-        cv2.imshow('frame', frame)
+        mark(out=frame_main, mask=mask, wh_t=wh_t)
+        cv2.imshow('frame', frame_main)
         key = cv2.waitKey(1) & 0xFF
         if key == ord('q'):
             prevMasks = []
@@ -303,21 +299,21 @@ def main():
             # between the array of the start of the turn, and the aftermath, and display
             # what we found the move was.
             prevMasks = []
-            while (len(prevMasks) != 10):
-                ret, frame = vid.read()
-                frame = frame[refPt[0][1]:refPt[1][1], refPt[0][0]:refPt[1][0]]
-                frame = resizeImage(frame)
-                frame = blurImg(frame)
-                count_unique_colors, wh_t = getUniqueColors(frame)
+            while len(prevMasks) != 10:
+                ret, frame_main = vid_main.read()
+                frame_main = frame_main[refPt[0][1]:refPt[1][1], refPt[0][0]:refPt[1][0]]
+                frame_main = resizeImage(frame_main)
+                frame_main = blurImg(frame_main)
+                count_unique_colors, wh_t = getUniqueColors(frame_main)
                 mask = threshAndMask(count_unique_colors)
                 prevMasks.append(mask)
 
             boardMask = stabilizeMask(prevMasks)  # replace with mask if needed
             # and we update the board and mark the free spaces.
-            centerArray = getCenter(frame)
-            updateBoardAndMark(frame, boardMask, wh_t)  # replace with mask if needed
+            centerArray = getCenter(frame_main)
+            updateBoardAndMark(frame_main, boardMask, wh_t)  # replace with mask if needed
             # we show the frame we got.
-            cv2.imshow('frame', frame)
+            cv2.imshow('frame', frame_main)
             # we print the final move.
             printMove(firstCenterArray, centerArray)
             firstCenterArray = centerArray
