@@ -1,5 +1,4 @@
 import cv2
-# import matplotlib.pyplot as plt
 import numpy as np
 from skimage.filters import threshold_otsu
 import crop
@@ -90,8 +89,8 @@ def getUniqueColors(img):
 
 
 def getCenter(img):
-    wh = np.min(round_down_to_next_multiple_of_8(
-        np.array(img.shape[:2])))  # we round the size of the image to the next multiple of 8
+    # we round the size of the image to the next multiple of 8
+    wh = np.min(round_down_to_next_multiple_of_8(np.array(img.shape[:2])))
     wh_t = wh // 8
     centerPixel = []
     for i in range(8):
@@ -259,7 +258,7 @@ def main():
     while True:
         # this while true will eventually have a breakpoint, it will break when the game is over.
         ret, frame_main = vid_main.read()
-        # we have previously discovered our reference points, these are the points 
+        # we have previously discovered our reference points, these are the points
         # we need to crop our image to in order to find the chessboard and get the best
         # picture of it. As so, in this line we crop the image to our desired area.
         frame_main = frame_main[refPt[0][1]:refPt[1][1], refPt[0][0]:refPt[1][0]]
@@ -270,7 +269,7 @@ def main():
         frame_main = resizeImage(frame_main)
         frame_main = blurImg(frame_main)
         # we get an array, or, more accurately an image representation of the unique
-        # colors in the frame. 
+        # colors in the frame.
         count_unique_colors, wh_t = getUniqueColors(frame_main)
         # we threshold using Otsu's method and mask the recieved count of unique colors.
         mask = threshAndMask(count_unique_colors)
