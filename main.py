@@ -267,6 +267,7 @@ def main():
             centerTaken = True
         # we resize and blur the image.
         frame_main = resizeImage(frame_main)
+        first_frame = frame_main  # will be used to show a good quality image.
         frame_main = blurImg(frame_main)
         # we get an array, or, more accurately an image representation of the unique
         # colors in the frame.
@@ -281,14 +282,9 @@ def main():
         if stabilized:
             boardMask = compareMasks(mask, boardMask)
             mask = boardMask
-        mark(out=frame_main, mask=mask, wh_t=wh_t)
-        cv2.imshow('frame', frame_main)
+        mark(out=first_frame, mask=mask, wh_t=wh_t)
+        cv2.imshow('frame', first_frame)
 
-        # if stabilized:
-        #   compareMasks(mask)
-        #    mask = boardMask
-        mark(out=frame_main, mask=mask, wh_t=wh_t)
-        cv2.imshow('frame', frame_main)
         key = cv2.waitKey(1) & 0xFF
         if key == ord('q'):
             prevMasks = []
