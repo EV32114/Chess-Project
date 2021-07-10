@@ -136,8 +136,6 @@ def getCenter(img):
     return centerPixel
 
 
-# we mask empty squares using cutoff from Otsu's method
-# reference: https://en.wikipedia.org/wiki/Otsu%27s_method
 def threshAndMask(count_unique_colors):
     """
     we mask empty squares using cutoff from Otsu's method
