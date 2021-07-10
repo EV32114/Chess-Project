@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 from skimage.filters import threshold_otsu
 import crop
+import socketlib
 
 boardMask = np.zeros((8, 8), dtype=bool)
 # default chess board (before changes).
@@ -17,8 +18,10 @@ chessBoard = np.array([["R", "N", "B", "Q", "K", "B", "N", "R"],
 # array conveying the empty spaces.
 updatedChess = np.zeros((8, 8))
 
-vid = cv2.VideoCapture(r'Valorant_2021.06.12_-_12.20.20.01.mp4')
-# vid = cv2.VideoCapture(0)
+sock = socketlib.connect()
+
+# vid = cv2.VideoCapture(r'Valorant_2021.06.12_-_12.20.20.01.mp4')
+vid = cv2.VideoCapture(0)
 # take a frame
 ret, frame = vid.read()
 clone = frame.copy()
@@ -187,16 +190,18 @@ def updateBoardAndMark(out, mask, wh_t):
 # now, we have an array called updatedChess which holds the chess board.
 # all we need to do now is compare the two arrays, and see which piece moved.
 
-def printMove(oldCenterArray, newCenterArray):
+def get_move(oldCenterArray, newCenterArray):
     global updatedChess
     global chessBoard
     string = ""
+    data = ""
     pieceThatMoved = 0
     for x in np.arange(8):
         for y in np.arange(8):
             if updatedChess[x, y] == 1 and chessBoard[x, y] != "":
                 pieceThatMoved = chessBoard[x, y]
                 string = chessBoard[x, y] + " Moved from " + convert(x, y)
+                data += convert(x, y)
                 chessBoard[x, y] = ""
                 break
 
@@ -205,6 +210,7 @@ def printMove(oldCenterArray, newCenterArray):
             if updatedChess[x, y] == 0 and chessBoard[x, y] == "":
                 string += " to position " + convert(x, y)
                 chessBoard[x, y] = pieceThatMoved
+                data += convert(x, y)
                 print(string)
                 return
 
@@ -217,6 +223,7 @@ def printMove(oldCenterArray, newCenterArray):
                             string += " and ate " + chessBoard[i][j] + " at position " + convert(i, j)
 
     print(string)
+    return data
 
 
 def stabilizeMask(prevMasks):
@@ -238,7 +245,8 @@ def compareMasks(mask1, mask2):
     mask = np.zeros((8, 8), dtype=bool)
     for x in np.arange(8):
         for y in np.arange(8):
-            if mask1[x, y] == True and mask2[x, y] == False or mask1[x, y] == False and mask2[x, y] == True or mask2[x, y] == True and mask1[x, y] == True:
+            if mask1[x, y] == True and mask2[x, y] == False or mask1[x, y] == False and mask2[x, y] == True or mask2[
+                x, y] == True and mask1[x, y] == True:
                 mask[x][y] = True
             else:
                 if not mask[x][y]:
@@ -246,16 +254,39 @@ def compareMasks(mask1, mask2):
     return mask
 
 
+def handle_data(data):
+    if data in [0, 2]:
+        return 0
+    if data == 1:
+        #handle_check()
+        return 2
+    if data == 8:
+        #handle_mate()
+        return 3
+    if data == 9:
+        #handle_castle()
+        return 4
+    else:
+        handle_invalid()
+        return -1
+
+
+def handle_invalid(pastPos):
+    print("Invalid move! Please make a legal move!")
+
+
 def main():
     global boardMask
     prevBoard = []
     stabilized = False
-    vid_main = cv2.VideoCapture(r'Valorant_2021.06.12_-_12.20.20.01.mp4')
-    # vid = cv2.VideoCapture(0) # we turn on the camera.
+    # vid_main = cv2.VideoCapture(r'Valorant_2021.06.12_-_12.20.20.01.mp4')
+    vid_main = cv2.VideoCapture(0)  # we turn on the camera.
     vid_main.set(cv2.CAP_PROP_CONVERT_RGB, 1)
     prevMasks = []
     centerTaken = False
     while True:  # this while true will eventually have a breakpoint, it will break when the game is over.
+        global updatedChess
+
         ret_main, frame_main = vid_main.read()
         # we have previously discovered our reference points, these are the points
         # we need to crop our image to in order to find the chessboard and get the best
@@ -279,7 +310,7 @@ def main():
                 boardMask = stabilizeMask(prevMasks)
                 stabilized = not stabilized
         if stabilized:
-            boardMask = compareMasks(mask, boardMask)
+            # boardMask = compareMasks(mask, boardMask)
             mask = boardMask
         mark(out=first_frame, mask=mask, wh_t=wh_t)
         cv2.imshow('frame', first_frame)
@@ -293,6 +324,7 @@ def main():
             # between the array of the start of the turn, and the aftermath, and display
             # what we found the move was.
             prevMasks = []
+            backup_mask = boardMask #
             while len(prevMasks) != 10:
                 ret_main, frame_main = vid_main.read()
                 frame_main = frame_main[refPt[0][1]:refPt[1][1], refPt[0][0]:refPt[1][0]]
@@ -305,11 +337,20 @@ def main():
             boardMask = stabilizeMask(prevMasks)  # replace with mask if needed
             # and we update the board and mark the free spaces.
             centerArray = getCenter(frame_main)
+            backup_board = updatedChess #
+            backup_frame = frame_main #
             updateBoardAndMark(frame_main, boardMask, wh_t)  # replace with mask if needed
+            data = get_move(firstCenterArray, centerArray) #
+            socketlib.send_data(sock, data) #
+            recv = socketlib.recv_data(sock) #
+            flag = handle_data(recv) #
+            if flag == -1: #
+                updatedChess = backup_board #
+                frame_main = backup_frame #
+                updateBoardAndMark(frame_main, backup_mask, wh_t) #
             # we show the frame we got.
             cv2.imshow('frame', frame_main)
             # we print the final move.
-            printMove(firstCenterArray, centerArray)
             firstCenterArray = centerArray
 
     cv2.waitKey(0)
