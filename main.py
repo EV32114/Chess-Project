@@ -255,9 +255,8 @@ def main():
     vid_main.set(cv2.CAP_PROP_CONVERT_RGB, 1)
     prevMasks = []
     centerTaken = False
-    while True:
-        # this while true will eventually have a breakpoint, it will break when the game is over.
-        ret, frame_main = vid_main.read()
+    while True:  # this while true will eventually have a breakpoint, it will break when the game is over.
+        ret_main, frame_main = vid_main.read()
         # we have previously discovered our reference points, these are the points
         # we need to crop our image to in order to find the chessboard and get the best
         # picture of it. As so, in this line we crop the image to our desired area.
@@ -295,7 +294,7 @@ def main():
             # what we found the move was.
             prevMasks = []
             while len(prevMasks) != 10:
-                ret, frame_main = vid_main.read()
+                ret_main, frame_main = vid_main.read()
                 frame_main = frame_main[refPt[0][1]:refPt[1][1], refPt[0][0]:refPt[1][0]]
                 frame_main = resizeImage(frame_main)
                 frame_main = blurImg(frame_main)
