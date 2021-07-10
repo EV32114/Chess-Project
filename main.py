@@ -4,8 +4,14 @@ from skimage.filters import threshold_otsu
 import crop
 import socketlib
 
+"""
+the mask of the board.
+"""
 boardMask = np.zeros((8, 8), dtype=bool)
-# default chess board (before changes).
+
+"""
+default chess board (before changes).
+"""
 chessBoard = np.array([["R", "N", "B", "Q", "K", "B", "N", "R"],
                        ["P", "P", "P", "P", "P", "P", "P", "P"],
                        ["", "", "", "", "", "", "", ""],
@@ -15,11 +21,20 @@ chessBoard = np.array([["R", "N", "B", "Q", "K", "B", "N", "R"],
                        ["p", "p", "p", "p", "p", "p", "p", "p"],
                        ["r", "n", "b", "q", "k", "b", "n", "r"]])
 
-# array conveying the empty spaces.
+"""
+array consisting of 0's for now, will later be use to hold
+the current chess board.
+"""
 updatedChess = np.zeros((8, 8))
 
+"""
+the socket used to communicate with the chess program.
+"""
 sock = socketlib.connect()
 
+"""
+cropping the image to the desired frame.
+"""
 # vid = cv2.VideoCapture(r'Valorant_2021.06.12_-_12.20.20.01.mp4')
 vid = cv2.VideoCapture(0)
 # take a frame
@@ -28,16 +43,23 @@ clone = frame.copy()
 refPt = crop.poggers(frame)
 
 
-# Round to next smaller multiple of 8
-# https://www.geeksforgeeks.org/round-to-next-smaller-multiple-of-8/
-# Explanation: the last three bits in the binary representation of a number will be 0.
 def round_down_to_next_multiple_of_8(a):
+    """
+    Round to next smaller multiple of 8
+    https://www.geeksforgeeks.org/round-to-next-smaller-multiple-of-8/
+    Explanation: the last three bits in the binary representation of a number will be 0.
+    :param a: the number we round down.
+    :return: the result.
+    """
     return a & (-8)  # rounds down to the next multiple of 8 using the algorithm above.
 
 
 def convert(x, y):
     """
     we convert the numbers to a proper chess position for printing.
+    :param x: the file it is in.
+    :param y: the rank it is in.
+    :return: the string consisting of the position.
     """
     strY = chr(97 + y)
     returnStr = strY + str(8 - x)
@@ -47,14 +69,15 @@ def convert(x, y):
 def resizeImage(img):
     """
     Read image, and shrink to quadratic shape with width and height of
-    next smaller multiple of 8
+    next smaller multiple of 8.
     Explanation img.shape[:2] holds the width and height of the image.
     We make the width and height into an array and round each down to the next
     multiple of 8. after that, we use np.min to get the minimum from the array 
     (as the picture should hypotethically be a square).
+    :param img: the image we resize.
+    :return: the resized image.
     """
-    wh = np.min(round_down_to_next_multiple_of_8(
-        np.array(img.shape[:2])))  # we round the size of the image to the next multiple of 8
+    wh = np.min(round_down_to_next_multiple_of_8(np.array(img.shape[:2])))
     img = cv2.resize(img, (wh, wh))
     return img
 
@@ -67,15 +90,21 @@ def resizeImage(img):
 def blurImg(img):
     """
     blurs the image.
+    :param img: the image we blur.
+    :return: the blurred image.
     """
     img = cv2.blur(img, (5, 5))
     return img
 
 
-# we iterate over the tiles, and count unique colors inside
-# we use the following algorithm:
-# https://stackoverflow.com/a/56606457/11089932
 def getUniqueColors(img):
+    """
+    we iterate over the tiles, and count the unique colors inside each tile.
+    we use the following algorithm:
+    https://stackoverflow.com/a/56606457/11089932
+    :param img: the image we want to take the colors from.
+    :return: an array consisting of the unique colors of each tiles, and the size of each tile.
+    """
     wh = np.min(round_down_to_next_multiple_of_8(
         np.array(img.shape[:2])))  # we round the size of the image to the next multiple of 8
     wh_t = wh // 8  # we use floor division and thus find size of each tile. (wh_t x wh_t)
@@ -88,13 +117,14 @@ def getUniqueColors(img):
     return count_unique_colors, wh_t
 
 
-# we iterate over the tiles, and get the center pixel of each tile.
-
-
 def getCenter(img):
-    # we round the size of the image to the next multiple of 8
-    wh = np.min(round_down_to_next_multiple_of_8(np.array(img.shape[:2])))
-    wh_t = wh // 8
+    """
+    We make an array consisting of the center pixels of each tile.
+    :param img: the image we want to take the pixels from.
+    :return: the array.
+    """
+    wh = np.min(round_down_to_next_multiple_of_8(np.array(img.shape[:2])))  # we find the size of the board.
+    wh_t = wh // 8  # we find the size of each tile.
     centerPixel = []
     for i in range(8):
         centerPixel.append([0, 0, 0, 0, 0, 0, 0, 0])
@@ -109,27 +139,29 @@ def getCenter(img):
 # we mask empty squares using cutoff from Otsu's method
 # reference: https://en.wikipedia.org/wiki/Otsu%27s_method
 def threshAndMask(count_unique_colors):
-    # we can decrease the val to get more accurate results, however, 
-    # this can only work granted we use pieces that don't match the dark board.
-    # therefore, we should most likely refrain from using this unless testing and seeing
-    # reliability.
-    val = threshold_otsu(count_unique_colors)
+    """
+    we mask empty squares using cutoff from Otsu's method
+    reference: https://en.wikipedia.org/wiki/Otsu%27s_method
+    we can decrease the val to get more accurate results, however,
+    this can only work granted we use pieces that don't match the dark board.
+    therefore, we should most likely refrain from using this unless testing and seeing
+    reliability.
+    :param count_unique_colors: an array consisting of the unique color of each tile.
+    :return: the mask of the frame.
+    """
+    val = threshold_otsu(count_unique_colors)  # a value used to distinguish between the foreground and the background.
     mask = count_unique_colors < val
     return mask
 
 
-# we mark every empty square.
-def markWithBoard(out, board, wh_t):
-    for x in np.arange(8):
-        for y in np.arange(8):
-            if board[y, x] == 1:
-                cv2.rectangle(out, (x * wh_t + 3, y * wh_t + 3),
-                              ((x + 1) * wh_t - 3, (y + 1) * wh_t - 3), (255, 0, 0),
-                              2)  # just for visuals, it surrounds the square.
-
-
-# we mark every empty square.
 def mark(out, mask, wh_t):
+    """
+    In this function we mark every empty square.
+    :param out: the frame on which we want to mark.
+    :param mask: the mask.
+    :param wh_t: the size of each tile.
+    :return: Nothing.
+    """
     for x in np.arange(8):
         for y in np.arange(8):
             if mask[y, x]:
@@ -138,39 +170,15 @@ def mark(out, mask, wh_t):
                               2)  # just for visuals, it surrounds the square.
 
 
-def updatedChessboard(prevBoards):
-    global updatedChess
-    for x in np.arange(8):
-        for y in np.arange(8):
-            for board in prevBoards:
-                for board2 in prevBoards:
-                    if board[y, x] != board2[y, x]:
-                        updatedChess[y, x] = 1
-                    else:
-                        if board[y, x] == 1:
-                            board[y, x] = 1
-                        board[y, x] = 0
-
-
-def getUpdatedBoard(mask):
-    # we put more visualization output, although we can already find the empty tiles.
-    # however, in this function we also update our chess board using 0`s and 1`s where 
-    # 1 signifies an empty space while 0 signifies a space that's taken.
-    updatedBoard = np.zeros((8, 8))
-    for x in np.arange(8):
-        for y in np.arange(8):
-            if mask[y, x]:
-                updatedBoard[y, x] = 1
-            else:
-                updatedBoard[y, x] = 0
-    return updatedBoard
-
-
-# we update the board and mark every empty square.
 def updateBoardAndMark(out, mask, wh_t):
-    # we put more visualization output, although we can already find the empty tiles.
-    # however, in this function we also update our chess board using 0`s and 1`s where 
-    # 1 signifies an empty space while 0 signifies a space that's taken.
+    """
+    In this function we update our board and mark every empty square.
+    1 signifies an empty space whilst 0 signifies a space that's taken.
+    :param out: the frame on which we want to mark.
+    :param mask: the mask.
+    :param wh_t: the size of each tile.
+    :return: the marked frame.
+    """
     for x in np.arange(8):
         for y in np.arange(8):
             if mask[y, x]:
@@ -191,6 +199,12 @@ def updateBoardAndMark(out, mask, wh_t):
 # all we need to do now is compare the two arrays, and see which piece moved.
 
 def get_move(oldCenterArray, newCenterArray):
+    """
+    We find the move the user made, print it to the screen and then return it to be sent to the chess program.
+    :param oldCenterArray: an array consisting of the center pixels of the tiles before the move.
+    :param newCenterArray: an array consisting of the center pixels of the tiles after the move.
+    :return: the move the user made in the format: "RFRF" (R - Rank, F - File) for example: "e2e4".
+    """
     global updatedChess
     global chessBoard
     string = ""
@@ -214,19 +228,24 @@ def get_move(oldCenterArray, newCenterArray):
                 print(string)
                 return
 
-    if 20 > len(string) > 5:
-        for i in range(len(oldCenterArray)):
-            for j in range(len(newCenterArray)):
-                for oldPos in oldCenterArray[i]:
-                    for newPos in newCenterArray[j]:
-                        if oldPos[0] not in range(newPos[0] - 50, newPos[0] + 50):
-                            string += " and ate " + chessBoard[i][j] + " at position " + convert(i, j)
+    # if 20 > len(string) > 5:
+    #    for i in range(len(oldCenterArray)):
+    #        for j in range(len(newCenterArray)):
+    #            for oldPos in oldCenterArray[i]:
+    #                for newPos in newCenterArray[j]:
+    #                    if oldPos[0] not in range(newPos[0] - 50, newPos[0] + 50):
+    #                        string += " and ate " + chessBoard[i][j] + " at position " + convert(i, j)
 
     print(string)
     return data
 
 
 def stabilizeMask(prevMasks):
+    """
+    We stabilize a mask using the list we made previous masks, and return the stabilized mask.
+    :param prevMasks: a list of previous masks.
+    :return: a stabilized mask.
+    """
     mask = np.zeros((8, 8), dtype=bool)
     for mask1 in prevMasks:
         for mask2 in prevMasks:
@@ -242,6 +261,12 @@ def stabilizeMask(prevMasks):
 
 
 def compareMasks(mask1, mask2):
+    """
+    We compare the masks we got and return a stabilized mask.
+    :param mask1: a mask.
+    :param mask2: a mask.
+    :return: the stabilized mask.
+    """
     mask = np.zeros((8, 8), dtype=bool)
     for x in np.arange(8):
         for y in np.arange(8):
@@ -255,23 +280,31 @@ def compareMasks(mask1, mask2):
 
 
 def handle_data(data):
+    """
+    We handle the data received according to his value.
+    :param data: the data we received.
+    :return: the flag corresponding to the data given.
+    """
     if data in [0, 2]:
         return 0
     if data == 1:
-        #handle_check()
+        # handle_check() TODO
         return 2
     if data == 8:
-        #handle_mate()
+        # handle_mate() TODO
         return 3
     if data == 9:
-        #handle_castle()
+        # handle_castle() TODO
         return 4
     else:
         handle_invalid()
         return -1
 
 
-def handle_invalid(pastPos):
+def handle_invalid():
+    """
+    we handle invalid moves in this function.
+    """
     print("Invalid move! Please make a legal move!")
 
 
@@ -281,50 +314,74 @@ def main():
     stabilized = False
     # vid_main = cv2.VideoCapture(r'Valorant_2021.06.12_-_12.20.20.01.mp4')
     vid_main = cv2.VideoCapture(0)  # we turn on the camera.
-    vid_main.set(cv2.CAP_PROP_CONVERT_RGB, 1)
-    prevMasks = []
+    vid_main.set(cv2.CAP_PROP_CONVERT_RGB, 1)  # we enhance the frame.
+    prevMasks = []  # will be used to store previous masks (for stabilization).
     centerTaken = False
-    while True:  # this while true will eventually have a breakpoint, it will break when the game is over.
+    while True and flag != 8:
         global updatedChess
 
-        ret_main, frame_main = vid_main.read()
-        # we have previously discovered our reference points, these are the points
-        # we need to crop our image to in order to find the chessboard and get the best
-        # picture of it. As so, in this line we crop the image to our desired area.
+        ret_main, frame_main = vid_main.read()  # we read the frame
+
+        """
+        we have previously discovered our reference points, these are the points
+        we need to crop our image to in order to find the chessboard and get the best
+        picture of it. As so, in this line we crop the image to get our desired frame.
+        """
         frame_main = frame_main[refPt[0][1]:refPt[1][1], refPt[0][0]:refPt[1][0]]
         if not centerTaken:
+            """
+            In case the center of each tile was not taken yet,
+            we take it.
+            """
             firstCenterArray = getCenter(frame_main)
             centerTaken = True
-        # we resize and blur the image.
-        frame_main = resizeImage(frame_main)
-        first_frame = frame_main  # will be used to show a good quality image.
-        frame_main = blurImg(frame_main)
-        # we get an array, or, more accurately an image representation of the unique
-        # colors in the frame.
+
+        frame_main = resizeImage(frame_main)  # we resize the image.
+
+        first_frame = frame_main  # we use it to later on show a high quality image.
+        frame_main = blurImg(frame_main)  # we blur the image.
+
+        """
+        we get an array, or, more accurately an image representation
+        of the unique colors in the frame.
+        """
         count_unique_colors, wh_t = getUniqueColors(frame_main)
-        # we threshold using Otsu's method and mask the recieved count of unique colors.
+
+        """
+        we threshold using Otsu's method and 
+        mask the received count of unique colors.
+        """
         mask = threshAndMask(count_unique_colors)
+
         if not stabilized:
+            """
+            If the board is not stabilized yet, we continue the stabilizing process
+            """
             prevMasks.append(mask)
             if len(prevMasks) == 20:
                 boardMask = stabilizeMask(prevMasks)
                 stabilized = not stabilized
+
         if stabilized:
-            # boardMask = compareMasks(mask, boardMask)
+            """
+            If the board is stabilized, we keep the mask the same until 'q' (timer button) is pressed.
+            """
+            # boardMask = compareMasks(mask, boardMask) - OPTIONAL
             mask = boardMask
-        mark(out=first_frame, mask=mask, wh_t=wh_t)
-        cv2.imshow('frame', first_frame)
+
+        mark(out=first_frame, mask=mask, wh_t=wh_t)  # we mark the frame.
+        cv2.imshow('frame', first_frame)  # we display the frame after it's marked.
 
         key = cv2.waitKey(1) & 0xFF
         if key == ord('q'):
+            """
+            this key click means the player had played his turn and we can scan the
+            board. Therefore, we will now scan the board again, find the differences
+            between the array of the start of the turn, and the aftermath, and display
+            what we found the move was.
+            """
             prevMasks = []
-
-            # this key click means the player had played his turn and we can scan the
-            # board. Therefore, we will now scan the board again, find the differences
-            # between the array of the start of the turn, and the aftermath, and display
-            # what we found the move was.
-            prevMasks = []
-            backup_mask = boardMask #
+            backup_mask = boardMask  #
             while len(prevMasks) != 10:
                 ret_main, frame_main = vid_main.read()
                 frame_main = frame_main[refPt[0][1]:refPt[1][1], refPt[0][0]:refPt[1][0]]
@@ -334,24 +391,26 @@ def main():
                 mask = threshAndMask(count_unique_colors)
                 prevMasks.append(mask)
 
-            boardMask = stabilizeMask(prevMasks)  # replace with mask if needed
-            # and we update the board and mark the free spaces.
-            centerArray = getCenter(frame_main)
-            backup_board = updatedChess #
-            backup_frame = frame_main #
-            updateBoardAndMark(frame_main, boardMask, wh_t)  # replace with mask if needed
-            data = get_move(firstCenterArray, centerArray) #
-            socketlib.send_data(sock, data) #
-            recv = socketlib.recv_data(sock) #
-            flag = handle_data(recv) #
-            if flag == -1: #
-                updatedChess = backup_board #
-                frame_main = backup_frame #
-                updateBoardAndMark(frame_main, backup_mask, wh_t) #
-            # we show the frame we got.
-            cv2.imshow('frame', frame_main)
-            # we print the final move.
-            firstCenterArray = centerArray
+            boardMask = stabilizeMask(prevMasks)  # we create a stabilized mask using the masks we have found.
+            centerArray = getCenter(frame_main)  # we create an array of the center pixel of each tile.
+            backup_board = updatedChess  # we keep a backup board in case of an invalid move.
+            backup_frame = frame_main  # we keep a backup frame in case of an invalid move.
+            updateBoardAndMark(frame_main, boardMask, wh_t)  # we update the board and mark the new empty squares.
+            data_to_send = get_move(firstCenterArray, centerArray)  # we get the move to send the chess program.
+            socketlib.send_data(sock, data_to_send)  # we send the data we got.
+            ans = socketlib.recv_data(sock)  # we receive the answer from the chess program.
+
+            """
+            we handle the answer received
+            """
+            flag = handle_data(ans)
+            if flag == -1:
+                updatedChess = backup_board
+                frame_main = backup_frame
+                updateBoardAndMark(frame_main, backup_mask, wh_t)
+
+            cv2.imshow('frame', frame_main)  # we display the final frame.
+            firstCenterArray = centerArray  # we update the center pixel array.
 
     cv2.waitKey(0)
     cv2.destroyAllWindows()
