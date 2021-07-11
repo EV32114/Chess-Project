@@ -35,8 +35,8 @@ sock = socketlib.connect()
 """
 cropping the image to the desired frame.
 """
-# vid = cv2.VideoCapture(r'Valorant_2021.06.12_-_12.20.20.01.mp4')
-vid = cv2.VideoCapture(0)
+vid = cv2.VideoCapture(r'Valorant_2021.06.12_-_12.20.20.01.mp4')
+# vid = cv2.VideoCapture(0)
 # take a frame
 ret, frame = vid.read()
 clone = frame.copy()
@@ -309,9 +309,10 @@ def handle_invalid():
 def main():
     global boardMask
     prevBoard = []
+    flag = 0
     stabilized = False
-    # vid_main = cv2.VideoCapture(r'Valorant_2021.06.12_-_12.20.20.01.mp4')
-    vid_main = cv2.VideoCapture(0)  # we turn on the camera.
+    vid_main = cv2.VideoCapture(r'Valorant_2021.06.12_-_12.20.20.01.mp4')
+    # vid_main = cv2.VideoCapture(0)  # we turn on the camera.
     vid_main.set(cv2.CAP_PROP_CONVERT_RGB, 1)  # we enhance the frame.
     prevMasks = []  # will be used to store previous masks (for stabilization).
     centerTaken = False
@@ -379,7 +380,7 @@ def main():
             what we found the move was.
             """
             prevMasks = []
-            backup_mask = boardMask  #
+            backup_mask = boardMask
             while len(prevMasks) != 10:
                 ret_main, frame_main = vid_main.read()
                 frame_main = frame_main[refPt[0][1]:refPt[1][1], refPt[0][0]:refPt[1][0]]
