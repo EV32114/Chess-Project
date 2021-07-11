@@ -1,0 +1,2 @@
+F:\magshimim\chess-project\Chess Project\x64\Debug\Chess Project.exe
+F:\magshimim\chess-project\Chess Project\x64\Debug\Chess Project.pdb

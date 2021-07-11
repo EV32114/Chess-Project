@@ -224,7 +224,7 @@ def get_move(oldCenterArray, newCenterArray):
                 chessBoard[x, y] = pieceThatMoved
                 data += convert(x, y)
                 print(string)
-                return
+                return data
 
     # if 20 > len(string) > 5:
     #    for i in range(len(oldCenterArray)):
@@ -283,11 +283,13 @@ def handle_data(data):
     :param data: the data we received.
     :return: the flag corresponding to the data given.
     """
-    if data in [0, 2]:
+    data = int(data)
+    if data == 0:
+        print('valid move')
         return 0
     if data == 1:
         # handle_check() TODO
-        return 2
+        return 0
     if data == 8:
         # handle_mate() TODO
         return 3
