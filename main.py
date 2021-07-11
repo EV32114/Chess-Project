@@ -35,7 +35,8 @@ sock = socketlib.connect()
 """
 cropping the image to the desired frame.
 """
-vid = cv2.VideoCapture(r'Valorant_2021.06.12_-_12.20.20.01.mp4')
+#vid = cv2.VideoCapture(r'Valorant_2021.06.12_-_12.20.20.01.mp4')
+vid = cv2.VideoCapture(r'chess.wmv')
 # vid = cv2.VideoCapture(0)
 # take a frame
 ret, frame = vid.read()
@@ -396,7 +397,7 @@ def main():
             centerArray = getCenter(frame_main)  # we create an array of the center pixel of each tile.
             backup_board = updatedChess  # we keep a backup board in case of an invalid move.
             backup_frame = frame_main  # we keep a backup frame in case of an invalid move.
-            updateBoardAndMark(frame_main, boardMask, wh_t)  # we update the board and mark the new empty squares.
+            updateBoardAndMark(backup_frame, boardMask, wh_t)  # we update the board and mark the new empty squares.
             data_to_send = get_move(firstCenterArray, centerArray)  # we get the move to send the chess program.
             socketlib.send_data(sock, data_to_send)  # we send the data we got.
             ans = socketlib.recv_data(sock)  # we receive the answer from the chess program.
@@ -406,9 +407,12 @@ def main():
             """
             flag = handle_data(ans)
             if flag == -1:
+                print("here")
                 updatedChess = backup_board
+                boardMask = backup_mask
+                mark(frame_main, boardMask, wh_t)
+            else:
                 frame_main = backup_frame
-                updateBoardAndMark(frame_main, backup_mask, wh_t)
 
             cv2.imshow('frame', frame_main)  # we display the final frame.
             firstCenterArray = centerArray  # we update the center pixel array.
