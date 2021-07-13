@@ -3,6 +3,7 @@ import numpy as np
 from skimage.filters import threshold_otsu
 import crop
 import socketlib
+import arduino
 
 """
 the mask of the board.
@@ -35,8 +36,8 @@ sock = socketlib.connect()
 """
 cropping the image to the desired frame.
 """
-#vid = cv2.VideoCapture(r'Valorant_2021.06.12_-_12.20.20.01.mp4')
-vid = cv2.VideoCapture(r'chess.wmv')
+vid = cv2.VideoCapture(r'Valorant_2021.06.12_-_12.20.20.01.mp4')
+#vid = cv2.VideoCapture(r'chess.wmv')
 # vid = cv2.VideoCapture(0)
 # take a frame
 ret, frame = vid.read()
@@ -312,13 +313,16 @@ def handle_invalid():
 def main():
     global boardMask
     prevBoard = []
+    port = arduino.connect_to_port()
     flag = 0
+    moved = False
     stabilized = False
     vid_main = cv2.VideoCapture(r'Valorant_2021.06.12_-_12.20.20.01.mp4')
     # vid_main = cv2.VideoCapture(0)  # we turn on the camera.
     vid_main.set(cv2.CAP_PROP_CONVERT_RGB, 1)  # we enhance the frame.
     prevMasks = []  # will be used to store previous masks (for stabilization).
     centerTaken = False
+    port.reset_input_buffer()
     while True and flag != 8:
         global updatedChess
 
@@ -373,9 +377,12 @@ def main():
 
         mark(out=first_frame, mask=mask, wh_t=wh_t)  # we mark the frame.
         cv2.imshow('frame', first_frame)  # we display the frame after it's marked.
+        if port.in_waiting:
+            data = arduino.get_input(port)
+            moved = arduino.check_button_mode(data)
 
         key = cv2.waitKey(1) & 0xFF
-        if key == ord('q'):
+        if moved:
             """
             this key click means the player had played his turn and we can scan the
             board. Therefore, we will now scan the board again, find the differences
@@ -407,15 +414,13 @@ def main():
             """
             flag = handle_data(ans)
             if flag == -1:
-                print("here")
-                updatedChess = backup_board
-                boardMask = backup_mask
-                mark(frame_main, boardMask, wh_t)
-            else:
-                frame_main = backup_frame
+                # TODO
+                pass
 
             cv2.imshow('frame', frame_main)  # we display the final frame.
             firstCenterArray = centerArray  # we update the center pixel array.
+            port.reset_input_buffer()  # we reset the input buffer
+            moved = False
 
     cv2.waitKey(0)
     cv2.destroyAllWindows()
