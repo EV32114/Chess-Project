@@ -209,14 +209,18 @@ def get_move(oldCenterArray, newCenterArray):
     global chessBoard
     string = ""
     data = ""
+    break_flag = False
     pieceThatMoved = 0
     for x in np.arange(8):
+        if break_flag:
+            break
         for y in np.arange(8):
             if updatedChess[x, y] == 1 and chessBoard[x, y] != "":
                 pieceThatMoved = chessBoard[x, y]
                 string = chessBoard[x, y] + " Moved from " + convert(x, y)
                 data += convert(x, y)
                 chessBoard[x, y] = ""
+                break_flag = True
                 break
 
     for x in np.arange(8):

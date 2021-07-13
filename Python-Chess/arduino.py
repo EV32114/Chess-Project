@@ -2,7 +2,7 @@ import serial
 
 
 def connect_to_port():
-    port = serial.Serial('COM3', 9600)  # Baud rate is 9600
+    port = serial.Serial('COM5', 9600)  # Baud rate is 9600
     return port
 
 
