@@ -42,7 +42,7 @@ vid = cv2.VideoCapture(r'Valorant_2021.06.12_-_12.20.20.01.mp4')
 # take a frame
 ret, frame = vid.read()
 clone = frame.copy()
-refPt = crop.poggers(frame)
+refPt = crop.crop_image(frame)
 
 
 def round_down_to_next_multiple_of_8(a):

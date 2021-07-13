@@ -9,15 +9,6 @@ cropping = False
 
 def click_and_crop(event, x, y, flags, param):
     # grab references to the global variables
-    # global refPt, cropping
-    # # if the left mouse button was clicked, record the starting
-    # # (x, y) coordinates and indicate that cropping is being
-    # # performed
-    # if event == cv2.EVENT_LBUTTONDOWN:
-    #     param = cv2.circle(param, (x, y), radius=2, color=(255, 0, 0), thickness=-1)
-    #     refPt.append((x, y))
-
-    # grab references to the global variables
     global refPt, cropping
     # if the left mouse button was clicked, record the starting
     # (x, y) coordinates and indicate that cropping is being
@@ -34,11 +25,8 @@ def click_and_crop(event, x, y, flags, param):
         # draw a rectangle around the region of interest
         cv2.rectangle(param, refPt[0], refPt[1], (0, 255, 0), 2)
 
-# ap = 'yes.jpg'  # argparse.ArgumentParser()
-# ap.add_argument("-i", "--image", required=True, help="Path to the image")
-# args = vars(ap.parse_args())
-# load the image, clone it, and setup the mouse callback function
-def poggers(frame):
+
+def crop_image(frame):
     image = frame
     clone = image.copy()
     cv2.namedWindow("image")
