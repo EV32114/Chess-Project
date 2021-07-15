@@ -5,44 +5,25 @@ import crop
 import socketlib
 import arduino
 
-"""
-the mask of the board.
-"""
-boardMask = np.zeros((8, 8), dtype=bool)
 
-"""
-default chess board (before changes).
-"""
-chessBoard = np.array([["R", "N", "B", "Q", "K", "B", "N", "R"],
+class Chess:
+    def __init__(self):
+        self.boardMask = np.zeros((8, 8), dtype=bool)  # the mask of the board.
+        self.chessBoard = np.array([["R", "N", "B", "Q", "K", "B", "N", "R"],
                        ["P", "P", "P", "P", "P", "P", "P", "P"],
                        ["", "", "", "", "", "", "", ""],
                        ["", "", "", "", "", "", "", ""],
                        ["", "", "", "", "", "", "", ""],
                        ["", "", "", "", "", "", "", ""],
                        ["p", "p", "p", "p", "p", "p", "p", "p"],
-                       ["r", "n", "b", "q", "k", "b", "n", "r"]])
-
-"""
-array consisting of 0's for now, will later be use to hold
-the current chess board.
-"""
-updatedChess = np.zeros((8, 8))
-
-"""
-the socket used to communicate with the chess program.
-"""
-sock = socketlib.connect()
-
-"""
-cropping the image to the desired frame.
-"""
-vid = cv2.VideoCapture(r'Valorant_2021.06.12_-_12.20.20.01.mp4')
-#vid = cv2.VideoCapture(r'chess.wmv')
-# vid = cv2.VideoCapture(0)
-# take a frame
-ret, frame = vid.read()
-clone = frame.copy()
-refPt = crop.crop_image(frame)
+                       ["r", "n", "b", "q", "k", "b", "n", "r"]])  # default chess board (before changes).
+        self.updatedChess = np.zeros((8, 8))  # array consisting of 0's for now, will later be use to hold the
+        # current chess board.
+        self.sock = socketlib.connect()  # the socket used to communicate with the chess program.
+        self.vid = cv2.VideoCapture(r'Valorant_2021.06.12_-_12.20.20.01.mp4')  # cropping the image to the desired
+        # frame.
+        self.ret, self.frame = self.vid.read()  # take a frame
+        self.refPt = crop.crop_image(self.frame)
 
 
 def round_down_to_next_multiple_of_8(a):
@@ -170,10 +151,11 @@ def mark(out, mask, wh_t):
                               2)  # just for visuals, it surrounds the square.
 
 
-def updateBoardAndMark(out, mask, wh_t):
+def updateBoardAndMark(out, mask, wh_t, chess):
     """
     In this function we update our board and mark every empty square.
     1 signifies an empty space whilst 0 signifies a space that's taken.
+    :param chess: instance of the class chess.
     :param out: the frame on which we want to mark.
     :param mask: the mask.
     :param wh_t: the size of each tile.
@@ -185,9 +167,9 @@ def updateBoardAndMark(out, mask, wh_t):
                 cv2.rectangle(out, (x * wh_t + 3, y * wh_t + 3),
                               ((x + 1) * wh_t - 3, (y + 1) * wh_t - 3), (255, 0, 0),
                               2)  # just for visuals, it surrounds the square.
-                updatedChess[y, x] = 1
+                chess.updatedChess[y, x] = 1
             else:
-                updatedChess[y, x] = 0
+                chess.updatedChess[y, x] = 0
 
     return out
 
@@ -198,15 +180,12 @@ def updateBoardAndMark(out, mask, wh_t):
 # now, we have an array called updatedChess which holds the chess board.
 # all we need to do now is compare the two arrays, and see which piece moved.
 
-def get_move(oldCenterArray, newCenterArray):
+def get_move(chess):
     """
     We find the move the user made, print it to the screen and then return it to be sent to the chess program.
-    :param oldCenterArray: an array consisting of the center pixels of the tiles before the move.
-    :param newCenterArray: an array consisting of the center pixels of the tiles after the move.
+    :param chess: instance of the class chess.
     :return: the move the user made in the format: "RFRF" (R - Rank, F - File) for example: "e2e4".
     """
-    global updatedChess
-    global chessBoard
     string = ""
     data = ""
     break_flag = False
@@ -215,19 +194,19 @@ def get_move(oldCenterArray, newCenterArray):
         if break_flag:
             break
         for y in np.arange(8):
-            if updatedChess[x, y] == 1 and chessBoard[x, y] != "":
-                pieceThatMoved = chessBoard[x, y]
-                string = chessBoard[x, y] + " Moved from " + convert(x, y)
+            if chess.updatedChess[x, y] == 1 and chess.chessBoard[x, y] != "":
+                pieceThatMoved = chess.chessBoard[x, y]
+                string = chess.chessBoard[x, y] + " Moved from " + convert(x, y)
                 data += convert(x, y)
-                chessBoard[x, y] = ""
+                chess.chessBoard[x, y] = ""
                 break_flag = True
                 break
 
     for x in np.arange(8):
         for y in np.arange(8):
-            if updatedChess[x, y] == 0 and chessBoard[x, y] == "":
+            if chess.updatedChess[x, y] == 0 and chess.chessBoard[x, y] == "":
                 string += " to position " + convert(x, y)
-                chessBoard[x, y] = pieceThatMoved
+                chess.chessBoard[x, y] = pieceThatMoved
                 data += convert(x, y)
                 print(string)
                 return data
@@ -238,7 +217,7 @@ def get_move(oldCenterArray, newCenterArray):
     #            for oldPos in oldCenterArray[i]:
     #                for newPos in newCenterArray[j]:
     #                    if oldPos[0] not in range(newPos[0] - 50, newPos[0] + 50):
-    #                        string += " and ate " + chessBoard[i][j] + " at position " + convert(i, j)
+    #                        string += " and ate " + chess.chessBoard[i][j] + " at position " + convert(i, j)
 
     print(string)
     return data
@@ -315,29 +294,25 @@ def handle_invalid():
 
 
 def main():
-    global boardMask
-    prevBoard = []
+    chess = Chess()
     port = arduino.connect_to_port()
     flag = 0
     moved = False
     stabilized = False
-    vid_main = cv2.VideoCapture(r'Valorant_2021.06.12_-_12.20.20.01.mp4')
-    # vid_main = cv2.VideoCapture(0)  # we turn on the camera.
-    vid_main.set(cv2.CAP_PROP_CONVERT_RGB, 1)  # we enhance the frame.
+    chess.vid.set(cv2.CAP_PROP_CONVERT_RGB, 1)  # we enhance the frame.
     prevMasks = []  # will be used to store previous masks (for stabilization).
     centerTaken = False
     port.reset_input_buffer()
     while True and flag != 8:
-        global updatedChess
 
-        ret_main, frame_main = vid_main.read()  # we read the frame
+        ret_main, frame_main = chess.vid.read()  # we read the frame
 
         """
         we have previously discovered our reference points, these are the points
         we need to crop our image to in order to find the chessboard and get the best
         picture of it. As so, in this line we crop the image to get our desired frame.
         """
-        frame_main = frame_main[refPt[0][1]:refPt[1][1], refPt[0][0]:refPt[1][0]]
+        frame_main = frame_main[chess.refPt[0][1]:chess.refPt[1][1], chess.refPt[0][0]:chess.refPt[1][0]]
         if not centerTaken:
             """
             In case the center of each tile was not taken yet,
@@ -369,15 +344,15 @@ def main():
             """
             prevMasks.append(mask)
             if len(prevMasks) == 20:
-                boardMask = stabilizeMask(prevMasks)
+                chess.boardMask = stabilizeMask(prevMasks)
                 stabilized = not stabilized
 
         if stabilized:
             """
             If the board is stabilized, we keep the mask the same until 'q' (timer button) is pressed.
             """
-            # boardMask = compareMasks(mask, boardMask) - OPTIONAL
-            mask = boardMask
+            # chess.boardMask = compareMasks(mask, chess.boardMask) - OPTIONAL
+            mask = chess.boardMask
 
         mark(out=first_frame, mask=mask, wh_t=wh_t)  # we mark the frame.
         cv2.imshow('frame', first_frame)  # we display the frame after it's marked.
@@ -394,24 +369,25 @@ def main():
             what we found the move was.
             """
             prevMasks = []
-            backup_mask = boardMask
+            backup_mask = chess.boardMask
             while len(prevMasks) != 10:
-                ret_main, frame_main = vid_main.read()
-                frame_main = frame_main[refPt[0][1]:refPt[1][1], refPt[0][0]:refPt[1][0]]
+                ret_main, frame_main = chess.vid.read()
+                frame_main = frame_main[chess.refPt[0][1]:chess.refPt[1][1], chess.refPt[0][0]:chess.refPt[1][0]]
                 frame_main = resizeImage(frame_main)
                 frame_main = blurImg(frame_main)
                 count_unique_colors, wh_t = getUniqueColors(frame_main)
                 mask = threshAndMask(count_unique_colors)
                 prevMasks.append(mask)
 
-            boardMask = stabilizeMask(prevMasks)  # we create a stabilized mask using the masks we have found.
+            chess.boardMask = stabilizeMask(prevMasks)  # we create a stabilized mask using the masks we have found.
             centerArray = getCenter(frame_main)  # we create an array of the center pixel of each tile.
-            backup_board = updatedChess  # we keep a backup board in case of an invalid move.
+            backup_board = chess.updatedChess  # we keep a backup board in case of an invalid move.
             backup_frame = frame_main  # we keep a backup frame in case of an invalid move.
-            updateBoardAndMark(backup_frame, boardMask, wh_t)  # we update the board and mark the new empty squares.
-            data_to_send = get_move(firstCenterArray, centerArray)  # we get the move to send the chess program.
-            socketlib.send_data(sock, data_to_send)  # we send the data we got.
-            ans = socketlib.recv_data(sock)  # we receive the answer from the chess program.
+            updateBoardAndMark(backup_frame, chess.boardMask, wh_t, chess)  # we update the board and mark the new empty
+            # squares.
+            data_to_send = get_move(chess)  # we get the move to send the chess program.
+            socketlib.send_data(chess.sock, data_to_send)  # we send the data we got.
+            ans = socketlib.recv_data(chess.sock)  # we receive the answer from the chess program.
 
             """
             we handle the answer received

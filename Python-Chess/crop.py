@@ -28,7 +28,7 @@ def click_and_crop(event, x, y, flags, param):
 
 def crop_image(frame):
     image = frame
-    clone = image.copy()
+    # clone = image.copy()
     cv2.namedWindow("image")
     cv2.setMouseCallback("image", click_and_crop, param=frame)
 
