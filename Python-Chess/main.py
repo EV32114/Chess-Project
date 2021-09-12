@@ -313,6 +313,7 @@ def main():
         picture of it. As so, in this line we crop the image to get our desired frame.
         """
         frame_main = frame_main[chess.refPt[0][1]:chess.refPt[1][1], chess.refPt[0][0]:chess.refPt[1][0]]
+        last_frame = frame_main
         if not centerTaken:
             """
             In case the center of each tile was not taken yet,
@@ -361,6 +362,7 @@ def main():
             moved = arduino.check_button_mode(data)
 
         key = cv2.waitKey(1) & 0xFF
+
         if moved:
             """
             this key click means the player had played his turn and we can scan the
