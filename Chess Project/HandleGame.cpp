@@ -25,7 +25,6 @@ void HandleGame::startGame(Board* board, SOCKET* pipe)
     int roundCounter = 0;
     int code = 0;
     char strCode[2] = { 0 };
-    // char msgToGraphics[1024];
     std::string msgToGraphics = INIT_STR;
     const char* pStr = msgToGraphics.c_str();
     std::string msgFromGraphics = "";
@@ -43,10 +42,8 @@ void HandleGame::startGame(Board* board, SOCKET* pipe)
             HandleGame::setCurrentPlayer(WHITE);
             board->printBoard();
             msgToGraphics = INIT_STR;
-            // pipe->sendMessageToGraphics(msgToGraphics);
             pStr = msgToGraphics.c_str();
             sendMsg(*pipe, &pStr, msgToGraphics.length());
-            // msgFromGraphics = pipe->getMessageFromGraphics();
             msgFromGraphics = receiveMsg(*pipe, 4, 0);
             continue;
         }
@@ -56,14 +53,11 @@ void HandleGame::startGame(Board* board, SOCKET* pipe)
         strCode[0] = code + '0';
         strCode[1] = '\0';
 
-        // strcpy_s(msgToGraphics, strCode);
-        // pipe->sendMessageToGraphics(msgToGraphics); // return result to graphics
         msgToGraphics = strCode;
         pStr = msgToGraphics.c_str();
         sendMsg(*pipe, &pStr, msgToGraphics.length());
 
         HandleGame::changeCurrentPlayer(code, &roundCounter);
-        // msgFromGraphics = pipe->getMessageFromGraphics(); // get message from graphics
     }
 }
 
