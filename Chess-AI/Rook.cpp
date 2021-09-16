@@ -52,7 +52,7 @@ bool Rook::isValidPieceMove(const int* src, const int* dest, const Board& board)
 
 string* Rook::getValidMoves(const int* src, const Board& board) const {
     int nIndex = 0;
-    string validMoves[16] = { "" };
+    string* validMoves = new string[NUM_OF_MOVES]{ "" };
     bool rowBlocked = false; // will be used to determine whether we have an interest to check the rows.
     bool colBlocked = false; // will be used to determine whether we have an interest to check the columns.
     for (int i = 1; i < 8; i++) {

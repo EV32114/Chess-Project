@@ -93,7 +93,7 @@ string* Pawn::getValidMoves(const int* src, const Board& board) const {
 	int initialRow = isupper(this->_type) ? WHITE_PAWN_ROW : BLACK_PAWN_ROW;
 	int pawnRow = src[0];
 	int nIndex = 0;
-	string validMoves[4] = { "" };
+	string* validMoves = new string[NUM_OF_MOVES]{ "" };
 	if (pawnRow == initialRow) {
 		// En Passant is an option!
 		if (board.getBoard()[src[0] + 2][src[1]]->getType() == EMPTY_SQUARE) { // going forward two spaces if it has yet to move.

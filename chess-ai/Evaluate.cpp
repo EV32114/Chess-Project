@@ -60,11 +60,17 @@ void Evaluate::countPieces(string pos, int* whitePieces, int* blackPieces){
 	}
 }
 
-void Evaluate::getValidMoves(const Board& board) {
+void Evaluate::getValidMoves(Board& board) {
+	string* arr;
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
-			if (board.getBoard()[i, j]->getType() != KNIGHT) {
-
+			if (std::tolower((**board.getBoard()[i, j]).getType()) != 'k' && std::tolower((**board.getBoard()[i, j]).getType()) != '#') {
+				arr = (**board.getBoard()[i, j]).getValidMoves(new int[2]{i, j}, board); // MEMORY LEAK
+				for (int yoav = 0; yoav < 32; yoav++)
+				{
+					cout << arr[yoav];
+				}
+				cout << endl;
 			}
 		}
 	}

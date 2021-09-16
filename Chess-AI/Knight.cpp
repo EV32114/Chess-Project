@@ -16,3 +16,8 @@ bool Knight::isValidPieceMove(const int* src, const int* dest, const Board& boar
 
 	return false;
 }
+
+std::string* Knight::getValidMoves(const int* src, const Board& board) const
+{
+	return nullptr;
+}

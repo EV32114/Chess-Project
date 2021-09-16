@@ -44,6 +44,6 @@ public:
 
 private:
 	static void countPieces(string pos, int* whitePieces, int* blackPieces);
-	static void getValidMoves(Board board);
+	static void getValidMoves(Board& board);
 };
  

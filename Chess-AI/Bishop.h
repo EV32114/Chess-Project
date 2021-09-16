@@ -3,8 +3,6 @@
 #include "Piece.h"
 #include <String>
 
-#define NUM_OF_MOVES 8
-
 using std::string;
 
 class Bishop : public Piece

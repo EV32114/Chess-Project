@@ -36,7 +36,7 @@ bool King::isValidPieceMove(const int* src, const int* dest, const Board& board)
 
 string* King::getValidMoves(const int* src, const Board& board) const {
     // A king only has 8 squares to move. We'll check which squares around him are free and return an array consisting of them.
-    string validMoves[NUM_OF_MOVES] = { "" };
+    string* validMoves = new string[NUM_OF_MOVES]{ "" };
     int nIndex = 0;
     //while (true){
     //    if (board.getBoard()[src[0] - i][src[1] - j]->getType() == EMPTY_SQUARE) {

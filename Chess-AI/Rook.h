@@ -3,8 +3,10 @@
 #include "Piece.h"
 #include "Board.h"
 #include <String>
+
 class Piece;
 class Board;
+
 using std::string;
 
 class Rook : public Piece

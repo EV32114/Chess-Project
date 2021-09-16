@@ -51,7 +51,7 @@ bool Bishop::isValidPieceMove(const int* src, const int* dest, const Board& boar
 }
 
 string* Bishop::getValidMoves(const int* src, const Board& board) const {
-    string validMoves[NUM_OF_MOVES] = { "" };
+    string* validMoves = new string[NUM_OF_MOVES] { "" };
     int nIndex = 0;
     for (int i = 1; i < NUM_OF_MOVES; i++) {
         for (int j = 1; j < i; j++) {

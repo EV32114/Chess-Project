@@ -10,6 +10,7 @@
 #define WHITE_IN_CHECK 0
 #define BLACK_IN_CHECK 1
 #define NO_CHECK -1
+#define NUM_OF_MOVES 32
 
 #define B_KING 'k'
 #define W_KING 'K'
@@ -33,15 +34,6 @@ private:
 	Piece** _board[BOARD_SIDE];
 	King* _blackKing;
 	King* _whiteKing;
-	
-	/// <summary>
-	/// This function checks if a piece can move to anywhere on the board.
-	/// </summary>
-	/// <param name="piece"> The piece to check </param>
-	/// <param name="srcX"> it's row </param>
-	/// <param name="srcY"> in's col </param>
-	/// <returns> If the piece can move </returns>
-	bool canMove(Piece& piece, int srcX, int srcY);
 
 public:
 	/// <summary>
@@ -122,14 +114,6 @@ public:
 	bool checkBottomRight();
 	bool checkTopLeft();
 	bool checkTopRight();*/
-
-	/// <summary>
-	/// This function checks if a square on the board is being attacked.
-	/// </summary>
-	/// <param name="pos"> A position on the poard </param>
-	/// <param name="isWhite"> If white is the attacker or not </param>
-	/// <returns> If the position is under attack </returns>
-	bool isUnderAttack(const int* pos, bool isWhite);
 };
 
 #endif // !__BOARD_H__
