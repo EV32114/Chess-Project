@@ -1,6 +1,6 @@
 #include "Bishop.h"
+#include "Board.h"
 
-using std namespace;
 Bishop::Bishop(char type) : Piece(type)
 {
 }
@@ -50,7 +50,7 @@ bool Bishop::isValidPieceMove(const int* src, const int* dest, const Board& boar
     return true;
 }
 
-string[] Bishop::getValidMoves(cost int* src, const Board& board) const {
+string* Bishop::getValidMoves(const int* src, const Board& board) const {
     string validMoves[NUM_OF_MOVES] = { "" };
     int nIndex = 0;
     for (int i = 1; i < NUM_OF_MOVES; i++) {
@@ -68,7 +68,7 @@ string[] Bishop::getValidMoves(cost int* src, const Board& board) const {
         //        nIndex++;
         //    }
         //}
-        validMoves[nIndex] = to_string(src[0] + i) + to_string(src[1] + i); // space is empty or there's a piece there, and we can move there.
+        validMoves[nIndex] = std::to_string(src[0] + i) + std::to_string(src[1] + i); // space is empty or there's a piece there, and we can move there.
         nIndex++;
     }
     return validMoves;

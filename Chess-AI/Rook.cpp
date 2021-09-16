@@ -1,7 +1,6 @@
 #include "Rook.h"
-#include "HandleGame.h"
 class HandleGame;
-using std namespace;
+
 
 Rook::Rook(char type) : Piece(type)
 {
@@ -51,7 +50,7 @@ bool Rook::isValidPieceMove(const int* src, const int* dest, const Board& board)
     return true;
 }
 
-string[] Rook::getValidMoves(const int* src, const int* dest, const Board& board) const {
+string* Rook::getValidMoves(const int* src, const int* dest, const Board& board) const {
     int nIndex = 0;
     string validMoves[16] = { "" };
     bool rowBlocked = false; // will be used to determine whether we have an interest to check the rows.
@@ -64,10 +63,11 @@ string[] Rook::getValidMoves(const int* src, const int* dest, const Board& board
                 colBlocked = true;
         }
         if (!rowBlocked) {
-            validMoves[nIndex] = to_string(src[0] + i) + to_string(src[1]);
+            validMoves[nIndex] = std::to_string(src[0] + i) + std::to_string(src[1]);
         }
         if (!colBlocked) {
-            validMoves[nIndex] = to_string(src[0]) + to_string(src[1] + i);
+            validMoves[nIndex] = std::to_string(src[0]) + std::to_string(src[1] + i);
         }
     }
+    return &validMoves;
 }

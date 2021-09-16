@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Bishop.cpp" />
+    <ClCompile Include="Board.cpp" />
     <ClCompile Include="EmptySquare.cpp" />
     <ClCompile Include="Evaluate.cpp" />
     <ClCompile Include="King.cpp" />
@@ -152,6 +153,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bishop.h" />
+    <ClInclude Include="Board.h" />
     <ClInclude Include="EmptySquare.h" />
     <ClInclude Include="Evaluate.h" />
     <ClInclude Include="King.h" />

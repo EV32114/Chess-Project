@@ -2,6 +2,9 @@
 #include <iostream>
 #include "Piece.h"
 #include "Board.h"
+
+using std::string;
+
 class Board;
 
 class Queen : public Piece
@@ -21,5 +24,5 @@ public:
 	/// <param name="board"> The game board </param>
 	/// <returns> If the move is valid or not </returns>
 	virtual bool isValidPieceMove(const int* src, const int* dest, const Board& board) const;
-	string[] Queen::getValidMoves(const int* src, const int* dest, const Board& board) const;
+	string* getValidMoves(const int* src, const int* dest, const Board& board) const;
 };
