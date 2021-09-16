@@ -118,10 +118,10 @@ public:
 	/// These function all check if the squares between the king and the rook are empty and not under attack.
 	/// </summary>
 	/// <returns> All function return if the result of the checking was true or false </returns>
-	bool checkBottomLeft();
+	/*bool checkBottomLeft();
 	bool checkBottomRight();
 	bool checkTopLeft();
-	bool checkTopRight();
+	bool checkTopRight();*/
 
 	/// <summary>
 	/// This function checks if a square on the board is being attacked.

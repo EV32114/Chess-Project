@@ -214,38 +214,13 @@ int Board::isInCheck() const
 
 int Board::isInMate(bool playerInCheck)
 {
-  int i = 0, j = 0;
-  HandleGame::setCurrentPlayer(!HandleGame::getCurrentPlayer());
-
-  for (i = 0; i < BOARD_SIDE; i++)
-  {
-    for (j = 0; j < BOARD_SIDE; j++)
-    {
-      if (playerInCheck == WHITE && isupper(this->_board[i][j]->getType()))
-      {
-        if (canMove(*this->_board[i][j], i, j))
-        {
-          HandleGame::setCurrentPlayer(!HandleGame::getCurrentPlayer());
-          return CHECK;
-        }
-      }
-
-      if (playerInCheck == BLACK && islower(this->_board[i][j]->getType()))
-      {
-        if (canMove(*this->_board[i][j], i, j))
-        {
-          HandleGame::setCurrentPlayer(!HandleGame::getCurrentPlayer());
-          return CHECK;
-        }
-      }
-    }
-  }
-  return CHECKMATE;
+    // TODO this function.
+    return 0;
 }
 
 int Board::castle(const int* src, const int* dest)
 {
-  Piece* rook = this->_board[0][0];
+  /*Piece* rook = this->_board[0][0];
   int rookSrc[BOARD_INDEX] = { 0 };
   int rookDest[BOARD_INDEX] = { 0 };
   bool srcColor = (isupper(this->_board[src[0]][src[1]]->getType())) ? WHITE : BLACK;
@@ -315,10 +290,11 @@ int Board::castle(const int* src, const int* dest)
   }
 
   movePiece(rookSrc, rookDest, true);
-  return CASTLE;
+  return CASTLE;*/
+    return 0;
 }
 
-bool Board::checkBottomLeft()
+/*bool Board::checkBottomLeft()
 {
   int square1[BOARD_INDEX] = { 7, 1 };
   int square2[BOARD_INDEX] = { 7, 2 };
@@ -436,4 +412,4 @@ bool Board::canMove(Piece& piece, int srcX, int srcY)
   }
 
   return false;
-}
+}*/

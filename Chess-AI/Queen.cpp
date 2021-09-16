@@ -17,14 +17,15 @@ bool Queen::isValidPieceMove(const int* src, const int* dest, const Board& board
 string* Queen::getValidMoves(const int* src, const int* dest, const Board& board) const {
     Rook rook('r');
     Bishop bishop('b');
-    string rookArr[] = rook.getValidMoves(src, dest, board);
-    string bishopArr[] = bishop.getValidMoves(src, dest, board);
-    const int arrLength = sizeof(rookArr) + sizeof(bishopArr), nIndex = 0;
+    string* rookArr = rook.getValidMoves(src, dest, board);
+    string* bishopArr = bishop.getValidMoves(src, board);
+    const int arrLength = sizeof(rookArr) + sizeof(bishopArr);
+    int nIndex = 0;
     bool goOverRook = true;
     string validMoves[arrLength];
     for (int i = 0; i < arrLength; i++, nIndex++) {
         if (goOverRook) {
-            if (i == sizeOf(rookArr) || rookArr[nIndex] == "") {
+            if (i == sizeof(rookArr) || rookArr[nIndex] == "") {
                 goOverRook = false;
                 nIndex = 0;
             }
@@ -37,4 +38,5 @@ string* Queen::getValidMoves(const int* src, const int* dest, const Board& board
             validMoves[i] = bishopArr[nIndex];
         }
     }
+    return validMoves;
 }

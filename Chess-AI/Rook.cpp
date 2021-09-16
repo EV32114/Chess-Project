@@ -69,5 +69,5 @@ string* Rook::getValidMoves(const int* src, const int* dest, const Board& board)
             validMoves[nIndex] = std::to_string(src[0]) + std::to_string(src[1] + i);
         }
     }
-    return &validMoves;
+    return validMoves;
 }

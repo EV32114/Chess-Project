@@ -2,7 +2,7 @@
 #define __PIECE_H__
 
 #include <iostream>
-#include "HandleGame.h"
+#include "Board.h"
 
 #define BLACK 1
 #define WHITE 0
@@ -14,15 +14,6 @@ class Piece
 protected:
 	char _type;
 	bool _hasMoved;
-
-	/// <summary>
-	/// This function handles the checking of codes SELF_CHECK and CHECK.
-	/// </summary>
-	/// <param name="board"> The game board </param>
-	/// <param name="src"> The position of the piece that the player wants to move </param>
-	/// <param name="dest"> Where the player wants to move the piece to </param>
-	/// <returns></returns>
-	static int HandleCheckCodes(Board& board, const int* src, const int* dest);
 
 public:
 	/// <summary>
@@ -42,15 +33,6 @@ public:
 	/// </summary>
 	/// <returns> The piece type </returns>
 	char getType() const;
-	
-	/// <summary>
-	/// This function checks if a move that the player wants to play is valid.
-	/// </summary>
-	/// <param name="src"> The position of the piece that the player wants to move </param>
-	/// <param name="dest"> Where the player wants to move the piece to </param>
-	/// <param name="board"> The game board </param>
-	/// <returns> A number code between 0 - 8 that indicates a certain outcome of the checking </returns>
-	static int isValidMove(const int* src, const int* dest, Board& board);
 	
 	/// <summary>
 	/// This function checks if a move that is proformed on a piece matches the way that the piece moves.

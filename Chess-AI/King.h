@@ -1,10 +1,14 @@
 #pragma once
 #include <iostream>
+#include <String>
 #include "Piece.h"
+#include "Board.h"
 
 #define NUM_OF_MOVES 8
 
 class Board;
+
+using std::string;
 
 class King : public Piece
 {
@@ -38,4 +42,6 @@ public:
 	/// <param name="board"> The game board </param>
 	/// <returns> If the move is valid or not </returns>
 	virtual bool isValidPieceMove(const int* src, const int* dest, const Board& board) const;
+
+	string* getValidMoves(const int* src, const Board& board) const;
 };

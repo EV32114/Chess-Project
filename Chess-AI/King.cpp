@@ -1,9 +1,8 @@
 #include "King.h"
-#include "HandleGame.h"
 
 class Piece;
 
-using std namespace;
+using std::string;
 
 King::King(char type, int pos1, int pos2) : Piece(type)
 {
@@ -35,11 +34,10 @@ bool King::isValidPieceMove(const int* src, const int* dest, const Board& board)
     return true;
 }
 
-string[] King::getValidMoves(cost int* src, const Board& board) const {
+string* King::getValidMoves(const int* src, const Board& board) const {
     // A king only has 8 squares to move. We'll check which squares around him are free and return an array consisting of them.
     string validMoves[NUM_OF_MOVES] = { "" };
     int nIndex = 0;
-    int i = 0, j = 1;
     //while (true){
     //    if (board.getBoard()[src[0] - i][src[1] - j]->getType() == EMPTY_SQUARE) {
     //        validMoves[nIndex] = to_string(i) + to_string(j);
@@ -64,11 +62,11 @@ string[] King::getValidMoves(cost int* src, const Board& board) const {
         for (int j = 0; j <= 1; j++) {
             if (!(i == 0 && j == 0)) {
                 if (board.getBoard()[src[0] - i][src[1] - j]->getType() == EMPTY_SQUARE) {
-                    validMoves[nIndex] = to_string(src[0] - i) + to_string(src[1] - j);
+                    validMoves[nIndex] = std::to_string(src[0] - i) + std::to_string(src[1] - j);
                     nIndex++;
                 }
                 if (board.getBoard()[src[0] + i][src[1] + j]->getType() == EMPTY_SQUARE) {
-                    validMoves[nIndex] = to_string(src[0] + i) + to_string(src[1] + j);
+                    validMoves[nIndex] = std::to_string(src[0] + i) + std::to_string(src[1] + j);
                     nIndex++;
                 }
             }

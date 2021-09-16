@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include "Piece.h"
 
 #define MID_PAWN 198
 #define END_PAWN 258
