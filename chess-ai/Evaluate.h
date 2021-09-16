@@ -28,6 +28,8 @@
 #define B_KNIGHT 'n'
 #define W_KNIGHT 'N'
 
+#define MAX_VALID_MOVES 321
+
 enum { KING, QUEEN, KNIGHT, ROOK, BISHOP, PAWN };
 
 using std::string;
@@ -41,5 +43,6 @@ public:
 
 private:
 	static void countPieces(string pos, int* whitePieces, int* blackPieces);
-
+	static void getValidMoves(Piece* board, string* blackValid, string* whiteValid);
 };
+ 

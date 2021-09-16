@@ -4,6 +4,8 @@ int Evaluate::evalPos(string pos)
 {
 	int blackPieceCounter[6] = { 0 };
 	int whitePieceCounter[6] = { 0 };
+	int blackValid[MAX_VALID_MOVES] = { 0 };
+	int whiteValid[MAX_VALID_MOVES] = { 0 };
 	countPieces(pos, whitePieceCounter, blackPieceCounter);
 	return 0;
 }
@@ -53,6 +55,10 @@ void Evaluate::countPieces(string pos, int* whitePieces, int* blackPieces){
 				break;
 		}
 	}
+}
+
+void Evaluate::getValidMoves(Piece* board, string* blackValid, string* whiteValid) {
+	
 }
 
 

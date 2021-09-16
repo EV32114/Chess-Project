@@ -88,3 +88,34 @@ bool Pawn::getPawnInfo(const Board& board, int* initialRow, Piece** afterSrc, co
 		return true;
 	}
 }
+
+string[] Pawn::getValidMoves(const int* src, const int* dest, const Board& board) const {
+	int initialRow = isUpper(this->type) ? WHITE_PAWN_ROW : BLACK_PAWN_ROW;
+	int pawnRow = src[0];
+	int nIndex = 0;
+	string validMoves[4] = { "" };
+	if (pawnRow == initialRow) {
+		// En Passant is an option!
+		if (board.getBoard()[src[0] + 2][src[1]]->getType() == EMPTY_SQUARE) { // going forward two spaces if it has yet to move.
+			validMoves[nIndex] = to_string(src[0]) + to_string(src[1] + 2);
+			nIndex++;
+		}
+	}
+	else {
+		// En Passant was never an option :(
+		;
+	}
+	if (board.getBoard()[src[0] + 1][src[1]]->getType() == EMPTY_SQUARE) { // going forward one space.
+		validMoves[nIndex] = to_string(src[0]) + to_string(src[1] + 1);
+		nIndex++;
+	}
+	if (board.getBoard()[src[0] + 1][src[1] + 1]->getType() != EMPTY_SQUARE) { // eating.
+		validMoves[nIndex] = to_string(src[0] + 1) + to_string(src[1] + 1);
+		nIndex++;
+	}
+	if (board.getBoard()[src[0] + 1][src[1] - 1]->getType() != EMPTY_SQUARE) { // eating.
+		validMoves[nIndex] = to_string(src[0] + 1) + to_string(src[1] + 1);
+		nIndex++;
+	}
+	return validMoves;
+}

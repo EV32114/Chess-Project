@@ -2,6 +2,8 @@
 #include <iostream>
 #include "Piece.h"
 
+#define NUM_OF_MOVES 8
+
 class Board;
 
 class King : public Piece
