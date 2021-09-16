@@ -68,7 +68,7 @@ string[] Bishop::getValidMoves(cost int* src, const Board& board) const {
         //        nIndex++;
         //    }
         //}
-        validMoves[nIndex] = to_string(i) + to_string(j); // space is empty or there's a piece there, and we can move there.
+        validMoves[nIndex] = to_string(src[0] + i) + to_string(src[1] + i); // space is empty or there's a piece there, and we can move there.
         nIndex++;
     }
     return validMoves;
