@@ -50,7 +50,7 @@ bool Rook::isValidPieceMove(const int* src, const int* dest, const Board& board)
     return true;
 }
 
-string* Rook::getValidMoves(const int* src, const int* dest, const Board& board) const {
+string* Rook::getValidMoves(const int* src, const Board& board) const {
     int nIndex = 0;
     string validMoves[16] = { "" };
     bool rowBlocked = false; // will be used to determine whether we have an interest to check the rows.

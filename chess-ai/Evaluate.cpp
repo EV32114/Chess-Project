@@ -2,12 +2,14 @@
 
 int Evaluate::evalPos(string pos)
 {
-	/*int blackPieceCounter[6] = {0};
+	int blackPieceCounter[6] = {0};
 	int whitePieceCounter[6] = { 0 };
 	int blackValid[MAX_VALID_MOVES] = { 0 };
 	int whiteValid[MAX_VALID_MOVES] = { 0 };
+	/*
 	countPieces(pos, whitePieceCounter, blackPieceCounter);*/
 	Board board(pos);
+	getValidMoves(board);
 	return 0;
 }
 
@@ -58,6 +60,12 @@ void Evaluate::countPieces(string pos, int* whitePieces, int* blackPieces){
 	}
 }
 
-void Evaluate::getValidMoves(Board board, string* blackValid, string* whiteValid) {
-	
+void Evaluate::getValidMoves(const Board& board) {
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 8; j++) {
+			if (board.getBoard()[i, j]->getType() != KNIGHT) {
+
+			}
+		}
+	}
 }

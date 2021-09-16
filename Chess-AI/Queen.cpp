@@ -14,7 +14,7 @@ bool Queen::isValidPieceMove(const int* src, const int* dest, const Board& board
     return rook.isValidPieceMove(src, dest, board) || bishop.isValidPieceMove(src, dest, board);
 }
 
-string* Queen::getValidMoves(const int* src, const int* dest, const Board& board) const {
+string* Queen::getValidMoves(const int* src, const Board& board) const {
     Rook rook('r');
     Bishop bishop('b');
     string* rookArr = rook.getValidMoves(src, dest, board);
