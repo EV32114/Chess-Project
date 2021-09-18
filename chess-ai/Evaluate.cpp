@@ -68,7 +68,9 @@ void Evaluate::getValidMoves(Board& board) {
 				arr = (**board.getBoard()[i, j]).getValidMoves(new int[2]{i, j}, board); // MEMORY LEAK
 				for (int yoav = 0; yoav < 32; yoav++)
 				{
-					cout << arr[yoav];
+					if (!(arr[yoav] == "")) {
+						cout << arr[yoav] << "\n";
+					}
 				}
 				cout << endl;
 			}

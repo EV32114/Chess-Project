@@ -96,26 +96,47 @@ string* Pawn::getValidMoves(const int* src, const Board& board) const {
 	string* validMoves = new string[NUM_OF_MOVES]{ "" };
 	if (pawnRow == initialRow) {
 		// En Passant is an option!
-		if (board.getBoard()[src[0] + 2][src[1]]->getType() == EMPTY_SQUARE) { // going forward two spaces if it has yet to move.
-			validMoves[nIndex] = std::to_string(src[0]) + std::to_string(src[1] + 2);
-			nIndex++;
+		if (!isupper(this->_type)) {
+			if (board.getBoard()[src[0] + 2][src[1]]->getType() == EMPTY_SQUARE) { // going forward two spaces if it has yet to move.
+				validMoves[nIndex] = std::to_string(src[0] + 2) + std::to_string(src[1]);
+				nIndex++;
+			}
+			if (board.getBoard()[src[0] + 1][src[1]]->getType() == EMPTY_SQUARE) { // going forward one space.
+				validMoves[nIndex] = std::to_string(src[0] + 1) + std::to_string(src[1]);
+				nIndex++;
+			}
+			if (board.getBoard()[src[0] + 1][src[1] + 1]->getType() != EMPTY_SQUARE) { // eating.
+				validMoves[nIndex] = std::to_string(src[0] + 1) + std::to_string(src[1] + 1);
+				nIndex++;
+			}
+			if (board.getBoard()[src[0] + 1][src[1] - 1]->getType() != EMPTY_SQUARE) { // eating.
+				validMoves[nIndex] = std::to_string(src[0] + 1) + std::to_string(src[1] + 1);
+				nIndex++;
+			}
+		}
+		else {
+			if (board.getBoard()[src[0] - 2][src[1]]->getType() == EMPTY_SQUARE) { // going forward two spaces if it has yet to move.
+				validMoves[nIndex] = std::to_string(src[0] - 2) + std::to_string(src[1]);
+				nIndex++;
+			}
+			if (board.getBoard()[src[0] - 1][src[1]]->getType() == EMPTY_SQUARE) { // going forward one space.
+				validMoves[nIndex] = std::to_string(src[0] - 1) + std::to_string(src[1]);
+				nIndex++;
+			}
+			if (board.getBoard()[src[0] - 1][src[1] + 1]->getType() != EMPTY_SQUARE) { // eating.
+				validMoves[nIndex] = std::to_string(src[0] - 1) + std::to_string(src[1] + 1);
+				nIndex++;
+			}
+			if (board.getBoard()[src[0] - 1][src[1] - 1]->getType() != EMPTY_SQUARE) { // eating.
+				validMoves[nIndex] = std::to_string(src[0] - 1) + std::to_string(src[1] - 1);
+				nIndex++;
+			}
 		}
 	}
 	else {
 		// En Passant was never an option :(
 		;
 	}
-	if (board.getBoard()[src[0] + 1][src[1]]->getType() == EMPTY_SQUARE) { // going forward one space.
-		validMoves[nIndex] = std::to_string(src[0]) + std::to_string(src[1] + 1);
-		nIndex++;
-	}
-	if (board.getBoard()[src[0] + 1][src[1] + 1]->getType() != EMPTY_SQUARE) { // eating.
-		validMoves[nIndex] = std::to_string(src[0] + 1) + std::to_string(src[1] + 1);
-		nIndex++;
-	}
-	if (board.getBoard()[src[0] + 1][src[1] - 1]->getType() != EMPTY_SQUARE) { // eating.
-		validMoves[nIndex] = std::to_string(src[0] + 1) + std::to_string(src[1] + 1);
-		nIndex++;
-	}
+	
 	return validMoves;
 }
