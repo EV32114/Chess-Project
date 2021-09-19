@@ -1,5 +1,6 @@
 #include "Bishop.h"
 #include "Board.h"
+#include <vector>
 
 Bishop::Bishop(char type) : Piece(type)
 {
@@ -50,27 +51,72 @@ bool Bishop::isValidPieceMove(const int* src, const int* dest, const Board& boar
     return true;
 }
 
-string* Bishop::getValidMoves(const int* src, const Board& board) const {
-    bool isWhite = isupper(this->_type);
-    int sign = isWhite ? 1 : -1;
-    string* validMoves = new string[NUM_OF_MOVES] { "" };
-    int nIndex = 0;
-    for (int i = 1; i < NUM_OF_MOVES; i++) {
-        for (int j = 1; j < i; j++) {
-            if (src[0] + j < 8 && src[1] + j < 8) {
-                if ((src[0] + j * sign) < 8 && (src[1] + j * sign) < 8 && (src[1] + j * sign) >= 8 && (src[0] + j * sign) >= 8) {
-                    if (board.getBoard()[src[0] + (j * sign)][src[1] + (j * sign)]->getType() != EMPTY_SQUARE) // if it tries to pass an occupied space, we break.
-                        return validMoves;
-                }
-            }
-        }
-        if ((src[0] + i * sign) < 8 && (src[0] + i * sign) >= 0 && (src[1] + i * sign) < 8 && (src[1] + i * sign) >= 0) {
-            if (board.getBoard()[src[0] + (i * sign)][src[1] + (i * sign)]->getType() == EMPTY_SQUARE
-                || ((board.getBoard()[src[0] + (i * sign)][src[1] + (i * sign)]->getType() == 'K' && !isWhite) || (board.getBoard()[src[0] + (i * sign)][src[1] + (i * sign)]->getType() == 'k') && isWhite)) {
-                validMoves[nIndex] = std::to_string(src[0] + i * sign) + std::to_string(src[1] + i * sign); // space is empty or there's a piece there, and we can move there.
-                nIndex++;
-            }
-        }
-    }
+std::vector<string> Bishop::getValidMoves(const int* src, const Board& board) const {
+	std::vector<string> validMoves;
+	bool breakFlag = false;;
+	for (int way = 0; way < 4; way++) {
+		breakFlag = false;
+		for (int i = 0; i < 8 && !breakFlag; i++) {
+			switch (way) {
+				case 0:
+					if (src[0] + i < 8 && src[1] + i < 8) {
+						if (board.getBoard()[src[0] + i][src[1] + i]->getType() == EMPTY_SQUARE) {
+							validMoves.push_back(std::to_string(src[0] + i) + std::to_string(src[1] + i));
+						}
+						else {
+							if (_isWhite != board.getBoard()[src[0] + i][src[1] + i]->getIsWhite()) {
+								validMoves.push_back(std::to_string(src[0] + i) + std::to_string(src[1] + i));
+							}
+							breakFlag = true;
+						}
+					}
+					break;
+				case 1:
+					if (src[0] + i < 8 && src[1] - i >= 0) {
+						if (board.getBoard()[src[0] + i][src[1] - i]->getType() == EMPTY_SQUARE) {
+							validMoves.push_back(std::to_string(src[0] + i) + std::to_string(src[1] - i));
+						}
+						else {
+							if (_isWhite != board.getBoard()[src[0] + i][src[1] - i]->getIsWhite()) {
+								validMoves.push_back(std::to_string(src[0] + i) + std::to_string(src[1] - i));
+							}
+							breakFlag = true;
+						}
+					}
+					break;
+				case 2:
+					if (src[0] - i >= 0 && src[1] - i >= 0) {
+						if (board.getBoard()[src[0] - i][src[1] - i]->getType() == EMPTY_SQUARE) {
+							validMoves.push_back(std::to_string(src[0] - i) + std::to_string(src[1] - i));
+						}
+						else {
+							if (_isWhite != board.getBoard()[src[0] - i][src[1] - i]->getIsWhite()) {
+								validMoves.push_back(std::to_string(src[0] - i) + std::to_string(src[1] - i));
+							}
+							breakFlag = true;
+						}
+					}
+					break;
+				case 3:
+					if (src[0] - i >= 0 && src[1] + i < 8) {
+						if (board.getBoard()[src[0] - i][src[1] + i]->getType() == EMPTY_SQUARE) {
+							validMoves.push_back(std::to_string(src[0] - i) + std::to_string(src[1] + i));
+						}
+						else {
+							if (_isWhite != board.getBoard()[src[0] - i][src[1] + i]->getIsWhite()) {
+								validMoves.push_back(std::to_string(src[0] - i) + std::to_string(src[1] + i));
+							}
+							breakFlag = true;
+						}
+					}
+					break;
+
+
+
+			}
+
+		}
+	}
+   
     return validMoves;
 }
