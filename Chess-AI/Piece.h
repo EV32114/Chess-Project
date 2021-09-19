@@ -14,6 +14,7 @@ class Piece
 protected:
 	char _type;
 	bool _hasMoved;
+	bool _isWhite;
 
 public:
 	/// <summary>
@@ -33,6 +34,12 @@ public:
 	/// </summary>
 	/// <returns> The piece type </returns>
 	char getType() const;
+
+	/// <summary>
+	/// This function returns true if the piece is white.
+	/// </summary>
+	/// <returns> true if the piece is white </returns>
+	bool getIsWhite() const;
 	
 	/// <summary>
 	/// This function checks if a move that is proformed on a piece matches the way that the piece moves.
