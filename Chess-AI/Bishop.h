@@ -2,6 +2,7 @@
 #include <iostream>
 #include "Piece.h"
 #include <String>
+#include <vector>
 
 using std::string;
 

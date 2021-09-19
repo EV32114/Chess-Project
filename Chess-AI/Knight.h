@@ -22,5 +22,5 @@ public:
 	/// <returns> If the move is valid or not </returns>
 	virtual bool isValidPieceMove(const int* src, const int* dest, const Board& board) const;
 
-	virtual std::string* getValidMoves(const int* src, const Board& board) const;
+	virtual std::vector<std::string> getValidMoves(const int* src, const Board& board) const;
 };

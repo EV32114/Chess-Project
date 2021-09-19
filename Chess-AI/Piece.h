@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include "Board.h"
+#include <vector>
 
 #define BLACK 1
 #define WHITE 0
