@@ -50,49 +50,89 @@ bool Rook::isValidPieceMove(const int* src, const int* dest, const Board& board)
     return true;
 }
 
-string* Rook::getValidMoves(const int* src, const Board& board) const {
-    bool isWhite = isupper(this->_type);
-    int sign = isWhite ? 1 : -1;
-    int nIndex = 0;
-    string* validMoves = new string[NUM_OF_MOVES]{ "" };
-    /*
-        Front row = row that takes a + index to get to.
-        Back row, obviously, is the opposite.
-    */
-    bool backRowBlocked = false; // will be used to determine whether we have an interest to check the back rows.
-    bool backColBlocked = false; // will be used to determine whether we have an interest to check the back columns.
-    bool frontRowBlocked = false; // will be used to determine whether we have an interest to check the front rows.
-    bool frontColBlocked = false; // will be used to determine whether we have an interest to check the front columns.
-
-    for (int i = 1; i < 8; i++) {
-        for (int j = 1; j < i; j++) {
-            if (src[0] + j < 8 && board.getBoard()[src[0] + j][src[1]]->getType() != EMPTY_SQUARE) // if it tries to pass an occupied space, we break.
-                frontRowBlocked = true;
-            if (src[1] + j < 8 && board.getBoard()[src[0]][src[1] + j]->getType() != EMPTY_SQUARE) // if it tries to pass an occupied space, we break.
-                frontColBlocked = true;
-            if (src[0] - j >= 0 && board.getBoard()[src[0] - j][src[1]]->getType() != EMPTY_SQUARE) // if it tries to pass an occupied space, we break.
-                backRowBlocked = true;
-            if (src[1] - j >= 0 && board.getBoard()[src[0]][src[1] - j]->getType() != EMPTY_SQUARE) // if it tries to pass an occupied space, we break.
-                backColBlocked = true;
-        }
-        /*
-            In the following if statements, we check whether a certain square which isn't blocked is either an empty square or an enemy piece.
-            If it is indeed one of them we add the move to the valid moves and increment the index.
-        */
-        if ((src[0] + i) < 8) {
-            if (board.getBoard()[src[0] + i][src[1]]->getType() == EMPTY_SQUARE ||
-                ((isupper(board.getBoard()[src[0] + i][src[1]]->getType()) && !isWhite) || (islower(board.getBoard()[src[0] + i][src[1]]->getType()) && isWhite))) {
-                validMoves[nIndex] = std::to_string(src[0] + i) + std::to_string(src[1]);
-                nIndex++;
-            }
-        }
-        if ((src[0] - i) >= 0) {
-            if (board.getBoard()[src[0] - i][src[1]]->getType() == EMPTY_SQUARE ||
-                ((isupper(board.getBoard()[src[0] - i][src[1]]->getType()) && !isWhite) || (islower(board.getBoard()[src[0] - i][src[1]]->getType()) && isWhite))) {
-                validMoves[nIndex] = std::to_string(src[0] - i) + std::to_string(src[1]);
-                nIndex++;
+std::vector<string> Rook::getValidMoves(const int* src, const Board& board) const {
+    std::vector<string> validMoves;
+    bool breakFlag = false;
+    for (size_t i = 0; i < 4; i++)
+    {
+        breakFlag = false;
+        for (size_t j = 0; j < BOARD_SIDE && !breakFlag; j++)
+        {
+            switch (i)
+            {
+            case 0:
+                if (src[1] + j < 8)
+                {
+                    if (board.getBoard()[src[0]][src[1] + j]->getType() == EMPTY_SQUARE || board.getBoard()[src[0]][src[1] + j]->getIsWhite() != this->getIsWhite())
+                    {
+                        validMoves.push_back(std::to_string(src[0]) + std::to_string(src[1] + j));
+                    }
+                    else {
+                        breakFlag = true;
+                        break;
+                    }
+                }
+                else {
+                    breakFlag = true;
+                    break;
+                }
+                break;
+            case 1:
+                if (src[1] - j < 8)
+                {
+                    if (board.getBoard()[src[0]][src[1] - j]->getType() == EMPTY_SQUARE || board.getBoard()[src[0]][src[1] - j]->getIsWhite() != this->getIsWhite())
+                    {
+                        validMoves.push_back(std::to_string(src[0]) + std::to_string(src[1] - j));
+                    }
+                    else {
+                        breakFlag = true;
+                        break;
+                    }
+                }
+                else {
+                    breakFlag = true;
+                    break;
+                }
+                break;
+            case 2:
+                if (src[0] + j < 8)
+                {
+                    if (board.getBoard()[src[0] + j][src[1]]->getType() == EMPTY_SQUARE || board.getBoard()[src[0] + j][src[1]]->getIsWhite() != this->getIsWhite())
+                    {
+                        validMoves.push_back(std::to_string(src[0] + j) + std::to_string(src[1]));
+                    }
+                    else {
+                        breakFlag = true;
+                        break;
+                    }
+                }
+                else {
+                    breakFlag = true;
+                    break;
+                }
+                break;
+            case 3:
+                if (src[0] - j < 8)
+                {
+                    if (board.getBoard()[src[0] - j][src[1]]->getType() == EMPTY_SQUARE || board.getBoard()[src[0] - j][src[1]]->getIsWhite() != this->getIsWhite())
+                    {
+                        validMoves.push_back(std::to_string(src[0] - j) + std::to_string(src[1]));
+                    }
+                    else {
+                        breakFlag = true;
+                        break;
+                    }
+                }
+                else {
+                    breakFlag = true;
+                    break;
+                }
+                break;
+            default:
+                break;
             }
         }
     }
+
     return validMoves;
 }

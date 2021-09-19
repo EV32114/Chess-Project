@@ -89,69 +89,60 @@ bool Pawn::getPawnInfo(const Board& board, int* initialRow, Piece** afterSrc, co
 	}
 }
 
-string* Pawn::getValidMoves(const int* src, const Board& board) const {
+std::vector<string> Pawn::getValidMoves(const int* src, const Board& board) const {
 	int initialRow = isupper(this->_type) ? WHITE_PAWN_ROW : BLACK_PAWN_ROW;
 	int pawnRow = src[0];
-	int nIndex = 0;
-	string* validMoves = new string[NUM_OF_MOVES]{ "" };
+	std::vector<string> validMoves;
 	if (pawnRow == initialRow) {
 		// En Passant is an option!
 		if (!isupper(this->_type)) {
 
 			if (src[0] - 2 >= 0) {
 				if (board.getBoard()[src[0] + 2][src[1]]->getType() == EMPTY_SQUARE || _isWhite != board.getBoard()[src[0] + 2][src[1]]->getIsWhite()) { // going forward two spaces if it has yet to move.
-					validMoves[nIndex] = std::to_string(src[0] + 2) + std::to_string(src[1]);
-					nIndex++;
+					validMoves.push_back(std::to_string(src[0] + 2) + std::to_string(src[1]));
 				}
 			}
 
 			if (src[0] + 1 < 8) {
 				if (board.getBoard()[src[0] + 1][src[1]]->getType() == EMPTY_SQUARE || _isWhite != board.getBoard()[src[0] + 2][src[1]]->getIsWhite()) { // going forward one space.
-					validMoves[nIndex] = std::to_string(src[0] + 1) + std::to_string(src[1]);
-					nIndex++;
+					validMoves.push_back(std::to_string(src[0] + 1) + std::to_string(src[1]));
 				}
 			}
 
 			if (src[0] + 1 < 8 && src[1] + 1) {
 				if (board.getBoard()[src[0] + 1][src[1] + 1]->getType() != EMPTY_SQUARE || _isWhite != board.getBoard()[src[0] + 2][src[1]]->getIsWhite()) { // eating.
-					validMoves[nIndex] = std::to_string(src[0] + 1) + std::to_string(src[1] + 1);
-					nIndex++;
+					validMoves.push_back(std::to_string(src[0] + 1) + std::to_string(src[1] + 1));
 				}
 			}
 
 			if (src[0] + 1 < 8 && src[1] - 1 >= 0) {
 				if (board.getBoard()[src[0] + 1][src[1] - 1]->getType() != EMPTY_SQUARE || _isWhite != board.getBoard()[src[0] + 2][src[1]]->getIsWhite()) { // eating.
-					validMoves[nIndex] = std::to_string(src[0] + 1) + std::to_string(src[1] + 1);
-					nIndex++;
+					validMoves.push_back(std::to_string(src[0] + 1) + std::to_string(src[1] + 1));
 				}
 			}
 		}
 		else {
 			if (src[0] - 2 >= 0) {
 				if (board.getBoard()[src[0] - 2][src[1]]->getType() == EMPTY_SQUARE || _isWhite != board.getBoard()[src[0] + 2][src[1]]->getIsWhite()) { // going forward two spaces if it has yet to move.
-					validMoves[nIndex] = std::to_string(src[0] - 2) + std::to_string(src[1]);
-					nIndex++;
+					validMoves.push_back(std::to_string(src[0] - 2) + std::to_string(src[1]));
 				}
 			}
 
 			if (src[0] - 1 >= 0) {
 				if (board.getBoard()[src[0] - 1][src[1]]->getType() == EMPTY_SQUARE || _isWhite != board.getBoard()[src[0] + 2][src[1]]->getIsWhite()) { // going forward one space.
-					validMoves[nIndex] = std::to_string(src[0] - 1) + std::to_string(src[1]);
-					nIndex++;
+					validMoves.push_back(std::to_string(src[0] - 1) + std::to_string(src[1]));
 				}
 			}
 			
 			if (src[0] - 1 >= 0 && src[1] + 1 < 8) {
 				if (board.getBoard()[src[0] - 1][src[1] + 1]->getType() != EMPTY_SQUARE || _isWhite != board.getBoard()[src[0] + 2][src[1]]->getIsWhite()) { // eating.
-					validMoves[nIndex] = std::to_string(src[0] - 1) + std::to_string(src[1] + 1);
-					nIndex++;
+					validMoves.push_back(std::to_string(src[0] - 1) + std::to_string(src[1] + 1));
 				}
 			}
 
 			if (src[0] - 1 >= 0 && src[1] - 1 >= 0) {
-				if (board.getBoard()[src[0] - 1][src[1] - 1]->getType() != EMPTY_SQUARE || _	isWhite != board.getBoard()[src[0] + 2][src[1]]->getIsWhite()) { // eating.
-					validMoves[nIndex] = std::to_string(src[0] - 1) + std::to_string(src[1] - 1);
-					nIndex++;
+				if (board.getBoard()[src[0] - 1][src[1] - 1]->getType() != EMPTY_SQUARE || _isWhite != board.getBoard()[src[0] + 2][src[1]]->getIsWhite()) { // eating.
+					validMoves.push_back(std::to_string(src[0] - 1) + std::to_string(src[1] - 1));
 				}
 			}
 		}

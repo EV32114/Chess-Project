@@ -41,5 +41,5 @@ private:
 	/// <param name="dest"> Where to move the pawn to </param>
 	/// <returns> If the pawn tried to move backwards </returns>
 	bool getPawnInfo(const Board& board, int* initialRow, Piece** afterSrc, const int* src, const int* dest) const;
-	string* getValidMoves(const int* src, const Board& board) const;
+	std::vector<std::string> getValidMoves(const int* src, const Board& board) const;
 };

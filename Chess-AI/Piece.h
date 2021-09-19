@@ -51,7 +51,7 @@ public:
 	/// <returns> If the move is valid or not </returns>
 	virtual bool isValidPieceMove(const int* src, const int* dest, const Board& board) const = 0;
 
-	virtual std::vector<string> getValidMoves(const int* src, const Board & board) const = 0;
+	virtual std::vector<std::string> getValidMoves(const int* src, const Board & board) const = 0;
 
 	bool getHasMoved() const;
 	void setHasMoved(const bool hasMoved);
