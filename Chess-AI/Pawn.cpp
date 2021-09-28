@@ -118,13 +118,13 @@ std::vector<string> Pawn::getValidMoves(const int* src, const Board& board) cons
         }
 
         if (src[0] + 1 < 8 && src[1] + 1 < 8) {
-            if (board.getBoard()[src[0] + 1][src[1] + 1]->getType() != EMPTY_SQUARE || _isWhite != board.getBoard()[src[0] + 1][src[1] + 1]->getIsWhite()) { // eating.
+            if (board.getBoard()[src[0] + 1][src[1] + 1]->getType() != EMPTY_SQUARE && _isWhite != board.getBoard()[src[0] + 1][src[1] + 1]->getIsWhite()) { // eating.
                 validMoves.push_back(std::to_string(src[0] + 1) + std::to_string(src[1] + 1));
             }
         }
 
         if (src[0] + 1 < 8 && src[1] - 1 >= 0) {
-            if (board.getBoard()[src[0] + 1][src[1] - 1]->getType() != EMPTY_SQUARE || _isWhite != board.getBoard()[src[0] + 1][src[1] - 1]->getIsWhite()) { // eating.
+            if (board.getBoard()[src[0] + 1][src[1] - 1]->getType() != EMPTY_SQUARE && _isWhite != board.getBoard()[src[0] + 1][src[1] - 1]->getIsWhite()) { // eating.
                 validMoves.push_back(std::to_string(src[0] + 1) + std::to_string(src[1] - 1));
             }
         }
@@ -139,13 +139,13 @@ std::vector<string> Pawn::getValidMoves(const int* src, const Board& board) cons
 		}
 
 		if (src[0] - 1 >= 0 && src[1] + 1 < 8) {
-			if (board.getBoard()[src[0] - 1][src[1] + 1]->getType() != EMPTY_SQUARE || _isWhite != board.getBoard()[src[0] - 1][src[1] + 1]->getIsWhite()) { // eating.
+			if (board.getBoard()[src[0] - 1][src[1] + 1]->getType() != EMPTY_SQUARE && _isWhite != board.getBoard()[src[0] - 1][src[1] + 1]->getIsWhite()) { // eating.
 				validMoves.push_back(std::to_string(src[0] - 1) + std::to_string(src[1] + 1));
 			}
 		}
 
 		if (src[0] - 1 >= 0 && src[1] - 1 >= 0) {
-			if (board.getBoard()[src[0] - 1][src[1] - 1]->getType() != EMPTY_SQUARE || _isWhite != board.getBoard()[src[0] - 1][src[1] - 1]->getIsWhite()) { // eating.
+			if (board.getBoard()[src[0] - 1][src[1] - 1]->getType() != EMPTY_SQUARE && _isWhite != board.getBoard()[src[0] - 1][src[1] - 1]->getIsWhite()) { // eating.
 				validMoves.push_back(std::to_string(src[0] - 1) + std::to_string(src[1] - 1));
 			}
 		}
