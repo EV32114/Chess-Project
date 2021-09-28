@@ -15,8 +15,8 @@ bool Queen::isValidPieceMove(const int* src, const int* dest, const Board& board
 }
 
 std::vector<string> Queen::getValidMoves(const int* src, const Board& board) const {
-    Rook rook('r');
-    Bishop bishop('b');
+    Rook rook(_isWhite ? 'R' : 'r');
+    Bishop bishop(_isWhite ? 'B' : 'b');
     std::vector<string> validMoves = rook.getValidMoves(src, board);
     std::vector<string> bishopVector = bishop.getValidMoves(src, board);
     validMoves.insert(validMoves.end(), bishopVector.begin(), bishopVector.end());
