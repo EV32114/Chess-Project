@@ -63,15 +63,15 @@ void Evaluate::countPieces(string pos, int* whitePieces, int* blackPieces){
 void Evaluate::getValidMoves(Board& board) {
 	std::vector<string> arr;
 	for (int i = 0; i < 8; i++) {
-		for (int j = 0; j < 8; j++) {
-			if (std::tolower(board.getBoard()[i][j]->getType()) != 'n' && std::tolower(board.getBoard()[i][j]->getType()) != '#') {
-				arr = board.getBoard()[i][j]->getValidMoves(new int[2]{i, j}, board); // MEMORY LEAK
-				for (std::vector<string>::iterator it = arr.begin(); it != arr.end(); it++)
-				{
-					cout << *it << "\n";
-				}
-				cout << endl;
-			}
-		}
-	}
+        for (int j = 0; j < 8; j++) {
+            if (std::tolower(board.getBoard()[i][j]->getType()) != '#') {
+                arr = board.getBoard()[i][j]->getValidMoves(new int[2]{i, j}, board); // MEMORY LEAK
+                cout << board.getBoard()[i][j]->getType() << "   ";
+                for (std::vector<string>::iterator it = arr.begin(); it != arr.end(); it++) {
+                    cout << *it << "    ";
+                }
+                cout << endl;
+            }
+        }
+    }
 }
