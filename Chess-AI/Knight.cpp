@@ -42,7 +42,7 @@ std::vector<std::string> Knight::getValidMoves(const int* src, const Board& boar
 
 	if (src[0] - 2 >= 0 && src[1] - 1 >= 0) {
 		if (board.getBoard()[src[0] - 2][src[1] - 1]->getType() == EMPTY_SQUARE || ((_isWhite && islower(board.getBoard()[src[0] - 2][src[1] - 1]->getType())) || (!_isWhite && isupper(board.getBoard()[src[0] - 2][src[1] - 1]->getType())))) {
-			validMoves.push_back(std::to_string(src[0] - 2) + std::to_string(src[1] + 1));
+			validMoves.push_back(std::to_string(src[0] - 2) + std::to_string(src[1] - 1));
 		}
 	}
 
