@@ -32,6 +32,7 @@ Board::Board(std::string strBoard)
       else if (strBoard[i] == '/')
       {
           rowCounter++;
+          columnCounter = 0;
       }
       else
       {
@@ -77,7 +78,11 @@ Board::Board(std::string strBoard)
               {
                   if (std::isdigit(strBoard[i]))
                   {
-                      columnCounter += (strBoard[i] - '0');
+                      columnCounter += (strBoard[i] - '0') - 1;
+                      for (short j = 0; j < (strBoard[i] - '0'); j++)
+                      {
+                          this->_board[rowCounter][j] = new EmptySquare('#');
+                      }
                   }
                   break;
               }
@@ -137,63 +142,6 @@ Board::Board(std::string strBoard)
       }
 
   }
-  /*for (int i = 0; i < BOARD_SIDE; i++)
-  {
-    for (int j = 0; j < BOARD_SIDE; j++)
-    {
-      piece = strBoard[counter];
-      switch (piece)
-      {
-      case B_KING:
-      case W_KING:
-      {
-        King* king = new King(piece, i, j);
-        if (piece == B_KING)
-        {
-          this->_blackKing = king;
-        }
-        else
-        {
-          this->_whiteKing = king;
-        }
-
-        this->_board[i][j] = king;
-        break;
-      }
-
-      case B_ROOK:
-      case W_ROOK:
-        this->_board[i][j] = new Rook(piece);
-        break;
-
-      case B_BISHOP:
-      case W_BISHOP:
-        this->_board[i][j] = new Bishop(piece);
-        break;
-
-      case B_QUEEN:
-      case W_QUEEN:
-        this->_board[i][j] = new Queen(piece);
-        break;
-
-      case B_PAWN:
-      case W_PAWN:
-        this->_board[i][j] = new Pawn(piece);
-        break;
-
-      case B_KNIGHT:
-      case W_KNIGHT:
-        this->_board[i][j] = new Knight(piece);
-        break;
-
-      default:
-        this->_board[i][j] = new EmptySquare(EMPTY_SQUARE);
-        break;
-      }
-      
-      counter++;
-    }
-  }*/
 }
 
 Board::~Board()
