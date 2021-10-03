@@ -45,7 +45,7 @@ public:
 private:
 	static void countPieces(string pos, int* whitePieces, int* blackPieces);
 	static void getValidMoves(Board& board);
-	static int evaluatePiecesMidGame(int* whitePieces, int* blackPieces, bool white);
-	static int evaluatePiecesEndGame(int* whitePieces, int* blackPieces, bool white);
+	static int evaluatePiecesWhite(int* whitePieces, bool midGame);
+	static int evaluatePiecesBlack(int* blackPieces, bool midGame);
 };
  

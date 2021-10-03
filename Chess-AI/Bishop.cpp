@@ -56,7 +56,7 @@ std::vector<string> Bishop::getValidMoves(const int* src, const Board& board) co
 	bool breakFlag = false;;
 	for (int way = 0; way < 4; way++) {
 		breakFlag = false;
-		for (int i = 0; i < 8 && !breakFlag; i++) {
+		for (int i = 1; i < 8 && !breakFlag; i++) {
 			switch (way) {
 				case 0:
 					if (src[0] + i < 8 && src[1] + i < 8) {
@@ -110,9 +110,6 @@ std::vector<string> Bishop::getValidMoves(const int* src, const Board& board) co
 						}
 					}
 					break;
-
-
-
 			}
 
 		}

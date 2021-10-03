@@ -78,11 +78,11 @@ Board::Board(std::string strBoard)
               {
                   if (std::isdigit(strBoard[i]))
                   {
+					  for (short j = columnCounter; j < columnCounter + (strBoard[i] - '0'); j++)
+					  {
+						  this->_board[rowCounter][j] = new EmptySquare('#');
+					  }
                       columnCounter += (strBoard[i] - '0') - 1;
-                      for (short j = 0; j < (strBoard[i] - '0'); j++)
-                      {
-                          this->_board[rowCounter][j] = new EmptySquare('#');
-                      }
                   }
                   break;
               }
