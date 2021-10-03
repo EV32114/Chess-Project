@@ -23,6 +23,7 @@ int Evaluate::evalPos(string pos)
 	cout << "Black's evaluation: \n" << evalBlack << endl;
 
 	Board board(pos);
+	board.printBoard();
 	getValidMoves(board);
 	return 0;
 }

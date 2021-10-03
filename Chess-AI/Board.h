@@ -34,7 +34,7 @@ private:
 	Piece** _board[BOARD_SIDE];
 	King* _blackKing;
 	King* _whiteKing;
-	int enPassantSquare[2];
+	int* enPassantSquare;
 	int halfMove;
 	int fullMove;
 	bool castleWhiteKing;

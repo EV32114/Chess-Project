@@ -90,13 +90,34 @@ Board::Board(std::string strBoard)
               break;
           }
           case 2:
-          {
-
+		  {
+			  if (strBoard[i] == '-') {
+				  this->castleBlackKing = false;
+				  this->castleBlackQueen = false;
+				  this->castleWhiteKing = false;
+				  this->castleWhiteQueen = false;
+			  }
+			  else if (strBoard[i] == 'K')
+				  this->castleWhiteKing = true;
+			  else if (strBoard[i] == 'Q') {
+				  this->castleWhiteQueen = true;
+			  }
+			  else if (strBoard[i] == 'k') {
+				  this->castleBlackKing = true;
+			  }
+			  else if (strBoard[i] == 'q') {
+				  this->castleBlackQueen = true;
+			  }
               break;
           }
           case 3:
           {
-
+			  if (strBoard[i] == '-') {
+				  break;
+			  }
+			  else {
+				  this->enPassantSquare = this->convertIndex(std::to_string(strBoard[i]) + std::to_string(strBoard[i + 1]));
+			  }
               break;
           }
           case 4:

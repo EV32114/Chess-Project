@@ -3,8 +3,9 @@
 int main()
 {
 	// cout << Evaluate::evalPos("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR") << endl;
-	cout << Evaluate::evalPos("rnbqkbnrpppppppp################################PPPPPPPPRNBQKBNR0") << endl;
-	Board board("rnbqkbnrpppppppp################################PPPPPPPPRNBQKBNR0");
+	cout << Evaluate::evalPos("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1") << endl;
+	Board board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+	
 	
 
 	return 0;

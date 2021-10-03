@@ -23,7 +23,7 @@ bool Knight::isValidPieceMove(const int* src, const int* dest, const Board& boar
 std::vector<std::string> Knight::getValidMoves(const int* src, const Board& board) const
 {
 	std::vector<string> validMoves;
-	if (src[0] + 2 < 8) {
+	if (src[0] + 2 < 8 && src[1] + 1 < 8) {
 		if (board.getBoard()[src[0] + 2][src[1] + 1]->getType() == EMPTY_SQUARE || ((_isWhite && islower(board.getBoard()[src[0] + 2][src[1] + 1]->getType())) || (!_isWhite && isupper(board.getBoard()[src[0] + 2][src[1] + 1]->getType())))) {
 			validMoves.push_back(std::to_string(src[0] + 2) + std::to_string(src[1] + 1));
 		}
