@@ -5,7 +5,7 @@ std::vector<std::string> whiteMoves;
 
 int Evaluate::evalPos(string pos)
 {
-	int blackPieceCounter[6] = {0};
+	int blackPieceCounter[6] = { 0 };
 	int whitePieceCounter[6] = { 0 };
 	int blackValid[MAX_VALID_MOVES] = { 0 };
 	int whiteValid[MAX_VALID_MOVES] = { 0 };
