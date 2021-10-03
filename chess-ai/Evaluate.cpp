@@ -79,11 +79,15 @@ void Evaluate::getValidMoves(Board& board) {
 			std::vector<string> temp;
             if (std::tolower(board.getBoard()[i][j]->getType()) != '#' && !board.getBoard()[i][j]->getIsWhite()) {
 				temp = board.getBoard()[i][j]->getValidMoves(new int[2]{ i, j }, board);
+				blackMoves.push_back(std::string(1, board.getBoard()[i][j]->getType()) + ": ");
                 blackMoves.insert(blackMoves.end(), temp.begin(), temp.end());
+				blackMoves.push_back("\n");
             }
 			else if (std::tolower(board.getBoard()[i][j]->getType()) != '#' && board.getBoard()[i][j]->getIsWhite()) {
 				temp = board.getBoard()[i][j]->getValidMoves(new int[2]{ i, j }, board);
+				whiteMoves.push_back(std::string(1, board.getBoard()[i][j]->getType()) + ": ");
 				whiteMoves.insert(whiteMoves.end(), temp.begin(), temp.end());
+				whiteMoves.push_back("\n");
 			}
         }
     }
