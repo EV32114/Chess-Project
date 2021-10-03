@@ -11,17 +11,112 @@
 
 Board::Board(std::string strBoard)
 {
-  int counter = 0;
-  char piece = 0;
-  this->_blackKing = 0;
-  this->_whiteKing = 0;
+    int segmentCounter = 0;
+    int rowCounter = 0;
+    int columnCounter = 0;
+
+    this->_blackKing = 0;
+    this->_whiteKing = 0;
 
   for (int i = 0; i < BOARD_SIDE; i++)
   {
     this->_board[i] = new Piece*[BOARD_SIDE];
   }
-  
-  for (int i = 0; i < BOARD_SIDE; i++)
+
+  for (size_t i = 0; i < strBoard.length(); i++)
+  {
+      if (strBoard[i] == ' ')
+      {
+          segmentCounter++;
+      }
+      else if (strBoard[i] == '/')
+      {
+          rowCounter++;
+      }
+      else
+      {
+          switch (segmentCounter)
+          {
+          case 0:
+          {
+              switch (strBoard[i])
+              {
+              case B_KING:
+              {
+                  this->_blackKing = new King(strBoard[i], rowCounter, columnCounter);
+                  this->_board[rowCounter][columnCounter] = new King(strBoard[i], rowCounter, columnCounter);
+                  break;
+              }
+              case W_KING:
+              {
+                  this->_whiteKing = new King(strBoard[i], rowCounter, columnCounter);
+                  this->_board[rowCounter][columnCounter] = new King(strBoard[i], rowCounter, columnCounter);
+                  break;
+              }
+              case B_QUEEN:
+              case W_QUEEN:
+                  this->_board[rowCounter][columnCounter] = new Queen(strBoard[i]);
+                  break;
+              case B_BISHOP:
+              case W_BISHOP:
+                  this->_board[rowCounter][columnCounter] = new Bishop(strBoard[i]);
+                  break;
+              case B_PAWN:
+              case W_PAWN:
+                  this->_board[rowCounter][columnCounter] = new Pawn(strBoard[i]);
+                  break;
+              case B_ROOK:
+              case W_ROOK:
+                  this->_board[rowCounter][columnCounter] = new Rook(strBoard[i]);
+                  break;
+              case B_KNIGHT:
+              case W_KNIGHT:
+                  this->_board[rowCounter][columnCounter] = new Knight(strBoard[i]);
+                  break;
+              default:
+              {
+                  if (std::isdigit(strBoard[i]))
+                  {
+                      columnCounter += (strBoard[i] - '0');
+                  }
+                  break;
+              }
+              }
+              break;
+          }
+          case 1:
+          {
+              this->nextTurnWhite = (strBoard[i] == 'w');
+              break;
+          }
+          case 2:
+          {
+
+              break;
+          }
+          case 3:
+          {
+
+              break;
+          }
+          case 4:
+          {
+              this->halfMove = (strBoard[i] - '0');
+              break;
+          }
+          case 5:
+          {
+              this->fullMove = (strBoard[i] - '0');
+              break;
+          }
+          default:
+              break;
+          }
+          columnCounter++;
+      }
+
+  }
+  /*for (int i = 0; i < BOARD_SIDE; i++)
   {
     for (int j = 0; j < BOARD_SIDE; j++)
     {
@@ -77,7 +172,7 @@ Board::Board(std::string strBoard)
       
       counter++;
     }
-  }
+  }*/
 }
 
 Board::~Board()

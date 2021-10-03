@@ -34,6 +34,14 @@ private:
 	Piece** _board[BOARD_SIDE];
 	King* _blackKing;
 	King* _whiteKing;
+	int enPassantSquare[2];
+	int halfMove;
+	int fullMove;
+	bool castleWhiteKing;
+	bool castleWhiteQueen;
+	bool castleBlackKing;
+	bool castleBlackQueen;
+	bool nextTurnWhite;
 
 public:
 	/// <summary>
