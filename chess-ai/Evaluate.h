@@ -4,6 +4,7 @@
 #include <string>
 #include <algorithm>
 #include "Piece.h"
+#include <vector>
 
 #define MID_PAWN 198
 #define END_PAWN 258
@@ -43,9 +44,12 @@ public:
 	static int evalPos(string pos);
 
 private:
+	static std::vector<std::string> blackMoves;
+	static std::vector<std::string> whiteMoves;
 	static void countPieces(string pos, int* whitePieces, int* blackPieces);
 	static void getValidMoves(Board& board);
 	static int evaluatePiecesWhite(int* whitePieces, bool midGame);
 	static int evaluatePiecesBlack(int* blackPieces, bool midGame);
+	static int evaluateKingSafety(Board& board);
 };
  

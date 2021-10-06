@@ -2,8 +2,8 @@
 #include <vector>
 #include <iterator>
 
-std::vector<std::string> blackMoves;
-std::vector<std::string> whiteMoves;
+std::vector<std::string> Evaluate::blackMoves;
+std::vector<std::string> Evaluate::whiteMoves;
 
 int Evaluate::evalPos(string pos)
 {
@@ -116,6 +116,12 @@ int Evaluate::evaluatePiecesBlack(int *blackPieces, bool midGame) {
 		}
 	}
 	return posEval;
+}
+
+int Evaluate::evaluateKingSafety(Board& board)
+{
+
+	return 0;
 }
 
 int Evaluate::evaluatePiecesWhite(int* whitePieces, bool midGame) {
