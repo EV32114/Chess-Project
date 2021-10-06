@@ -51,5 +51,8 @@ private:
 	static int evaluatePiecesWhite(int* whitePieces, bool midGame);
 	static int evaluatePiecesBlack(int* blackPieces, bool midGame);
 	static int evaluateKingSafety(Board& board);
+	static int attackKingZone(Board& board, bool white);
+	static std::vector<Piece*> calcKingZone(Board& board, bool white);
+
 };
  

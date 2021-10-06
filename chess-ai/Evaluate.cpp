@@ -6,7 +6,6 @@
 std::vector<std::string> Evaluate::blackMoves;
 std::vector<std::string> Evaluate::whiteMoves;
 
-
 int Evaluate::evalPos(string pos)
 {
 	int blackPieceCounter[6] = { 0 };
@@ -124,6 +123,23 @@ int Evaluate::evaluateKingSafety(Board& board)
 {
 
 	return 0;
+}
+
+int Evaluate::attackKingZone(Board& board, bool white)
+{
+	int attackingPiecesCount = 0, valueOfAttack = 0;
+	const int KNIGHT_VAL = 20, BISHOP_VAL = 20, ROOK_VAL = 40, QUEEN_VAL = 80;
+	const int attackWeight[7] = { 0, 50, 75, 88, 94, 97, 99 };
+	std::vector<Piece*> kingZone = calcKingZone(board, white);
+
+
+	return 0;
+}
+
+std::vector<Piece*> Evaluate::calcKingZone(Board& board, bool white)
+{
+	std::vector<Piece*> v;
+	return v;
 }
 
 int Evaluate::evaluatePiecesWhite(int* whitePieces, bool midGame) {
