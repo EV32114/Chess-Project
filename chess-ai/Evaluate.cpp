@@ -2,8 +2,10 @@
 #include <vector>
 #include <iterator>
 
+// static variables initialization
 std::vector<std::string> Evaluate::blackMoves;
 std::vector<std::string> Evaluate::whiteMoves;
+
 
 int Evaluate::evalPos(string pos)
 {
