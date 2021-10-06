@@ -121,8 +121,127 @@ int Evaluate::evaluatePiecesBlack(int *blackPieces, bool midGame) {
 int Evaluate::evaluateKingSafety(Board& board)
 {
 
+}
+
+int Evaluate::evaluatePawnShield(int src[], Board& board)
+{
+	/*
+		Firstly, we shall check whether the king is in a place that we need to evaluate.
+		In our case, we will first check if the king is in either position 7,2 - 7,1 or 7,6.
+		src[] is an array consisting of the row and column of the king respectively.
+	*/
+	King* tempK = (King*)(board.getBoard()[src[0]][src[1]]);
+	bool _isWhite = board.getBoard()[src[0]][src[1]]->getIsWhite();
+	int penalty = 0;
+
+	if (_isWhite) {
+		if (src[0] != 0) 
+			return 0;
+		if (src[1] != 1 && src[1] != 2 && src[1] != 6)
+			return 0;
+	}
+	else {
+		if (src[0] != 7)
+			return 0;
+		if (src[1] != 1 && src[1] != 2 && src[1] != 6)
+			return 0;
+	}
+
+	// We check whether there's an open file
+	bool openFile = true;
+	for (int i = 1; i < 8; i++) {
+		if (_isWhite) {
+			if (board.getBoard()[src[0] - i][src[1]]->getType() == 'P' || board.getBoard()[src[0] - i][src[1]]->getType() == 'p') {
+				openFile = false;
+			}
+		}
+		else {
+			if (board.getBoard()[src[0] + i][src[1]]->getType() == 'P' || board.getBoard()[src[0] + i][src[1]]->getType() == 'p') {
+				openFile = false;
+			}
+		}
+	}
+
+	penalty += openFile ? OPEN_FILE_PENALTY : 0; 
+
+	// We check whether there are pawns shielding the king
+
+
+
 	return 0;
 }
+
+std::vector<Piece*> Evaluate::calcKingZone(Board& board, int src[], bool white) {
+	std::vector<Piece*> vec;
+	if(src[0] + 1 < 8)
+		vec.push_back(board.getBoard()[src[0] + 1][src[1]]);
+	if(src[1] + 1 < 8)
+		vec.push_back(board.getBoard()[src[0]][src[1] + 1]);
+	if(src[0] + 1 < 8 && src[1] + 1 < 8)
+		vec.push_back(board.getBoard()[src[0] + 1][src[1] + 1]);
+	if(src[0] - 1 >= 0)
+		vec.push_back(board.getBoard()[src[0] - 1][src[1]]);
+	if (src[1] - 1 >= 0)
+		vec.push_back(board.getBoard()[src[0]][src[1] - 1]);
+	if(src[0] - 1 >= 0 && src[1] - 1 >= 0)
+		vec.push_back(board.getBoard()[src[0]][src[1] - 1]);
+	if(src[0] - 1 >= 0 && src[1] + 1 < 8)
+		vec.push_back(board.getBoard()[src[0] - 1][src[1] + 1]);
+	if(src[0] + 1 < 8 && src[1] - 1 >= 0)
+		vec.push_back(board.getBoard()[src[0] + 1][src[1] - 1]);
+	if (white) {
+		if (src[0] - 2 >= 0) {
+			vec.push_back(board.getBoard()[src[0] - 2][src[1]]);
+			if (src[1] + 1 < 8)
+				vec.push_back(board.getBoard()[src[0] - 2][src[1] + 1]);
+			if (src[1] - 1 >= 0)
+				vec.push_back(board.getBoard()[src[0] - 2][src[1] - 1]);
+		}
+		if (src[0] - 3 >= 0) {
+			vec.push_back(board.getBoard()[src[0] - 3][src[1]]);
+			if (src[1] + 1 < 8)
+				vec.push_back(board.getBoard()[src[0] - 3][src[1] + 1]);
+			if (src[1] - 1 >= 0)
+				vec.push_back(board.getBoard()[src[0] - 3][src[1] - 1]);
+		}
+		if (src[0] - 4 >= 0) {
+			vec.push_back(board.getBoard()[src[0] - 4][src[1] - 1]);
+			if (src[1] + 1 < 8)
+				vec.push_back(board.getBoard()[src[0] - 4][src[1] + 1]);
+			if (src[1] - 1 >= 0)
+				vec.push_back(board.getBoard()[src[0] - 4][src[1] - 1]);
+		}
+	}
+	else {
+		if (src[0] + 2 < 8) {
+			vec.push_back(board.getBoard()[src[0] + 2][src[1]]);
+			if (src[1] + 1 < 8)
+				vec.push_back(board.getBoard()[src[0] + 2][src[1] + 1]);
+			if (src[1] - 1 >= 0)
+				vec.push_back(board.getBoard()[src[0] + 2][src[1] - 1]);
+		}
+		if (src[0] + 3 < 8) {
+			vec.push_back(board.getBoard()[src[0] + 3][src[1]]);
+			if (src[1] + 1 < 8)
+				vec.push_back(board.getBoard()[src[0] + 3][src[1] + 1]);
+			if (src[1] - 1 >= 0)
+				vec.push_back(board.getBoard()[src[0] + 3][src[1] - 1]);
+		}
+		if (src[0] + 4 < 8) {
+			vec.push_back(board.getBoard()[src[0] + 4][src[1]]);
+			if (src[1] + 1 < 8)
+				vec.push_back(board.getBoard()[src[0] + 4][src[1] + 1]);
+			if (src[1] - 1 >= 0)
+				vec.push_back(board.getBoard()[src[0] + 4][src[1] - 1]);
+		}
+	}
+
+
+	return vec;
+
+}
+
+
 
 int Evaluate::evaluatePiecesWhite(int* whitePieces, bool midGame) {
 	int posEval = 0;

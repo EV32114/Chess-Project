@@ -31,6 +31,7 @@
 #define W_KNIGHT 'N'
 
 #define MAX_VALID_MOVES 321
+#define OPEN_FILE_PENALTY 50
 
 enum { KING, QUEEN, KNIGHT, ROOK, BISHOP, PAWN };
 
@@ -51,5 +52,7 @@ private:
 	static int evaluatePiecesWhite(int* whitePieces, bool midGame);
 	static int evaluatePiecesBlack(int* blackPieces, bool midGame);
 	static int evaluateKingSafety(Board& board);
+	static int evaluatePawnShield(int src[], Board& board);
+	static std::vector<Piece*> calcKingZone(Board& board, int src[], bool white);
 };
  
