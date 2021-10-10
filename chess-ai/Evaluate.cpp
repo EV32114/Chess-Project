@@ -129,6 +129,18 @@ int Evaluate::evaluateKingSafety(Board& board)
 
 }
 
+bool Evaluate::isUnderAttack(Board& board, int src[])
+{
+	bool _isWhite = board.getBoard()[src[0]][src[1]]->getIsWhite();
+	std::vector<std::string> enemyValidMoves = _isWhite ? blackMoves : whiteMoves;
+	for (std::vector<std::string>::iterator i = enemyValidMoves.begin(); i != enemyValidMoves.end(); i++) {
+		if ((std::to_string(src[0]) + std::to_string(src[1])) == *i) {
+			return true;
+		}
+	}
+	return false;
+}
+
 int Evaluate::evaluatePawnShield(int src[], Board& board)
 {
 	/*

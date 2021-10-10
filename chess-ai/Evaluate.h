@@ -98,6 +98,7 @@ private:
 	static int evaluatePiecesWhite(int* whitePieces, bool midGame);
 	static int evaluatePiecesBlack(int* blackPieces, bool midGame);
 	static int evaluateKingSafety(Board& board);
+	static bool isUnderAttack(Board& board, int src[]);
 	static int evaluatePawnShield(int src[], Board& board);
 	static std::vector<Piece*> calcKingZone(Board& board, int src[], bool white);
 };
