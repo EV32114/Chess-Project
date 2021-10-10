@@ -7,6 +7,7 @@
 #include "King.h"
 #include <vector>
 
+#define MAX_ROW_INDEX 7
 #define MID_PAWN 198
 #define END_PAWN 258
 #define MID_KNIGHT 817
@@ -98,8 +99,10 @@ private:
 	static void getValidMoves(Board& board);
 	static int evaluatePiecesWhite(int* whitePieces, bool midGame);
 	static int evaluatePiecesBlack(int* blackPieces, bool midGame);
+	static int evaluatePiecePositions(Board& board, bool white);
 	static int evaluateKingSafety(Board& board);
 	static bool isUnderAttack(Board& board, int src[]);
+	static int calculateBlackIndex(int row);
 	static int evaluatePawnShield(int src[], Board& board);
 	static int attackKingZone(Board& board, bool white);
 	static std::vector<Piece*> calcKingZone(Board& board, int src[], bool white);

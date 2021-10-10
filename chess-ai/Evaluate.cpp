@@ -124,6 +124,47 @@ int Evaluate::evaluatePiecesBlack(int *blackPieces, bool midGame) {
 	return posEval;
 }
 
+int Evaluate::evaluatePiecePositions(Board& board, bool white)
+{
+	int eval = 0;
+	for (int i = 0; i < BOARD_SIDE; i++) {
+		for (int j = 0; j < BOARD_SIDE; j++) {
+			if (board.getBoard()[i][j]->getIsWhite()) {
+				if (white) {
+					switch (board.getBoard()[i][j]->getType()) {
+					case 'P':
+						eval += pawnTable[i][j];
+					case 'B':
+						eval += bishopTable[i][j];
+					case 'N':
+						eval += knightTable[i][j];
+					case 'K':
+						// TODO: SEPERATE END GAME 
+						eval += kingTable[i][j];
+					}
+				}
+			}
+			else {
+				if (!white) {
+					int row = calculateBlackIndex(i);
+					switch (board.getBoard()[i][j]->getType()) {
+					case 'P':
+						eval += pawnTable[row][j];
+					case 'B':
+						eval += bishopTable[row][j];
+					case 'N':
+						eval += knightTable[row][j];
+					case 'K':
+						// TODO: SEPERATE END GAME 
+						eval += kingTable[row][j];
+					}
+				}
+			}	
+		}
+	}
+	return eval;
+}
+
 int Evaluate::evaluateKingSafety(Board& board)
 {
 	return 0;
@@ -139,6 +180,20 @@ bool Evaluate::isUnderAttack(Board& board, int src[])
 		}
 	}
 	return false;
+}
+
+/*
+	This function returns the adjusted index of the Piece-Square table for the black side.
+	The tables are symmetrical, therefore we only need to change the row and adjust it to it's opposite row.
+	From selected examples:
+	7-0, 6-1, 5-2, etc.
+	we can see a clear pattern of 7 (max row index) - the row number being the desired result.
+	@params: src[], a sized array containing the position using the format row, col
+	@returns: adjusted src[].
+*/
+int Evaluate::calculateBlackIndex(int row)
+{
+	return MAX_ROW_INDEX - row;
 }
 
 int Evaluate::evaluatePawnShield(int src[], Board& board)
