@@ -84,7 +84,7 @@ public:
 	/// <param name="src"> The position of the piece that the player wants to move </param>
 	/// <param name="dest"> Where the player wants to move the piece to </param>
 	/// <param name="toDelete"> If to delete the dest piece </param>
-	void movePiece(const int* src, const int* dest, bool toDelete);
+	void movePiece(int* src, const int* dest, bool toDelete);
 
 	/// <summary>
 	/// This function converts a position on the graphics board to match the board in the code. 

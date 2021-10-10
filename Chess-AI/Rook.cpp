@@ -2,11 +2,11 @@
 class HandleGame;
 
 
-Rook::Rook(char type) : Piece(type)
+Rook::Rook(char type, int* pos) : Piece(type, pos)
 {
 }
 
-bool Rook::isValidPieceMove(const int* src, const int* dest, const Board& board) const
+bool Rook::isValidPieceMove(int* src, const int* dest, const Board& board) const
 {
     int tempSrc[BOARD_INDEX] = { src[0], src[1] };
     int tempDest[BOARD_INDEX] = { dest[0], dest[1] };
@@ -50,7 +50,7 @@ bool Rook::isValidPieceMove(const int* src, const int* dest, const Board& board)
     return true;
 }
 
-std::vector<string> Rook::getValidMoves(const int* src, const Board& board) const {
+std::vector<string> Rook::getValidMoves(int* src, const Board& board) const {
     std::vector<string> validMoves;
     bool breakFlag = false;
     for (size_t i = 0; i < 4; i++)

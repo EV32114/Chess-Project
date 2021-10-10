@@ -1,10 +1,10 @@
 #include "Pawn.h"
 
-Pawn::Pawn(char type) : Piece(type)
+Pawn::Pawn(char type, int* pos) : Piece(type, pos)
 {
 }
 
-bool Pawn::isValidPieceMove(const int* src, const int* dest, const Board& board) const
+bool Pawn::isValidPieceMove(int* src, const int* dest, const Board& board) const
 {
 	int subX = src[0] - dest[0];
 	int subY = src[1] - dest[1];
@@ -89,7 +89,7 @@ bool Pawn::getPawnInfo(const Board& board, int* initialRow, Piece** afterSrc, co
 	}
 }
 
-std::vector<string> Pawn::getValidMoves(const int* src, const Board& board) const {
+std::vector<string> Pawn::getValidMoves(int* src, const Board& board) const {
 	int initialRow = isupper(this->_type) ? WHITE_PAWN_ROW : BLACK_PAWN_ROW;
 	int pawnRow = src[0];
 	std::vector<string> validMoves;

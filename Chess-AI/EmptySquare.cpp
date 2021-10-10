@@ -1,15 +1,15 @@
 #include "EmptySquare.h"
 
-EmptySquare::EmptySquare(char type) : Piece(type)
+EmptySquare::EmptySquare(char type, int* pos) : Piece(type, pos)
 {
 }
 
-bool EmptySquare::isValidPieceMove(const int* src, const int* dest, const Board& board) const
+bool EmptySquare::isValidPieceMove(int* src, const int* dest, const Board& board) const
 {
 	return false;
 }
 
-std::vector<std::string> EmptySquare::getValidMoves(const int* src, const Board& board) const
+std::vector<std::string> EmptySquare::getValidMoves(int* src, const Board& board) const
 {
 	return std::vector<std::string>();
 }

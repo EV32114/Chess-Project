@@ -2,11 +2,11 @@
 #include "Board.h"
 #include <vector>
 
-Bishop::Bishop(char type) : Piece(type)
+Bishop::Bishop(char type, int* pos) : Piece(type, pos)
 {
 }
 
-bool Bishop::isValidPieceMove(const int* src, const int* dest, const Board& board) const
+bool Bishop::isValidPieceMove(int* src, const int* dest, const Board& board) const
 {
     int subX = src[0] - dest[0];
     int subY = src[1] - dest[1];
@@ -51,7 +51,7 @@ bool Bishop::isValidPieceMove(const int* src, const int* dest, const Board& boar
     return true;
 }
 
-std::vector<string> Bishop::getValidMoves(const int* src, const Board& board) const {
+std::vector<string> Bishop::getValidMoves(int* src, const Board& board) const {
 	std::vector<string> validMoves;
 	bool breakFlag = false;;
 	for (int way = 0; way < 4; way++) {

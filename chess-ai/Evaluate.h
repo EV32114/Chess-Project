@@ -4,6 +4,7 @@
 #include <string>
 #include <algorithm>
 #include "Piece.h"
+#include "King.h"
 #include <vector>
 
 #define MID_PAWN 198
@@ -100,6 +101,7 @@ private:
 	static int evaluateKingSafety(Board& board);
 	static bool isUnderAttack(Board& board, int src[]);
 	static int evaluatePawnShield(int src[], Board& board);
+	static int attackKingZone(Board& board, bool white);
 	static std::vector<Piece*> calcKingZone(Board& board, int src[], bool white);
 };
  

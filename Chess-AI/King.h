@@ -10,9 +10,6 @@ using std::string;
 
 class King : public Piece
 {
-private:
-	int _position[BOARD_INDEX];
-
 public:
 	/// <summary>
 	/// This function is the constructor of the class king.
@@ -39,7 +36,7 @@ public:
 	/// <param name="dest"> Where the player wants to move the king to </param>
 	/// <param name="board"> The game board </param>
 	/// <returns> If the move is valid or not </returns>
-	virtual bool isValidPieceMove(const int* src, const int* dest, const Board& board) const;
+	virtual bool isValidPieceMove(int* src, const int* dest, const Board& board) const;
 
-	std::vector<std::string> getValidMoves(const int* src, const Board& board) const;
+	virtual std::vector<std::string> getValidMoves(int* src, const Board& board) const;
 };

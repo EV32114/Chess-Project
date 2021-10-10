@@ -3,11 +3,11 @@
 using std::string;
 
 
-Knight::Knight(char type) : Piece(type)
+Knight::Knight(char type, int* pos) : Piece(type, pos)
 {
 }
 
-bool Knight::isValidPieceMove(const int* src, const int* dest, const Board& board) const
+bool Knight::isValidPieceMove(int* src, const int* dest, const Board& board) const
 {
 	int subX = abs(src[0] - dest[0]);
 	int subY = abs(src[1] - dest[1]);
@@ -20,7 +20,7 @@ bool Knight::isValidPieceMove(const int* src, const int* dest, const Board& boar
 	return false;
 }
 
-std::vector<std::string> Knight::getValidMoves(const int* src, const Board& board) const
+std::vector<std::string> Knight::getValidMoves(int* src, const Board& board) const
 {
 	std::vector<string> validMoves;
 	if (src[0] + 2 < 8 && src[1] + 1 < 8) {

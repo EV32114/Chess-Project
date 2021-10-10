@@ -16,13 +16,14 @@ protected:
 	char _type;
 	bool _hasMoved;
 	bool _isWhite;
+	int* _position;
 
 public:
 	/// <summary>
 	/// This function is the constructor of the class Piece.
 	/// </summary>
 	/// <param name="type"> The type of the piece </param>
-	Piece(const char type);
+	Piece(const char type, int* pos);
 
 	/// <summary>
 	/// This function sets a new type to _type.
@@ -49,12 +50,14 @@ public:
 	/// <param name="dest"> Where the player wants to move the piece to </param>
 	/// <param name="board"> The game board </param>
 	/// <returns> If the move is valid or not </returns>
-	virtual bool isValidPieceMove(const int* src, const int* dest, const Board& board) const = 0;
+	virtual bool isValidPieceMove(int* src, const int* dest, const Board& board) const = 0;
 
-	virtual std::vector<std::string> getValidMoves(const int* src, const Board & board) const = 0;
+	virtual std::vector<std::string> getValidMoves(int* src, const Board & board) const = 0;
 
 	bool getHasMoved() const;
 	void setHasMoved(const bool hasMoved);
+	void setPos(const int* pos);
+	int* getPos();
 };
 
 #endif // !__PIECE_H__

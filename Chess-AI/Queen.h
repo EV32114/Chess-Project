@@ -14,7 +14,7 @@ public:
 	/// This function is the constructor of the class queen.
 	/// </summary>
 	/// <param name="type"> If the queen is black or white </param>
-	Queen(char type);
+	Queen(char type, int* pos);
 
 	/// <summary>
 	/// This function checks if a move that is proformed on a queen matches the way that a queen moves.
@@ -23,6 +23,6 @@ public:
 	/// <param name="dest"> Where the player wants to move the queen to </param>
 	/// <param name="board"> The game board </param>
 	/// <returns> If the move is valid or not </returns>
-	virtual bool isValidPieceMove(const int* src, const int* dest, const Board& board) const;
-	std::vector<std::string> getValidMoves(const int* src, const Board& board) const;
+	virtual bool isValidPieceMove(int* src, const int* dest, const Board& board) const;
+	std::vector<std::string> getValidMoves(int* src, const Board& board) const;
 };

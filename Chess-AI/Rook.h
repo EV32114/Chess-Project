@@ -16,7 +16,7 @@ public:
 	/// This function is the constructor of the class rook.
 	/// </summary>
 	/// <param name="type"> If the rook is black or white </param>
-	Rook(char type);
+	Rook(char type, int* pos);
 
 	/// <summary>
 	/// This function checks if a move that is proformed on a rook matches the way that a rook moves.
@@ -25,6 +25,6 @@ public:
 	/// <param name="dest"> Where the player wants to move the rook to </param>
 	/// <param name="board"> The game board </param>
 	/// <returns> If the move is valid or not </returns>
-	virtual bool isValidPieceMove(const int* src, const int* dest, const Board& board) const;
-	std::vector<std::string> getValidMoves(const int* src, const Board& board) const;
+	virtual bool isValidPieceMove(int* src, const int* dest, const Board& board) const;
+	virtual std::vector<std::string> getValidMoves(int* src, const Board& board) const;
 };

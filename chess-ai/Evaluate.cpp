@@ -126,7 +126,7 @@ int Evaluate::evaluatePiecesBlack(int *blackPieces, bool midGame) {
 
 int Evaluate::evaluateKingSafety(Board& board)
 {
-
+	return 0;
 }
 
 bool Evaluate::isUnderAttack(Board& board, int src[])
@@ -193,6 +193,53 @@ int Evaluate::evaluatePawnShield(int src[], Board& board)
 
 	// Calculate using adjusted numbers.
 	return pawnCount;
+}
+
+int Evaluate::attackKingZone(Board& board, bool white)
+{
+	int attackingPiecesCount = 0, valueOfAttack = 0;
+	const int KNIGHT_VAL = 20, BISHOP_VAL = 20, ROOK_VAL = 40, QUEEN_VAL = 80;
+	const int attackWeight[7] = { 0, 50, 75, 88, 94, 97, 99 };
+	std::vector<std::string>::iterator attacker;
+	std::vector<Piece*> kingZone = calcKingZone(board, white ? board.getWhiteKing()->getPosition() : board.getBlackKing()->getPosition(), white);
+	for (std::vector<Piece*>::iterator it = kingZone.begin(); it != kingZone.end(); it++)
+	{
+		if (!white)
+		{
+			attacker = std::find_if(whiteMoves.begin(), whiteMoves.end(), [&](std::string s1) {return s1.find(std::to_string((*it)->getPos()[1])) != std::string::npos; });
+		}
+		else
+		{
+			attacker = std::find_if(blackMoves.begin(), blackMoves.end(), [&](std::string s1) {return s1.find(std::to_string((*it)->getPos()[1])) != std::string::npos; });
+		}
+		if ((!white && attacker != whiteMoves.end()) || (white && attacker != blackMoves.end()))
+		{
+			char type = board.getBoard()[std::stoi((*attacker).substr(0, 1))][std::stoi((*attacker).substr(1, 1))]->getType();
+			attackingPiecesCount++;
+			switch (type)
+			{
+			case B_QUEEN:
+			case W_QUEEN:
+				valueOfAttack += QUEEN_VAL;
+				break;
+			case B_BISHOP:
+			case W_BISHOP:
+				valueOfAttack += BISHOP_VAL;
+				break;
+			case B_ROOK:
+			case W_ROOK:
+				valueOfAttack += ROOK_VAL;
+				break;
+			case B_KNIGHT:
+			case W_KNIGHT:
+				valueOfAttack += KNIGHT_VAL;
+			default:
+				break;
+			}
+		}
+	}
+
+	return valueOfAttack * attackWeight[attackingPiecesCount] / 100;
 }
 
 std::vector<Piece*> Evaluate::calcKingZone(Board& board, int src[], bool white) {

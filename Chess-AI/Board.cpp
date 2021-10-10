@@ -56,23 +56,23 @@ Board::Board(std::string strBoard)
               }
               case B_QUEEN:
               case W_QUEEN:
-                  this->_board[rowCounter][columnCounter] = new Queen(strBoard[i]);
+                  this->_board[rowCounter][columnCounter] = new Queen(strBoard[i], new int[2]{rowCounter, columnCounter});
                   break;
               case B_BISHOP:
               case W_BISHOP:
-                  this->_board[rowCounter][columnCounter] = new Bishop(strBoard[i]);
+                  this->_board[rowCounter][columnCounter] = new Bishop(strBoard[i], new int[2]{ rowCounter, columnCounter });
                   break;
               case B_PAWN:
               case W_PAWN:
-                  this->_board[rowCounter][columnCounter] = new Pawn(strBoard[i]);
+                  this->_board[rowCounter][columnCounter] = new Pawn(strBoard[i], new int[2]{ rowCounter, columnCounter });
                   break;
               case B_ROOK:
               case W_ROOK:
-                  this->_board[rowCounter][columnCounter] = new Rook(strBoard[i]);
+                  this->_board[rowCounter][columnCounter] = new Rook(strBoard[i], new int[2]{ rowCounter, columnCounter });
                   break;
               case B_KNIGHT:
               case W_KNIGHT:
-                  this->_board[rowCounter][columnCounter] = new Knight(strBoard[i]);
+                  this->_board[rowCounter][columnCounter] = new Knight(strBoard[i], new int[2]{ rowCounter, columnCounter });
                   break;
               default:
               {
@@ -80,7 +80,7 @@ Board::Board(std::string strBoard)
                   {
 					  for (short j = columnCounter; j < columnCounter + (strBoard[i] - '0'); j++)
 					  {
-						  this->_board[rowCounter][j] = new EmptySquare('#');
+						  this->_board[rowCounter][j] = new EmptySquare('#', new int[2]{ rowCounter, j });
 					  }
                       columnCounter += (strBoard[i] - '0') - 1;
                   }
@@ -184,16 +184,17 @@ King* Board::getWhiteKing() const
   return this->_whiteKing;
 }
 
-void Board::movePiece(const int* src, const int* dest, bool toDelete)
+void Board::movePiece(int* src, const int* dest, bool toDelete)
 {
   char srcChar = this->_board[src[0]][src[1]]->getType();
-
   if (toDelete)
   {
     delete this->_board[dest[0]][dest[1]];
   }
   this->_board[dest[0]][dest[1]] = this->_board[src[0]][src[1]];
-  this->_board[src[0]][src[1]] = new EmptySquare(EMPTY_SQUARE);
+  this->_board[dest[0]][dest[1]]->setHasMoved(true);
+  this->_board[dest[0]][dest[1]]->setPos(dest);
+  this->_board[src[0]][src[1]] = new EmptySquare(EMPTY_SQUARE, src);
 
   if (srcChar == B_KING)
   {

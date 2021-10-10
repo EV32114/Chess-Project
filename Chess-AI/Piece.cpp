@@ -1,10 +1,11 @@
 #include "Piece.h"
 
-Piece::Piece(const char type)
+Piece::Piece(const char type, int* pos)
 {
 	this->_type = type;
     this->_hasMoved = false;
 	this->_isWhite = isupper(type);
+	this->_position = pos;
 }
 
 void Piece::setType(char type)
@@ -30,4 +31,14 @@ bool Piece::getIsWhite() const {
 void Piece::setHasMoved(const bool hasMoved)
 {
     this->_hasMoved = hasMoved;
+}
+
+void Piece::setPos(const int* pos)
+{
+	this->_position = (int*)pos;
+}
+
+int* Piece::getPos()
+{
+	return this->_position;
 }

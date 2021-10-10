@@ -11,11 +11,11 @@ public:
 	/// This function is the constructor of the class EmptySquare.
 	/// </summary>
 	/// <param name="type"> An empty square char - '#' </param>
-	EmptySquare(char type);
+	EmptySquare(char type, int* pos);
 
-	virtual bool isValidPieceMove(const int* src, const int* dest, const Board& board) const;
+	virtual bool isValidPieceMove(int* src, const int* dest, const Board& board) const;
 
-	virtual std::vector<std::string> getValidMoves(const int* src, const Board& board) const;
+	virtual std::vector<std::string> getValidMoves(int* src, const Board& board) const;
 private:
 	static std::vector<std::string> blackMoves;
 	static std::vector<std::string> whiteMoves;
