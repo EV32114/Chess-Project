@@ -7,6 +7,9 @@ std::vector<std::string> Evaluate::blackMoves;
 std::vector<std::string> Evaluate::whiteMoves;
 
 
+void Evaluate() {
+	
+}
 int Evaluate::evalPos(string pos)
 {
 	int blackPieceCounter[6] = { 0 };
@@ -18,6 +21,7 @@ int Evaluate::evalPos(string pos)
 	//countPieces(pos, whitePieceCounter, blackPieceCounter);
 
 	Board board(pos);
+	
 	getValidMoves(board);
 	for (std::vector<std::string>::iterator i = blackMoves.begin(); i != blackMoves.end(); i++) {
 		cout << *i << endl;
@@ -132,8 +136,8 @@ int Evaluate::evaluatePawnShield(int src[], Board& board)
 		In our case, we will first check if the king is in either position 7,2 - 7,1 or 7,6.
 		src[] is an array consisting of the row and column of the king respectively.
 	*/
-	King* tempK = (King*)(board.getBoard()[src[0]][src[1]]);
 	bool _isWhite = board.getBoard()[src[0]][src[1]]->getIsWhite();
+	char validPawn = _isWhite ? 'P' : 'p';
 	int penalty = 0;
 
 	if (_isWhite) {
@@ -167,10 +171,16 @@ int Evaluate::evaluatePawnShield(int src[], Board& board)
 	penalty += openFile ? OPEN_FILE_PENALTY : 0; 
 
 	// We check whether there are pawns shielding the king
+	int pawnCount = 0;
+	std::vector<Piece*> kingZone = calcKingZone(board, src, _isWhite);
+	for (std::vector<Piece*>::iterator i = kingZone.begin(); i != kingZone.end(); i++) {
+		char currentPiece = (*i)->getType();
+		if (currentPiece == validPawn)
+			pawnCount += 1;
+	}
 
-
-
-	return 0;
+	// Calculate using adjusted numbers.
+	return pawnCount;
 }
 
 std::vector<Piece*> Evaluate::calcKingZone(Board& board, int src[], bool white) {
