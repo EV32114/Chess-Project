@@ -38,6 +38,7 @@ std::vector<std::string> King::getValidMoves(int* src, const Board& board) const
     /*
         This for loop goes over each possible move for the king and checks whether it is a valid move. If so, it adds it to the valid move array.
     */
+    std::vector<string> validMoves;
     for (int i = 0; i <= 1; i++) {
         for (int j = 0; j <= 1; j++) {
             if (!(i == 0 && j == 0)) {
