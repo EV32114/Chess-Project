@@ -7,9 +7,6 @@ std::vector<std::string> Evaluate::blackMoves;
 std::vector<std::string> Evaluate::whiteMoves;
 
 
-void Evaluate() {
-	
-}
 int Evaluate::evalPos(string pos)
 {
 	int blackPieceCounter[6] = { 0 };
@@ -252,6 +249,7 @@ int Evaluate::evaluatePawnShield(int src[], Board& board)
 
 int Evaluate::attackKingZone(Board& board, bool white)
 {
+	getValidMoves(board); // TEMP
 	int attackingPiecesCount = 0, valueOfAttack = 0;
 	const int KNIGHT_VAL = 20, BISHOP_VAL = 20, ROOK_VAL = 40, QUEEN_VAL = 80;
 	const int attackWeight[7] = { 0, 50, 75, 88, 94, 97, 99 };

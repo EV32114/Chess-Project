@@ -45,6 +45,7 @@ class Evaluate
 {
 public:
 	static int evalPos(string pos);
+	static int attackKingZone(Board& board, bool white);
 
 private:
 	static constexpr short pawnTable[8][8] =    {{0,  0,  0,  0,  0,  0,  0,  0},
@@ -104,7 +105,6 @@ private:
 	static bool isUnderAttack(Board& board, int src[]);
 	static int calculateBlackIndex(int row);
 	static int evaluatePawnShield(int src[], Board& board);
-	static int attackKingZone(Board& board, bool white);
 	static std::vector<Piece*> calcKingZone(Board& board, int src[], bool white);
 };
  
