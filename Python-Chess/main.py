@@ -239,7 +239,7 @@ def stabilizeMask(prevMasks):
                         mask[x, y] = True
                     else:
                         if not mask[x, y]:
-                            mask[x, y] = False
+                            mask[x, y] = False # EV WTF
     return mask
 
 
@@ -253,8 +253,7 @@ def compareMasks(mask1, mask2):
     mask = np.zeros((8, 8), dtype=bool)
     for x in np.arange(8):
         for y in np.arange(8):
-            if mask1[x, y] == True and mask2[x, y] == False or mask1[x, y] == False and mask2[x, y] == True or mask2[
-                x, y] == True and mask1[x, y] == True:
+            if mask1[x, y] and not mask2[x, y] or not mask1[x, y] and mask2[x, y] or mask2[x, y] and mask1[x, y]:
                 mask[x][y] = True
             else:
                 if not mask[x][y]:
