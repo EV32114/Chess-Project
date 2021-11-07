@@ -10,17 +10,18 @@ class Chess:
     def __init__(self):
         self.boardMask = np.zeros((8, 8), dtype=bool)  # the mask of the board.
         self.chessBoard = np.array([["R", "N", "B", "Q", "K", "B", "N", "R"],
-                       ["P", "P", "P", "P", "P", "P", "P", "P"],
-                       ["", "", "", "", "", "", "", ""],
-                       ["", "", "", "", "", "", "", ""],
-                       ["", "", "", "", "", "", "", ""],
-                       ["", "", "", "", "", "", "", ""],
-                       ["p", "p", "p", "p", "p", "p", "p", "p"],
-                       ["r", "n", "b", "q", "k", "b", "n", "r"]])  # default chess board (before changes).
+                                    ["P", "P", "P", "P", "P", "P", "P", "P"],
+                                    ["", "", "", "", "", "", "", ""],
+                                    ["", "", "", "", "", "", "", ""],
+                                    ["", "", "", "", "", "", "", ""],
+                                    ["", "", "", "", "", "", "", ""],
+                                    ["p", "p", "p", "p", "p", "p", "p", "p"],
+                                    ["r", "n", "b", "q", "k", "b", "n", "r"]])  # default chess board (before changes).
+        self.averageColors = []
         self.updatedChess = np.zeros((8, 8))  # array consisting of 0's for now, will later be use to hold the
         # current chess board.
         self.sock = socketlib.connect()  # the socket used to communicate with the chess program.
-        self.vid = cv2.VideoCapture(r'Valorant_2021.06.12_-_12.20.20.01.mp4')  # cropping the image to the desired
+        self.vid = cv2.VideoCapture(r'Valorant_2021.06.12_-_12.20.20.01.mkv')  # cropping the image to the desired
         # frame.
         self.ret, self.frame = self.vid.read()  # take a frame
         self.refPt = crop.crop_image(self.frame)
@@ -211,14 +212,6 @@ def get_move(chess):
                 print(string)
                 return data
 
-    # if 20 > len(string) > 5:
-    #    for i in range(len(oldCenterArray)):
-    #        for j in range(len(newCenterArray)):
-    #            for oldPos in oldCenterArray[i]:
-    #                for newPos in newCenterArray[j]:
-    #                    if oldPos[0] not in range(newPos[0] - 50, newPos[0] + 50):
-    #                        string += " and ate " + chess.chessBoard[i][j] + " at position " + convert(i, j)
-
     print(string)
     return data
 
@@ -239,7 +232,7 @@ def stabilizeMask(prevMasks):
                         mask[x, y] = True
                     else:
                         if not mask[x, y]:
-                            mask[x, y] = False # EV WTF
+                            mask[x, y] = False  # EV WTF
     return mask
 
 
@@ -285,6 +278,32 @@ def handle_data(data):
         return -1
 
 
+def getAverageColors(img):
+    averageColor = []
+    # we round the size of the image to the next multiple of 8
+    wh = np.min(round_down_to_next_multiple_of_8(np.array(img.shape[:2])))
+    wh_t = wh // 8  # we use floor division and thus find size of each tile. (wh_t x wh_t)
+
+    for x in np.arange(8):
+        for y in np.arange(8):
+            tile = img[y * wh_t:(y + 1) * wh_t, x * wh_t:(x + 1) * wh_t]
+            tile = tile[3:-3, 3:-3]
+            average = tile.mean(axis=0).mean(axis=0)
+            averageColor.append(average)
+    return averageColor
+
+
+def checkEating(chess, img):
+    average = getAverageColors(img)
+
+    for i, x in enumerate(range(64)):
+        if abs(average[i][0] - chess.averageColors[i][0]) > 30 and abs(average[i][1] - chess.averageColors[i][1]) > 30 and abs(average[i][2] - chess.averageColors[i][2]) > 30:
+            if not chess.updatedChess[i % 8, i // 8] == 0:
+                print(i % 8, i // 8)
+                return True
+    return False
+
+
 def handle_invalid():
     """
     we handle invalid moves in this function.
@@ -302,7 +321,7 @@ def main():
     prevMasks = []  # will be used to store previous masks (for stabilization).
     centerTaken = False
     port.reset_input_buffer()
-    while True and flag != 8:
+    while flag != 8:
 
         ret_main, frame_main = chess.vid.read()  # we read the frame
 
@@ -346,6 +365,7 @@ def main():
             if len(prevMasks) == 20:
                 chess.boardMask = stabilizeMask(prevMasks)
                 stabilized = not stabilized
+                chess.averageColors = getAverageColors(first_frame)
 
         if stabilized:
             """
@@ -362,7 +382,7 @@ def main():
 
         key = cv2.waitKey(1) & 0xFF
 
-        if moved:
+        if moved or key == ord("q"):
             """
             this key click means the player had played his turn and we can scan the
             board. Therefore, we will now scan the board again, find the differences
@@ -379,8 +399,11 @@ def main():
                 count_unique_colors, wh_t = getUniqueColors(frame_main)
                 mask = threshAndMask(count_unique_colors)
                 prevMasks.append(mask)
-
             chess.boardMask = stabilizeMask(prevMasks)  # we create a stabilized mask using the masks we have found.
+            if len(prevMasks) == 10:
+                eating = checkEating(chess, frame_main)
+                print(eating)
+                prevMasks.append(mask)
             centerArray = getCenter(frame_main)  # we create an array of the center pixel of each tile.
             backup_board = chess.updatedChess  # we keep a backup board in case of an invalid move.
             backup_frame = frame_main  # we keep a backup frame in case of an invalid move.
@@ -402,9 +425,11 @@ def main():
             firstCenterArray = centerArray  # we update the center pixel array.
             port.reset_input_buffer()  # we reset the input buffer
             moved = False
+            chess.averageColors = getAverageColors(frame_main)
 
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+
 
 
 if __name__ == "__main__":
