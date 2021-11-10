@@ -3,6 +3,7 @@
 
 
 const int stepsPerRevolution = 2048;
+const int stepsBetweenSquares = 400;
 Stepper step1 = Stepper(stepsPerRevolution, 32, 25, 33, 26);
 Stepper step2 = Stepper(stepsPerRevolution, 27, 13, 14, 12);
 
@@ -71,6 +72,9 @@ void handleRequest(String userReq){
   moveSteppers(nNumOfSteps, cDirection);
 }
 
+void calculateMove(){
+    
+}
 void moveSteppers(int nNumOfSteps, char cDirection){
   /*
    * First of all, we shall decide on which stepper motor is responsible
@@ -82,21 +86,38 @@ void moveSteppers(int nNumOfSteps, char cDirection){
   switch(cDirection){
     case 'u':
       // We move up by given number of steps
-      step1.step(nNumOfSteps);
+      moveUp(nNumOfSteps);
       break;
       
     case 'd':
       // We move down by given number of steps
-      step1.step(-nNumOfSteps);
+      moveDown(nNumOfSteps);
       break;
 
     case 'l':
       // We move left by given number of steps
-      step2.step(-nNumOfSteps);
+      moveLeft(nNumOfSteps);
       break;
+      
     case 'r':
       // We move right by given number of steps
-      step2.step(nNumOfSteps);
+      moveRight(nNumOfSteps);
       break;
   }
+}
+
+void moveUp(int nNumOfSteps){
+  step1.move(nNumOfSteps);  
+}
+
+void moveDown(int nNumOfSteps){
+  step1.move(-nNumOfSteps);  
+}
+
+void moveLeft(int nNumOfSteps){
+  step2.move(-nNumOfSteps);
+}
+
+void moveRight(int nNumOfSteps){
+  step2.move(nNumOfSteps);
 }
