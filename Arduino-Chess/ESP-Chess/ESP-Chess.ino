@@ -1,17 +1,17 @@
 #include <WiFi.h>
 #include <Stepper.h>
 
+#define SQUARE_STEPS 10 // TEMP - CHANGE LATER
+#define STEPS_PER_REVOLUTION 2048
+#define SSID "ESP32-AP"
+#define PASSWORD "12345678"
 
-const int stepsPerRevolution = 2048;
-const int stepsBetweenSquares = 400;
-Stepper step1 = Stepper(stepsPerRevolution, 32, 25, 33, 26);
-Stepper step2 = Stepper(stepsPerRevolution, 27, 13, 14, 12);
+Stepper step1 = Stepper(STEPS_PER_REVOLUTION, 32, 25, 33, 26);
+Stepper step2 = Stepper(STEPS_PER_REVOLUTION, 27, 13, 14, 12);
 
 void handleRequest(String userReq);
 void moveSteppers(int nNumOfSteps, char cDirection);
 
-char* ssid = "ESP32-AP";
-char* password = "12345678";
 String userReq = "";
 
 WiFiServer wifiServer(1337);
@@ -23,7 +23,7 @@ void setup() {
   step2.setSpeed(10);
   delay(1000);
   WiFi.mode(WIFI_AP_STA);
-  if (!WiFi.softAP(ssid, password))
+  if (!WiFi.softAP(SSID, PASSWORD))
   {
    Serial.println("Failed to init WiFi AP");
   }
@@ -49,7 +49,7 @@ void loop() {
       if (client.available()) {             // if there's bytes to read from the client
         char charIn = client.read();             // read a byte, then
         userReq += charIn;
-        if(userReq.length() == 6){
+        if(userReq.length() == 4){
           handleRequest(userReq);
           userReq = "";
           client.write("OK");
@@ -61,17 +61,33 @@ void loop() {
 }
 
 void handleRequest(String userReq){
-  String sNumStr = "";
-  char cDirection = ' ';
-  int nNumOfSteps;
-  for(int i = 0; i < 5; i++){
-    sNumStr += userReq[i];
-  }
-  nNumOfSteps = sNumStr.toInt();
-  cDirection = userReq[5];
-  moveSteppers(nNumOfSteps, cDirection);
+  int src[] = {atoi(userReq[0]), atoi(userReq[1])};
+  int target[] = {atoi(userReq[2]), atoi(userReq[3])};
+  calculateMove(src, target);
 }
 
+/*
+ * responsible for moving the magnet at the start and the end of the movement.
+ * isUnder: is the target under the original magnet location.
+ * isLeft: is the target to the left of the original magnet location.
+*/
+void moveStartAndEnd(bool isUnder, bool isLeft) {
+  if(isUnder)
+    moveUp(SQUARE_STEPS / 2);
+  else
+    moveDown(SQUARE_STEPS / 2);
+  if(isLeft)
+    moveRight(SQUARE_STEPS / 2);
+  else
+    moveLeft(SQUARE_STEPS / 2);
+}
+
+/*
+ * calculate the distance required of the magnet to move and move it.
+ * the movement is done in steps up/down and left/right between the squares such that the piece will not hit any other pieces.
+ * src: the source location of the magnet.
+ * target: the target square on the board.
+*/
 void calculateMove(int[] src, int[] target){
   // Getting the delta x and y coordinates.
   int dX = src[1] - target[1];
@@ -82,25 +98,34 @@ void calculateMove(int[] src, int[] target){
 
   int currX = src[1];
   int currY = src[0];
-
+  moveStartAndEnd(isUnder, isLeft);
   for(int i = 0; i < max(abs(dX) - 1, abs(dY)); i++){
-      
+    if (currX != target[1] - 1) {
+      if(isLeft)
+        moveRight(SQUARE_STEPS);
+      else
+        moveLeft(SQUARE_STEPS);
+      currX += 1;
+    }
+    if(currY != target[0]){
+      if(isUnder)
+        moveUp(SQUARE_STEPS);
+      else
+        moveDown(SQUARE_STEPS);
+     }
+     currY += 1;
   }
-
-  if(isLeft)
-    moveRight(SQUARE_STEPS / 2);
-   else
-    moveLeft(SQUARE_STEPS / 2);
+  moveStartAndEnd(isUnder, isLeft);
 }
 
+/*
+ * First of all, we shall decide on which stepper motor is responsible
+ * for each movement.
+ * Therefore, we shall decide this:
+ * Stepper Motor 1 (step1): Up, Down
+ * Stepper Motor 2 (step2): Right, Left
+ */
 void moveSteppers(int nNumOfSteps, char cDirection){
-  /*
-   * First of all, we shall decide on which stepper motor is responsible
-   * for each movement.
-   * Therefore, we shall decide this:
-   * Stepper Motor 1 (step1): Up, Down
-   * Stepper Motor 2 (step2): Right, Left
-   */
   switch(cDirection){
     case 'u':
       // We move up by given number of steps
