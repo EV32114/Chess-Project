@@ -2,17 +2,18 @@
 #include <Stepper.h>
 
 #define SQUARE_STEPS 10 // TEMP - CHANGE LATER
-#define STEPS_PER_REVOLUTION 2048
-#define SSID "ESP32-AP"
-#define PASSWORD "12345678"
+#define STEPS_PER_REVOLUTION 2048 // Steps per revolution.
+#define SSID "ESP32-AP" // WiFi name.
+#define PASSWORD "12345678" // WiFi password.
 
-Stepper step1 = Stepper(STEPS_PER_REVOLUTION, 32, 25, 33, 26);
-Stepper step2 = Stepper(STEPS_PER_REVOLUTION, 27, 13, 14, 12);
+Stepper step1 = Stepper(STEPS_PER_REVOLUTION, 32, 25, 33, 26); // Creating an object of our stepper motor.
+Stepper step2 = Stepper(STEPS_PER_REVOLUTION, 27, 13, 14, 12); // Creating an object of our stepper motor.
 
-void handleRequest(String userReq);
+/*
+ * Function Declarations
+ */
+void handleRequest(String userReq); 
 void moveSteppers(int nNumOfSteps, char cDirection);
-
-String userReq = "";
 
 WiFiServer wifiServer(1337);
 
@@ -40,19 +41,23 @@ void setup() {
 }
 
 void loop() {
+  /* 
+   *  Variable and object initializations
+   */
   WiFiClient client = wifiServer.available();   // Listen for incoming clients
-
+  String userReq = "";
+  
   if (client) {                             // If a new client connects,
     Serial.println("New Client.");          // print a message out in the serial port
     String currentLine = "";                // make a String to hold incoming data from the client
     while (client.connected()) {            // loop while the client's connected
       if (client.available()) {             // if there's bytes to read from the client
-        char charIn = client.read();             // read a byte, then
-        userReq += charIn;
-        if(userReq.length() == 4){
-          handleRequest(userReq);
-          userReq = "";
-          client.write("OK");
+        char charIn = client.read();        // read a byte, then
+        userReq += charIn;                  // add it to the string.
+        if(userReq.length() == 4){          // if we're done reading
+          handleRequest(userReq);           // we send the data to be handled.
+          userReq = "";                     // reset the data, and then
+          client.write("OK");               // print a message that our job has been done.
         }
 
       }
@@ -60,6 +65,9 @@ void loop() {
   }
 }
 
+/*
+ * handles the request for moving, sends it to calculateMove.
+ */
 void handleRequest(String userReq){
   int src[] = {atoi(userReq[0]), atoi(userReq[1])};
   int target[] = {atoi(userReq[2]), atoi(userReq[3])};
@@ -149,18 +157,30 @@ void moveSteppers(int nNumOfSteps, char cDirection){
   }
 }
 
+/*
+ * Moves the magnet up
+ */
 void moveUp(int nNumOfSteps){
   step1.move(nNumOfSteps);  
 }
 
+/*
+ * Moves the magnet down
+ */
 void moveDown(int nNumOfSteps){
   step1.move(-nNumOfSteps);  
 }
 
+/*
+ * Moves the magnet left
+ */
 void moveLeft(int nNumOfSteps){
   step2.move(-nNumOfSteps);
 }
 
+/*
+ * Moves the magnet right
+ */
 void moveRight(int nNumOfSteps){
   step2.move(nNumOfSteps);
 }
