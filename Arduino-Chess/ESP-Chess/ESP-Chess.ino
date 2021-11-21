@@ -72,9 +72,27 @@ void handleRequest(String userReq){
   moveSteppers(nNumOfSteps, cDirection);
 }
 
-void calculateMove(){
-    
+void calculateMove(int[] src, int[] target){
+  // Getting the delta x and y coordinates.
+  int dX = src[1] - target[1];
+  int dY = src[0] - target[0];
+  // Determining whether the point is under or is to the left of the target point.
+  bool isUnder = dY < 0;
+  bool isLeft = dX < 0;
+
+  int currX = src[1];
+  int currY = src[0];
+
+  for(int i = 0; i < max(abs(dX) - 1, abs(dY)); i++){
+      
+  }
+
+  if(isLeft)
+    moveRight(SQUARE_STEPS / 2);
+   else
+    moveLeft(SQUARE_STEPS / 2);
 }
+
 void moveSteppers(int nNumOfSteps, char cDirection){
   /*
    * First of all, we shall decide on which stepper motor is responsible
@@ -120,4 +138,32 @@ void moveLeft(int nNumOfSteps){
 
 void moveRight(int nNumOfSteps){
   step2.move(nNumOfSteps);
+}
+
+void moveDiagonalUpRight(int nNumOfSteps){
+  for(int i = 0; i < nNumOfSteps){
+      moveUp(1);
+      moveRight(1);
+  }  
+}
+
+void moveDiagonalDownRight(int nNumOfSteps){
+  for(int i = 0; i < nNumOfSteps){
+      moveDown(1);
+      moveRight(1);
+  }  
+}
+
+void moveDiagonalDownLeft(int nNumOfSteps){
+  for(int i = 0; i < nNumOfSteps){
+      moveDown(1);
+      moveLeft(1);
+  }  
+}
+
+void moveDiagonalUpLeft(int nNumOfSteps){
+  for(int i = 0; i < nNumOfSteps){
+      moveUp(1);
+      moveLeft(1);
+  }  
 }
