@@ -418,7 +418,7 @@ def main():
             """
             flag = handle_data(ans)
             if flag == -1:
-                # TODO
+                # TODO handle check and shit
                 pass
 
             cv2.imshow('frame', frame_main)  # we display the final frame.
