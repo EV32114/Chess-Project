@@ -5,9 +5,11 @@ int main()
 	// cout << Evaluate::evalPos("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1") << endl;
 
 	// Board board("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1");
-	Board board("8/8/5p2/1P1Kk12/8/2r5/8/7R w - - 0 0");
-	cout << Evaluate::attackKingZone(board, true) << endl;
+	// cout << Evaluate::attackKingZone(board, true) << endl;
+	Board board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	board.printBoard();
+	int x[2] = { 7,7 };
+	cout << Evaluate::isOpenFile(board, true, x);
 	
 	
 

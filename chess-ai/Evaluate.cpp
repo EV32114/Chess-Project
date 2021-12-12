@@ -162,6 +162,26 @@ int Evaluate::evaluatePiecePositions(Board& board, bool white)
 	return eval;
 }
 
+int* Evaluate::generateMove(Board& board, bool isWhite) {
+	srand((unsigned)time(0));
+	
+	int srcX = rand() % 8, srcY = rand() % 8;
+	int destX = rand() % 8, destY = rand() % 8;
+
+	while (board.getBoard()[srcX][srcY]->getIsWhite() != isWhite) {
+		srcX = rand() % 8;
+		srcY = rand() % 8;
+	}
+
+	while (board.getBoard()[destX][destY]->getIsWhite() == isWhite) {
+		destX = rand() % 8;
+		destY = rand() % 8;
+	}
+
+	return new int[] {srcX, srcY, destX, destY};
+	
+}
+
 int Evaluate::evaluateKingSafety(Board& board)
 {
 	return 0;
@@ -169,8 +189,8 @@ int Evaluate::evaluateKingSafety(Board& board)
 
 bool Evaluate::isUnderAttack(Board& board, int src[])
 {
-	bool _isWhite = board.getBoard()[src[0]][src[1]]->getIsWhite();
-	std::vector<std::string> enemyValidMoves = _isWhite ? blackMoves : whiteMoves;
+	bool isWhite = board.getBoard()[src[0]][src[1]]->getIsWhite();
+	std::vector<std::string> enemyValidMoves = isWhite ? blackMoves : whiteMoves;
 	for (std::vector<std::string>::iterator i = enemyValidMoves.begin(); i != enemyValidMoves.end(); i++) {
 		if ((std::to_string(src[0]) + std::to_string(src[1])) == *i) {
 			return true;
@@ -200,11 +220,11 @@ int Evaluate::evaluatePawnShield(int src[], Board& board)
 		In our case, we will first check if the king is in either position 7,2 - 7,1 or 7,6.
 		src[] is an array consisting of the row and column of the king respectively.
 	*/
-	bool _isWhite = board.getBoard()[src[0]][src[1]]->getIsWhite();
-	char validPawn = _isWhite ? 'P' : 'p';
+	bool isWhite = board.getBoard()[src[0]][src[1]]->getIsWhite();
+	char validPawn = isWhite ? 'P' : 'p';
 	int penalty = 0;
 
-	if (_isWhite) {
+	if (isWhite) {
 		if (src[0] != 0) 
 			return 0;
 		if (src[1] != 1 && src[1] != 2 && src[1] != 6)
@@ -218,25 +238,13 @@ int Evaluate::evaluatePawnShield(int src[], Board& board)
 	}
 
 	// We check whether there's an open file
-	bool openFile = true;
-	for (int i = 1; i < 8; i++) {
-		if (_isWhite) {
-			if (board.getBoard()[src[0] - i][src[1]]->getType() == 'P' || board.getBoard()[src[0] - i][src[1]]->getType() == 'p') {
-				openFile = false;
-			}
-		}
-		else {
-			if (board.getBoard()[src[0] + i][src[1]]->getType() == 'P' || board.getBoard()[src[0] + i][src[1]]->getType() == 'p') {
-				openFile = false;
-			}
-		}
-	}
+	bool openFile = Evaluate::isOpenFile(board, isWhite, src);
 
 	penalty += openFile ? OPEN_FILE_PENALTY : 0; 
 
 	// We check whether there are pawns shielding the king
 	int pawnCount = 0;
-	std::vector<Piece*> kingZone = calcKingZone(board, src, _isWhite);
+	std::vector<Piece*> kingZone = calcKingZone(board, src, isWhite);
 	for (std::vector<Piece*>::iterator i = kingZone.begin(); i != kingZone.end(); i++) {
 		char currentPiece = (*i)->getType();
 		if (currentPiece == validPawn)
@@ -363,6 +371,24 @@ std::vector<Piece*> Evaluate::calcKingZone(Board& board, int src[], bool white) 
 
 	return vec;
 
+}
+
+bool Evaluate::isOpenFile(Board& board, bool isWhite, int* src)
+{
+	bool openFile = true;
+	for (int i = 1; i < 8; i++) {
+		if (isWhite) {
+			if (board.getBoard()[src[0] - i][src[1]]->getType() == 'P' || board.getBoard()[src[0] - i][src[1]]->getType() == 'p') {
+				openFile = false;
+			}
+		}
+		else {
+			if (board.getBoard()[src[0] + i][src[1]]->getType() == 'P' || board.getBoard()[src[0] + i][src[1]]->getType() == 'p') {
+				openFile = false;
+			}
+		}
+	}
+	return openFile;
 }
 
 
