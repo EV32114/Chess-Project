@@ -47,6 +47,8 @@ public:
 	static int evalPos(string pos);
 	static int attackKingZone(Board& board, bool white);
 	static bool isOpenFile(Board& board, bool isWhite, int* src);
+	static int* generateMove(Board& board, bool isWhite);
+
 
 private:
 	static constexpr short pawnTable[8][8] =    {{0,  0,  0,  0,  0,  0,  0,  0},
@@ -102,7 +104,6 @@ private:
 	static int evaluatePiecesWhite(int* whitePieces, bool midGame);
 	static int evaluatePiecesBlack(int* blackPieces, bool midGame);
 	static int evaluatePiecePositions(Board& board, bool white);
-	int* generateMove(Board& board, bool isWhite);
 	static int evaluateKingSafety(Board& board);
 	static bool isUnderAttack(Board& board, int src[]);
 	static int calculateBlackIndex(int row);

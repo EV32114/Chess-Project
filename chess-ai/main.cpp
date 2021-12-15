@@ -10,7 +10,12 @@ int main()
 	board.printBoard();
 	int x[2] = { 7,7 };
 	cout << Evaluate::isOpenFile(board, true, x);
-	
+	int* moves = Evaluate::generateMove(board, true);
+	cout << endl << endl;
+	for (int i = 4; i--> 0;) {
+		cout << i << endl;
+		cout << *(moves + i) << endl;
+	}
 	
 
 	return 0;

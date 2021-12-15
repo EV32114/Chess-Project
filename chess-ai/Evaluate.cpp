@@ -1,6 +1,7 @@
 #include "Evaluate.h"
 #include <vector>
 #include <iterator>
+#include <time.h>
 
 // static variables initialization
 std::vector<std::string> Evaluate::blackMoves;
@@ -163,23 +164,20 @@ int Evaluate::evaluatePiecePositions(Board& board, bool white)
 }
 
 int* Evaluate::generateMove(Board& board, bool isWhite) {
-	srand((unsigned)time(0));
+	srand((unsigned)time(0)); // Generate a random seed.
 	
-	int srcX = rand() % 8, srcY = rand() % 8;
-	int destX = rand() % 8, destY = rand() % 8;
-
+	/* We find a random white piece. */
+	int srcX = rand() % 8, srcY = rand() % 8; 
 	while (board.getBoard()[srcX][srcY]->getIsWhite() != isWhite) {
 		srcX = rand() % 8;
 		srcY = rand() % 8;
 	}
 
-	while (board.getBoard()[destX][destY]->getIsWhite() == isWhite) {
-		destX = rand() % 8;
-		destY = rand() % 8;
-	}
+	getValidMoves(board); // TEMP
+	int numOfValidMoves = isWhite ? whiteMoves.size() : blackMoves.size(); // we get the number of valid moves.
+	std::string move = isWhite ? whiteMoves.at(rand() % numOfValidMoves) : blackMoves.at(rand() % numOfValidMoves); // we get a random move from the valid moves.
 
-	return new int[] {srcX, srcY, destX, destY};
-	
+	return new int[4] {srcX, srcY, move[0] - '0', move[1] - '0'}; // We return the move.
 }
 
 int Evaluate::evaluateKingSafety(Board& board)
@@ -189,8 +187,10 @@ int Evaluate::evaluateKingSafety(Board& board)
 
 bool Evaluate::isUnderAttack(Board& board, int src[])
 {
-	bool isWhite = board.getBoard()[src[0]][src[1]]->getIsWhite();
-	std::vector<std::string> enemyValidMoves = isWhite ? blackMoves : whiteMoves;
+	bool isWhite = board.getBoard()[src[0]][src[1]]->getIsWhite(); // We find if the piece is white.
+	std::vector<std::string> enemyValidMoves = isWhite ? blackMoves : whiteMoves; // we get the enemys valid moves.
+
+	/* We iterate over each move and check if it is an attack on the piece we check. */
 	for (std::vector<std::string>::iterator i = enemyValidMoves.begin(); i != enemyValidMoves.end(); i++) {
 		if ((std::to_string(src[0]) + std::to_string(src[1])) == *i) {
 			return true;
@@ -255,6 +255,7 @@ int Evaluate::evaluatePawnShield(int src[], Board& board)
 	return pawnCount;
 }
 
+// TODO: DOCUMENT (EV)
 int Evaluate::attackKingZone(Board& board, bool white)
 {
 	getValidMoves(board); // TEMP
@@ -303,6 +304,12 @@ int Evaluate::attackKingZone(Board& board, bool white)
 	return valueOfAttack * attackWeight[attackingPiecesCount] / 100;
 }
 
+/*
+	This function returns a vector containing all the pieces (or, empty squares) in the king's zone.
+	@param board the board we check.
+	@param src[] the position of the king we check.
+	@param isWhite represents whether the king is white or black.
+*/
 std::vector<Piece*> Evaluate::calcKingZone(Board& board, int src[], bool white) {
 	std::vector<Piece*> vec;
 	if(src[0] + 1 < 8)
@@ -373,6 +380,12 @@ std::vector<Piece*> Evaluate::calcKingZone(Board& board, int src[], bool white) 
 
 }
 
+/*
+	This function returns whether the file is open (from pawns).
+	@param board the board we check.
+	@param isWhite represents whether the piece is white or black.
+	@param *src the position of the piece we check for.
+*/
 bool Evaluate::isOpenFile(Board& board, bool isWhite, int* src)
 {
 	bool openFile = true;
@@ -391,8 +404,10 @@ bool Evaluate::isOpenFile(Board& board, bool isWhite, int* src)
 	return openFile;
 }
 
-
-
+/*
+	This function evaluates the current position of the white pieces.
+	TODO: decide whether we need it still.
+*/
 int Evaluate::evaluatePiecesWhite(int* whitePieces, bool midGame) {
 	int posEval = 0;
 
