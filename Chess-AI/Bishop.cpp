@@ -60,11 +60,11 @@ std::vector<string> Bishop::getValidMoves(int* src, const Board& board) const {
 			switch (way) {
 				case 0:
 					if (src[0] + i < 8 && src[1] + i < 8) {
-						if (board.getBoard()[src[0] + i][src[1] + i]->getType() == EMPTY_SQUARE) {
+						if (board.getBoard()[src[0] + i][src[1] + i]->getType() == EMPTY_SQUARE) { // Moving to an empty square.
 							validMoves.push_back(std::to_string(src[0] + i) + std::to_string(src[1] + i));
 						}
 						else {
-							if (_isWhite != board.getBoard()[src[0] + i][src[1] + i]->getIsWhite()) {
+							if (_isWhite != board.getBoard()[src[0] + i][src[1] + i]->getIsWhite()) { // Eating.
 								validMoves.push_back(std::to_string(src[0] + i) + std::to_string(src[1] + i));
 							}
 							breakFlag = true;
@@ -73,11 +73,11 @@ std::vector<string> Bishop::getValidMoves(int* src, const Board& board) const {
 					break;
 				case 1:
 					if (src[0] + i < 8 && src[1] - i >= 0) {
-						if (board.getBoard()[src[0] + i][src[1] - i]->getType() == EMPTY_SQUARE) {
+						if (board.getBoard()[src[0] + i][src[1] - i]->getType() == EMPTY_SQUARE) { // Moving to an empty square.
 							validMoves.push_back(std::to_string(src[0] + i) + std::to_string(src[1] - i));
 						}
 						else {
-							if (_isWhite != board.getBoard()[src[0] + i][src[1] - i]->getIsWhite()) {
+							if (_isWhite != board.getBoard()[src[0] + i][src[1] - i]->getIsWhite()) { // Eating.
 								validMoves.push_back(std::to_string(src[0] + i) + std::to_string(src[1] - i));
 							}
 							breakFlag = true;
@@ -86,11 +86,11 @@ std::vector<string> Bishop::getValidMoves(int* src, const Board& board) const {
 					break;
 				case 2:
 					if (src[0] - i >= 0 && src[1] - i >= 0) {
-						if (board.getBoard()[src[0] - i][src[1] - i]->getType() == EMPTY_SQUARE) {
+						if (board.getBoard()[src[0] - i][src[1] - i]->getType() == EMPTY_SQUARE) { // Moving to an empty square.
 							validMoves.push_back(std::to_string(src[0] - i) + std::to_string(src[1] - i));
 						}
 						else {
-							if (_isWhite != board.getBoard()[src[0] - i][src[1] - i]->getIsWhite()) {
+							if (_isWhite != board.getBoard()[src[0] - i][src[1] - i]->getIsWhite()) { // Eating. 
 								validMoves.push_back(std::to_string(src[0] - i) + std::to_string(src[1] - i));
 							}
 							breakFlag = true;
@@ -99,11 +99,11 @@ std::vector<string> Bishop::getValidMoves(int* src, const Board& board) const {
 					break;
 				case 3:
 					if (src[0] - i >= 0 && src[1] + i < 8) {
-						if (board.getBoard()[src[0] - i][src[1] + i]->getType() == EMPTY_SQUARE) {
+						if (board.getBoard()[src[0] - i][src[1] + i]->getType() == EMPTY_SQUARE) { // Moving to an empty square.
 							validMoves.push_back(std::to_string(src[0] - i) + std::to_string(src[1] + i));
 						}
 						else {
-							if (_isWhite != board.getBoard()[src[0] - i][src[1] + i]->getIsWhite()) {
+							if (_isWhite != board.getBoard()[src[0] - i][src[1] + i]->getIsWhite()) { // Eating.
 								validMoves.push_back(std::to_string(src[0] - i) + std::to_string(src[1] + i));
 							}
 							breakFlag = true;

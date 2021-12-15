@@ -23,6 +23,8 @@ bool Knight::isValidPieceMove(int* src, const int* dest, const Board& board) con
 std::vector<std::string> Knight::getValidMoves(int* src, const Board& board) const
 {
 	std::vector<string> validMoves;
+	
+	/* We check each of the possibiliies, if it's empty or eatable we can move there. */
 	if (src[0] + 2 < 8 && src[1] + 1 < 8) {
 		if (board.getBoard()[src[0] + 2][src[1] + 1]->getType() == EMPTY_SQUARE || ((_isWhite && islower(board.getBoard()[src[0] + 2][src[1] + 1]->getType())) || (!_isWhite && isupper(board.getBoard()[src[0] + 2][src[1] + 1]->getType())))) {
 			validMoves.push_back(std::to_string(src[0] + 2) + std::to_string(src[1] + 1));
