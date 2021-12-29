@@ -45,6 +45,7 @@ class Evaluate
 {
 public:
 	static int evalPos(string pos);
+	static int evalPos(Board& board);
 	static int attackKingZone(Board& board, bool white);
 	static bool isOpenFile(Board& board, bool isWhite, int* src);
 	static int* generateMove(Board& board, bool isWhite);
@@ -102,6 +103,8 @@ private:
 	static void countPieces(string pos, int* whitePieces, int* blackPieces);
 	static void getValidMoves(Board& board);
 	static int evaluatePiecesWhite(int* whitePieces, bool midGame);
+	int* minimaxRoot(int depth, Board& board, bool isMaximisingPlayer);
+	int minimax(int depth, Board& board, int alpha, int beta, bool isMaximisingPlayer);
 	static int evaluatePiecesBlack(int* blackPieces, bool midGame);
 	static int evaluatePiecePositions(Board& board, bool white);
 	static int evaluateKingSafety(Board& board);

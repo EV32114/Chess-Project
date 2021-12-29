@@ -30,6 +30,12 @@ int Evaluate::evalPos(string pos)
 	return 0;
 }
 
+int Evaluate::evalPos(Board& board)
+{
+	
+	return 0;
+}
+
 void Evaluate::countPieces(string pos, int* whitePieces, int* blackPieces){
 	for(unsigned int i = 0; i < pos.length(); i++)
 	{
@@ -431,4 +437,64 @@ int Evaluate::evaluatePiecesWhite(int* whitePieces, bool midGame) {
 		}
 	}
 	return posEval;
+}
+
+int* Evaluate::minimaxRoot(int depth, Board& board, bool isMaximizingPlayer) {
+	std::string newMove;
+	int src[2], dest[2];
+	for (std::vector<std::string>::iterator it = whiteMoves.begin(); it != whiteMoves.end(); it++) {
+		newMove = *it;
+		src[0] = newMove[0] - '0';
+		src[1] = newMove[1] - '0';
+		dest[0] = newMove[2] - '0';
+		dest[1] = newMove[3] - '0';
+
+		board.movePiece(src, dest, board.getBoard()[src[0]][src[1]]->getType() != EMPTY_SQUARE);
+		int val = minimax(depth - 1, board, -10000, 10000, !isMaximizingPlayer);
+	}
+}
+
+int Evaluate::minimax(int depth, Board& board, int alpha, int beta, bool isMaximizingPlayer) {
+	if (depth == 0) return -(Evaluate::evalPos(board));
+	int bestMove;
+	std::string newMove;
+	int* src;
+	int* dst;
+
+	if (isMaximizingPlayer) {
+		bestMove = -9999;
+
+		for (std::vector<std::string>::iterator it = whiteMoves.begin(); it != whiteMoves.end(); it++) {
+			newMove = *it;
+			src = Board::convertIndex(newMove.substr(0, 2));
+			dst = Board::convertIndex(newMove.substr(2, 2));
+
+			board.movePiece(src, dst, board.getBoard()[src[0]][src[1]]->getType() != EMPTY_SQUARE);
+			int bestMove = std::max(bestMove, minimax(depth - 1, board, alpha, beta, !isMaximizingPlayer));
+			board.undoMove(newMove);
+			alpha = std::max(bestMove, alpha);
+			if (beta <= alpha) {
+				return bestMove;
+			}
+		}
+		return bestMove;
+	}
+	else {
+		bestMove = 9999;
+
+		for (std::vector<std::string>::iterator it = blackMoves.begin(); it != blackMoves.end(); it++) {
+			newMove = *it;
+			src = Board::convertIndex(newMove.substr(0, 2));
+			dst = Board::convertIndex(newMove.substr(2, 2));
+
+			board.movePiece(src, dst, board.getBoard()[src[0]][src[1]]->getType() != EMPTY_SQUARE);
+			int bestMove = std::min(bestMove, minimax(depth - 1, board, alpha, beta, !isMaximizingPlayer));
+			board.undoMove(newMove);
+			beta = std::min(bestMove, beta);
+			if (beta <= alpha) {
+				return bestMove;
+			}
+		}
+		return bestMove;
+	}
 }

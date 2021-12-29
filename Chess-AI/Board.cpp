@@ -206,7 +206,7 @@ void Board::movePiece(int* src, const int* dest, bool toDelete)
   }
 }
 
-int* Board::convertIndex(std::string strIndex) const
+int* Board::convertIndex(std::string strIndex)
 {
   int* index = new int[BOARD_INDEX];
 

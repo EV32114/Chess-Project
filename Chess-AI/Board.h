@@ -91,7 +91,9 @@ public:
 	/// </summary>
 	/// <param name="strIndex"> A position on the graphics board </param>
 	/// <returns> A position on the code board </returns>
-	int* convertIndex(std::string strIndex) const;
+	static int* convertIndex(std::string strIndex);
+
+	static void undoMove(std::string move);
 
 	/// <summary>
 	/// This function checks if one of the players is in check.
