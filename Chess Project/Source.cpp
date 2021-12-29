@@ -5,8 +5,32 @@
 #include <WinSock2.h>
 #include "HandleGame.h"
 #include <string>
+#include "CPipeServer.h"
 
 #define PORT_ADDRESS 3000
+
+void bindAndListen(SOCKET& m_socket);
+
+SOCKET connectEsp(SOCKET& m_socket)
+{
+	m_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+	if (m_socket == INVALID_SOCKET)
+		throw std::exception(__FUNCTION__ " - socket");
+	try
+	{
+		bindAndListen(m_socket);
+	}
+	catch (const std::exception& e)
+	{
+		std::cerr << "Something bad happened here... " << e.what() << std::endl;
+	}
+	SOCKET client_socket = accept(m_socket, NULL, NULL);
+
+	if (client_socket == INVALID_SOCKET)
+		throw std::exception(__FUNCTION__);
+	return client_socket;
+}
 
 void bindAndListen(SOCKET& m_socket)
 {
@@ -32,24 +56,16 @@ int main()
 	WSAInitializer wsaInit;
 	srand(time_t(NULL));
 	SOCKET m_socket;
-	Board* board = new Board(INIT_STR);
-	m_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	// SOCKET client_socket = connectEsp(m_socket);
+	std::string sPipeName(PIPENAME);
+	CPipeServer* pServer = new CPipeServer(sPipeName);
+	std::cout << "Got here" << std::endl;
+	::WaitForSingleObject(pServer->GetThreadHandle(), INFINITE);
+	delete pServer;
+	pServer = NULL;
+	// Board* board = new Board(INIT_STR);
 
-	if (m_socket == INVALID_SOCKET)
-		throw std::exception(__FUNCTION__ " - socket");
-	try
-	{
-		bindAndListen(m_socket);
-	}
-	catch (const std::exception& e)
-	{
-		std::cerr << "Something bad happened here... " << e.what() << std::endl;
-	}
-	SOCKET client_socket = accept(m_socket, NULL, NULL);
-
-	if (client_socket == INVALID_SOCKET)
-		throw std::exception(__FUNCTION__);
-	HandleGame::startGame(board, &client_socket);
-	closesocket(m_socket);
+	// HandleGame::startGame(board, &client_socket);
+	// closesocket(m_socket);
 	return 0;
 }
