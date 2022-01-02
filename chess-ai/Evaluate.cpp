@@ -441,17 +441,27 @@ int Evaluate::evaluatePiecesWhite(int* whitePieces, bool midGame) {
 
 int* Evaluate::minimaxRoot(int depth, Board& board, bool isMaximizingPlayer) {
 	std::string newMove;
-	int src[2], dest[2];
+	int* src;
+	int* dst;
+	int maxVal = -9999;
+	int* bestMove = new int[4];
 	for (std::vector<std::string>::iterator it = whiteMoves.begin(); it != whiteMoves.end(); it++) {
 		newMove = *it;
-		src[0] = newMove[0] - '0';
-		src[1] = newMove[1] - '0';
-		dest[0] = newMove[2] - '0';
-		dest[1] = newMove[3] - '0';
+		src = Board::convertIndex(newMove.substr(0, 2));
+		dst = Board::convertIndex(newMove.substr(2, 2));
 
-		board.movePiece(src, dest, board.getBoard()[src[0]][src[1]]->getType() != EMPTY_SQUARE);
+		board.movePiece(src, dst, board.getBoard()[src[0]][src[1]]->getType() != EMPTY_SQUARE);
 		int val = minimax(depth - 1, board, -10000, 10000, !isMaximizingPlayer);
+		board.undoMove(newMove);
+		if (val > maxVal) {
+			maxVal = val;
+			for (int i = 0; i < 2; i++) {
+				bestMove[i] = i < 2 ? src[i] : dst[i - 2];
+			}
+			
+		}
 	}
+	return bestMove;
 }
 
 int Evaluate::minimax(int depth, Board& board, int alpha, int beta, bool isMaximizingPlayer) {

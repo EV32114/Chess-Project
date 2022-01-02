@@ -217,6 +217,10 @@ int* Board::convertIndex(std::string strIndex)
   return index;
 }
 
+void Board::undoMove(std::string move)
+{
+}
+
 int Board::isInCheck() const
 {
   int i = 0, j = 0;
