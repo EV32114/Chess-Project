@@ -1,8 +1,9 @@
 #include "Evaluate.h"
+#include "CPipeClient.h"
 
 int main()
 {
-	// cout << Evaluate::evalPos("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1") << endl;
+	/*// cout << Evaluate::evalPos("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1") << endl;
 
 	// Board board("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1");
 	// cout << Evaluate::attackKingZone(board, true) << endl;
@@ -17,6 +18,13 @@ int main()
 		cout << *(moves + i) << endl;
 	}
 	
+	*/
+
+	std::string sPipeName(PIPENAME);
+	CPipeClient* pClient = new CPipeClient(sPipeName);
+	::WaitForSingleObject(pClient->GetThreadHandle(), INFINITE); // to remove before prod
+	delete pClient;
+	pClient = NULL;
 
 	return 0;
 }

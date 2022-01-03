@@ -1,20 +1,17 @@
 /**
- * Description: CPipeServer class implements pipe server related functionality.
+ * Description: CPipeClient class implements pipe client related functionality.
  *              Wraps the underlying ReadFile/WriteFile functions to read/write
  *              data to the pipe. Provides an event-based mechanism to handle
  *              pipe communication. An independent thread processes all the pipe
  *              related events. This implemenation is Windows specific.
  */
-
 #pragma once
 
 #include "windows.h"
 #include <string>
 #include "PipeConst.h"
-#include <mutex>
-#include <condition_variable>
 
-class CPipeServer
+class CPipeClient
 {
 public:
 
@@ -22,12 +19,12 @@ public:
      * Constructor
      * @paramIn sName: Pipe name
      */
-    CPipeServer(std::string& sName);
+    CPipeClient(std::string& sName);
 
     /**
      * Destructor
      */
-    virtual ~CPipeServer(void);
+    virtual ~CPipeClient(void);
 
     /**
      * Get event ID
@@ -55,7 +52,7 @@ public:
 
     /**
      * Write data to buffer
-     * @paramIn sData: wstring data to be copied to buffer
+     * @paramIn sData: string data to be copied to buffer
      */
     void SetData(std::string sData);
 
@@ -64,6 +61,11 @@ public:
      * @paramOut: Data will be copied from buffer
      */
     void GetData(std::string& sData);
+
+    /**
+     * Connect pipe client to pipe server
+     */
+    void ConnectToServer();
 
     /**
      * Invoked whenever there is a pipe event
@@ -75,37 +77,12 @@ public:
      * Thread callback function which processes the pipe I/O events
      * @paramIn param: CPipeClient object
      */
-    static UINT32 __stdcall PipeThreadProc(void*); 
-
-    /**
-     * Wait for a pipe client to get connected
-     */
-    void WaitForClient();
+    static UINT32 __stdcall PipeThreadProc(void* param); 
 
     /**
      * Close the pipe client
      */
     void Close();
-
-    void SendData(std::string data);
-    void ReceiveData(std::string& data);
-
-private:
-
-    /**
-     * Default constructor
-     */
-    CPipeServer(void);
-
-    /**
-     * Initializes pipe client. A thread is created and starts running
-     */
-    void Init();
-
-    /**
-     * Starts the pipe thread
-     */
-    void Run();
 
     /**
      * Read data from pipe. This is a blocking call.
@@ -119,10 +96,28 @@ private:
      */
     bool Write();
 
+private:
+
+    /**
+     * Default constructor
+     */
+    CPipeClient(void);
+
+    /**
+     * Initializes pipe client. A thread is created and starts running
+     */
+    void Init();
+
+    /**
+     * Starts the pipe thread
+     */
+    void Run();
+
     const std::string m_sPipeName; // Pipe name
     HANDLE m_hPipe;                 // Pipe handle
     HANDLE m_hThread;               // Pipe thread
     int    m_nEvent;                // Pipe event
     char* m_buffer;              // Buffer to hold data
-    bool setup_complete;
+
 };
+

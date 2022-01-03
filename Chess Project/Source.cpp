@@ -55,12 +55,16 @@ int main()
 {
 	WSAInitializer wsaInit;
 	srand(time_t(NULL));
-	SOCKET m_socket;
+	// SOCKET m_socket;
 	// SOCKET client_socket = connectEsp(m_socket);
 	std::string sPipeName(PIPENAME);
 	CPipeServer* pServer = new CPipeServer(sPipeName);
-	std::cout << "Got here" << std::endl;
-	::WaitForSingleObject(pServer->GetThreadHandle(), INFINITE);
+	std::string pog;
+	pServer->SendData("1");
+	pServer->ReceiveData(pog);
+	pServer->SendData("2");
+	pServer->ReceiveData(pog);
+	::WaitForSingleObject(pServer->GetThreadHandle(), INFINITE); // to remove before prod
 	delete pServer;
 	pServer = NULL;
 	// Board* board = new Board(INIT_STR);

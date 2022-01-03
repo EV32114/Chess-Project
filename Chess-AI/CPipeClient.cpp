@@ -1,101 +1,77 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
 
+// #include "StdAfx.h"
 #include "process.h"
-#include "windows.h"
-#include "tchar.h"
-#include "CPipeServer.h"
+#include "CPipeClient.h"
 
-std::mutex buffer_mutex;
-std::condition_variable cv;
-std::condition_variable write_and_read_cond;
 
-CPipeServer::CPipeServer(void)
+CPipeClient::CPipeClient(void)
 {
 }
 
-CPipeServer::CPipeServer(std::string& sName) : m_sPipeName(sName), 
+CPipeClient::CPipeClient(std::string& sName) : m_sPipeName(sName), 
                                                 m_hThread(NULL), 
                                                 m_nEvent(AU_INIT)
 {
     m_buffer = (char*)calloc(AU_DATA_BUF, sizeof(char));
-    setup_complete = false;
     Init();
 }
 
-CPipeServer::~CPipeServer(void)
+CPipeClient::~CPipeClient(void)
 {
     delete m_buffer;
     m_buffer = NULL;
 }
 
-int CPipeServer::GetEvent() const
+int CPipeClient::GetEvent() const
 {
     return m_nEvent;
 }
 
-void CPipeServer::SetEvent(int nEventID)
+void CPipeClient::SetEvent(int nEventID)
 {
     m_nEvent = nEventID;
 }
 
-HANDLE CPipeServer::GetThreadHandle()
+HANDLE CPipeClient::GetThreadHandle()
 {
     return m_hThread;
 }
 
-HANDLE CPipeServer::GetPipeHandle()
+HANDLE CPipeClient::GetPipeHandle()
 {
     return m_hPipe;
 }
 
-void CPipeServer::SetData(std::string sData)
+void CPipeClient::SetData(std::string sData)
 {
     memset(&m_buffer[0], 0, AU_DATA_BUF);
+    //memcpy(&m_buffer[0], sData.c_str(), __min(AU_DATA_BUF, sData.size()));
     strncpy(&m_buffer[0], sData.c_str(), __min(AU_DATA_BUF, sData.size()));
 }
 
 // Get data from buffer
-void CPipeServer::GetData(std::string& sData)
+void CPipeClient::GetData(std::string& sData)
 {
     sData.clear(); // Clear old data, if any
     sData.append(m_buffer);
 }
 
-void CPipeServer::Init()
+void CPipeClient::Init()
 {
     if(m_sPipeName.empty())
     {
-        LOG << "Error: Invalid pipe name" << std::endl;
+        // Invalid pipe name
         return;
-    }
-    std::wstring stemp = std::wstring(m_sPipeName.begin(), m_sPipeName.end());
-    m_hPipe = ::CreateNamedPipe(
-            stemp.c_str(),                // pipe name 
-            PIPE_ACCESS_DUPLEX,       // read/write access 
-            PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT,  // message-type pipe/message-read mode/blocking mode
-            PIPE_UNLIMITED_INSTANCES, // max. instances  
-            1024,              // output buffer size 
-            1024,              // input buffer size 
-            NMPWAIT_USE_DEFAULT_WAIT, // client time-out 
-            NULL);                    // default security attribute 
-
-    if(INVALID_HANDLE_VALUE == m_hPipe)
-    {
-        LOG << "Error: Could not create named pipe" << std::endl;
-        OnEvent(AU_ERROR);
-    }
-    else
-    {
-        OnEvent(AU_SERV_RUN);
     }
 
     Run();
 }
 
-void CPipeServer::Run()
+void CPipeClient::Run()
 {
     UINT uiThreadId = 0;
-    m_hThread = (HANDLE)_beginthreadex(NULL,
+    m_hThread = (HANDLE)::_beginthreadex(NULL,
         NULL,
         PipeThreadProc,
         this,
@@ -113,23 +89,15 @@ void CPipeServer::Run()
     }
 }
 
-UINT32 __stdcall CPipeServer::PipeThreadProc(void* pParam)
+UINT32 __stdcall CPipeClient::PipeThreadProc(void* pParam)
 {
-    CPipeServer* pPipe = reinterpret_cast<CPipeServer*>(pParam);
+    CPipeClient* pPipe = reinterpret_cast<CPipeClient*>(pParam);
     if(pPipe == NULL)
         return 1L;
 
-    LOG << "BEFORE YUX" << std::endl;
-    std::unique_lock<std::mutex> lc(buffer_mutex);
-    LOG << "AFTER YUX" << std::endl;
     pPipe->OnEvent(AU_THRD_RUN);
     while(true)
     {
-        if (pPipe->setup_complete) {
-            write_and_read_cond.notify_all();
-            cv.wait(lc);
-            pPipe->setup_complete = false;
-        }
         int nEventID = pPipe->GetEvent();
         if(nEventID == AU_ERROR || nEventID == AU_TERMINATE)
         {
@@ -142,7 +110,7 @@ UINT32 __stdcall CPipeServer::PipeThreadProc(void* pParam)
         {
         case AU_INIT:
             {
-                pPipe->WaitForClient();
+                pPipe->ConnectToServer();
                 break;
             }
 
@@ -193,7 +161,31 @@ UINT32 __stdcall CPipeServer::PipeThreadProc(void* pParam)
     return 0;
 }
 
-void CPipeServer::OnEvent(int nEventID)
+void CPipeClient::ConnectToServer()
+{
+    OnEvent(AU_CLNT_TRY);
+    std::wstring stemp = std::wstring(m_sPipeName.begin(), m_sPipeName.end());
+    m_hPipe = ::CreateFile(
+        stemp.c_str(),      // pipe name
+        GENERIC_READ | GENERIC_WRITE, // read and write access
+        0,              // no sharing
+        NULL,           // default security attributes
+        OPEN_EXISTING,  // opens existing pipe
+        0,              // default attributes
+        NULL);          // no template file
+
+    if(INVALID_HANDLE_VALUE == m_hPipe)
+    {
+        //SetEventData("Could not connect to pipe server");
+        OnEvent(AU_ERROR);
+    }
+    else
+    {
+        OnEvent(AU_CLNT_CONN);
+    }
+}
+
+void CPipeClient::OnEvent(int nEventID)
 {
     switch(nEventID)
     {
@@ -205,19 +197,14 @@ void CPipeServer::OnEvent(int nEventID)
         LOG << "Initializing pipe comm" << std::endl;
         break;
 
-    case AU_SERV_RUN:
-        LOG << "Pipe server running" << std::endl;
-        break;
-
-    case AU_CLNT_WAIT:
-        LOG << "Waiting for client" << std::endl;
+    case AU_CLNT_TRY:
+        LOG << "Trying to connect to pipe server" << std::endl;
         break;
 
     case AU_CLNT_CONN:
         {
-        std::string sData("SYN");
-        SetData(sData);
-        SetEvent(AU_IOWRITE);
+        LOG << "Connected to server" << std::endl;
+        SetEvent(AU_IOREAD);
         break;
         }
 
@@ -225,19 +212,16 @@ void CPipeServer::OnEvent(int nEventID)
         {
         std::string sData;
         GetData(sData);
-        LOG << "Message from client: " << sData << std::endl;
-
-        if (strcmp(sData.c_str(), "close") == 0)
-            SetEvent(AU_CLOSE);
-        else if (strcmp(sData.c_str(), "ACK") == 0) {
-            setup_complete = true;
-            LOG << "setup complete" << std::endl;
-            SetEvent(AU_IOPENDING);
+        LOG << "Message from server: " << sData << std::endl;
+        if (strcmp(sData.c_str(), "SYN") == 0) {
+            SetData("ACK");
         }
         else
-            SetEvent(AU_IOREAD);
+            SetData("Fuck U");
+        SetEvent(AU_IOWRITE);
         break;
         }
+
     case AU_WRITE:
         LOG << "Wrote data to pipe" << std::endl;
         SetEvent(AU_IOREAD);
@@ -255,27 +239,13 @@ void CPipeServer::OnEvent(int nEventID)
     };
 }
 
-void CPipeServer::WaitForClient()
-{
-    OnEvent(AU_CLNT_WAIT);
-    if(FALSE == ConnectNamedPipe(m_hPipe, NULL)) // Wait for client to get connected
-    {
-        //SetEventData("Error connecting to pipe client");
-        OnEvent(AU_ERROR);
-    }
-    else
-    {
-        OnEvent(AU_CLNT_CONN);
-    }
-}
-
-void CPipeServer::Close()
+void CPipeClient::Close()
 {
     ::CloseHandle(m_hPipe);
     m_hPipe = NULL;
 }
 
-bool CPipeServer::Read()
+bool CPipeClient::Read()
 {
     DWORD drBytes = 0;
     BOOL bFinishedRead = FALSE;
@@ -303,11 +273,11 @@ bool CPipeServer::Read()
         //SetEventData("ReadFile failed");
         return false;
     }
-    write_and_read_cond.notify_all();
+
     return true;
 }
 
-bool CPipeServer::Write()
+bool CPipeClient::Write()
 {
     DWORD dwBytes;
     BOOL bResult = ::WriteFile(
@@ -322,32 +292,7 @@ bool CPipeServer::Write()
         //SetEventData("WriteFile failed");
         return false;
     }
-    write_and_read_cond.notify_all();
+
     return true;
 }
 
-void CPipeServer::SendData(std::string data)
-{
-    std::unique_lock<std::mutex>l(buffer_mutex);
-    if (!setup_complete)
-        write_and_read_cond.wait(l);
-    LOG << "HELLO YOAV" << std::endl;
-    this->SetData(data);
-    this->SetEvent(AU_IOWRITE);
-    l.unlock();
-    cv.notify_all();
-    write_and_read_cond.wait(l);
-}
-
-void CPipeServer::ReceiveData(std::string& data)
-{
-    std::unique_lock<std::mutex>l(buffer_mutex);
-    if (!setup_complete)
-        write_and_read_cond.wait(l);
-    LOG << "FUCK YOU YOAV" << std::endl;
-    this->SetEvent(AU_IOREAD);
-    l.unlock();
-    cv.notify_all();
-    this->GetData(data);
-    write_and_read_cond.wait(l);
-}
