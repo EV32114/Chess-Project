@@ -213,11 +213,7 @@ void CPipeClient::OnEvent(int nEventID)
         std::string sData;
         GetData(sData);
         LOG << "Message from server: " << sData << std::endl;
-        if (strcmp(sData.c_str(), "SYN") == 0) {
-            SetData("ACK");
-        }
-        else
-            SetData("Fuck U");
+        SetData("Fuck U");
         SetEvent(AU_IOWRITE);
         break;
         }

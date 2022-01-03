@@ -124,5 +124,4 @@ private:
     HANDLE m_hThread;               // Pipe thread
     int    m_nEvent;                // Pipe event
     char* m_buffer;              // Buffer to hold data
-    bool setup_complete;
 };

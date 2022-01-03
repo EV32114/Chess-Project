@@ -4,10 +4,12 @@
 #include "windows.h"
 #include "tchar.h"
 #include "CPipeServer.h"
+#include <semaphore>
 
-std::mutex buffer_mutex;
+/*std::mutex buffer_mutex;
 std::condition_variable cv;
-std::condition_variable write_and_read_cond;
+std::condition_variable write_and_read_cond;*/
+std::binary_semaphore semaphore{ 0 };
 
 CPipeServer::CPipeServer(void)
 {
@@ -18,7 +20,6 @@ CPipeServer::CPipeServer(std::string& sName) : m_sPipeName(sName),
                                                 m_nEvent(AU_INIT)
 {
     m_buffer = (char*)calloc(AU_DATA_BUF, sizeof(char));
-    setup_complete = false;
     Init();
 }
 
@@ -119,17 +120,13 @@ UINT32 __stdcall CPipeServer::PipeThreadProc(void* pParam)
     if(pPipe == NULL)
         return 1L;
 
-    LOG << "BEFORE YUX" << std::endl;
-    std::unique_lock<std::mutex> lc(buffer_mutex);
-    LOG << "AFTER YUX" << std::endl;
+    // LOG << "BEFORE YUX" << std::endl;
+    // std::unique_lock<std::mutex> lc(buffer_mutex);
+    // semaphore.acquire();
+    // LOG << "AFTER YUX" << std::endl;
     pPipe->OnEvent(AU_THRD_RUN);
     while(true)
     {
-        if (pPipe->setup_complete) {
-            write_and_read_cond.notify_all();
-            cv.wait(lc);
-            pPipe->setup_complete = false;
-        }
         int nEventID = pPipe->GetEvent();
         if(nEventID == AU_ERROR || nEventID == AU_TERMINATE)
         {
@@ -137,7 +134,6 @@ UINT32 __stdcall CPipeServer::PipeThreadProc(void* pParam)
             pPipe->Close();
             break;
         }
-
         switch(nEventID)
         {
         case AU_INIT:
@@ -215,9 +211,7 @@ void CPipeServer::OnEvent(int nEventID)
 
     case AU_CLNT_CONN:
         {
-        std::string sData("SYN");
-        SetData(sData);
-        SetEvent(AU_IOWRITE);
+        SetEvent(AU_IOPENDING);
         break;
         }
 
@@ -229,18 +223,16 @@ void CPipeServer::OnEvent(int nEventID)
 
         if (strcmp(sData.c_str(), "close") == 0)
             SetEvent(AU_CLOSE);
-        else if (strcmp(sData.c_str(), "ACK") == 0) {
-            setup_complete = true;
-            LOG << "setup complete" << std::endl;
-            SetEvent(AU_IOPENDING);
+        else {
+            if (GetEvent() == AU_IOREAD)
+                SetEvent(AU_IOPENDING);
         }
-        else
-            SetEvent(AU_IOREAD);
         break;
         }
     case AU_WRITE:
         LOG << "Wrote data to pipe" << std::endl;
-        SetEvent(AU_IOREAD);
+        if (GetEvent() == AU_IOWRITE)
+            SetEvent(AU_IOPENDING);
         break;
 
     case AU_ERROR:
@@ -303,7 +295,8 @@ bool CPipeServer::Read()
         //SetEventData("ReadFile failed");
         return false;
     }
-    write_and_read_cond.notify_all();
+    // write_and_read_cond.notify_all();
+    semaphore.release();
     return true;
 }
 
@@ -322,32 +315,37 @@ bool CPipeServer::Write()
         //SetEventData("WriteFile failed");
         return false;
     }
-    write_and_read_cond.notify_all();
+    // write_and_read_cond.notify_all();
+    semaphore.release();
     return true;
 }
 
 void CPipeServer::SendData(std::string data)
 {
-    std::unique_lock<std::mutex>l(buffer_mutex);
+    /*std::unique_lock<std::mutex>l(buffer_mutex);
     if (!setup_complete)
-        write_and_read_cond.wait(l);
-    LOG << "HELLO YOAV" << std::endl;
+        write_and_read_cond.wait(l);*/
+    while (this->GetEvent() == AU_INIT) {}
     this->SetData(data);
     this->SetEvent(AU_IOWRITE);
-    l.unlock();
+    semaphore.acquire();
+    // semaphore.release();
+    /*l.unlock();
     cv.notify_all();
-    write_and_read_cond.wait(l);
+    write_and_read_cond.wait(l);*/
 }
 
 void CPipeServer::ReceiveData(std::string& data)
 {
-    std::unique_lock<std::mutex>l(buffer_mutex);
+    /*std::unique_lock<std::mutex>l(buffer_mutex);
     if (!setup_complete)
-        write_and_read_cond.wait(l);
-    LOG << "FUCK YOU YOAV" << std::endl;
+        write_and_read_cond.wait(l);*/
+    while (this->GetEvent() == AU_INIT) {}
     this->SetEvent(AU_IOREAD);
-    l.unlock();
-    cv.notify_all();
+    semaphore.acquire();
+    // semaphore.release();
+    // l.unlock();
+    // cv.notify_all();
     this->GetData(data);
-    write_and_read_cond.wait(l);
+    // write_and_read_cond.wait(l);
 }
