@@ -11,8 +11,7 @@
 #include "windows.h"
 #include <string>
 #include "PipeConst.h"
-#include <mutex>
-#include <condition_variable>
+#include <semaphore>
 
 class CPipeServer
 {
@@ -124,4 +123,5 @@ private:
     HANDLE m_hThread;               // Pipe thread
     int    m_nEvent;                // Pipe event
     char* m_buffer;              // Buffer to hold data
+    std::binary_semaphore semaphore{ 0 };
 };
