@@ -19,16 +19,17 @@ WiFiServer wifiServer(1337);
 
 void setup() {
   int notConnectedCounter = 0;
-  Serial.begin(115200);
+  Serial.begin(115200); // set the communication frequency to 115200Hz
   step1.setSpeed(10);
-  step2.setSpeed(10);
+  step2.setSpeed(10); 
   delay(1000);
-  WiFi.mode(WIFI_AP_STA);
-  if (!WiFi.softAP(SSID, PASSWORD))
+  WiFi.mode(WIFI_AP_STA); // set the Wi-Fi mode to Access Point
+  if (!WiFi.softAP(SSID, PASSWORD)) // If we failed to initiate the Wi-Fi access point, we display an error.
   {
    Serial.println("Failed to init WiFi AP");
+   retrurn;
   }
-  else
+  else // Else, we print the ip address
   {
    Serial.println("IP adress of AP is:");
    Serial.println(WiFi.softAPIP());
@@ -37,7 +38,7 @@ void setup() {
   Serial.println("Connected to the WiFi network");
   Serial.println(WiFi.localIP());
  
-  wifiServer.begin();
+  wifiServer.begin(); // we start the Wi-Fi server.
 }
 
 void loop() {
@@ -185,6 +186,9 @@ void moveRight(int nNumOfSteps){
   step2.move(nNumOfSteps);
 }
 
+/*
+ * Moves the magnet diagonally up and right.
+ */
 void moveDiagonalUpRight(int nNumOfSteps){
   for(int i = 0; i < nNumOfSteps){
       moveUp(1);
@@ -192,6 +196,9 @@ void moveDiagonalUpRight(int nNumOfSteps){
   }  
 }
 
+/*
+ * Moves the magnet diagonally down and right.
+ */
 void moveDiagonalDownRight(int nNumOfSteps){
   for(int i = 0; i < nNumOfSteps){
       moveDown(1);
@@ -199,6 +206,9 @@ void moveDiagonalDownRight(int nNumOfSteps){
   }  
 }
 
+/*
+ * Moves the magnet diagonally down and left.
+ */
 void moveDiagonalDownLeft(int nNumOfSteps){
   for(int i = 0; i < nNumOfSteps){
       moveDown(1);
@@ -206,6 +216,9 @@ void moveDiagonalDownLeft(int nNumOfSteps){
   }  
 }
 
+/*
+ * Moves the magnet diagonally up and left.
+ */
 void moveDiagonalUpLeft(int nNumOfSteps){
   for(int i = 0; i < nNumOfSteps){
       moveUp(1);
