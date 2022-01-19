@@ -184,6 +184,15 @@ King* Board::getWhiteKing() const
   return this->_whiteKing;
 }
 
+void Board::undoMove(std::string move){
+    int *src;
+    int *dst;
+    dst = Board::convertIndex(move.substr(0, 2));
+	src = Board::convertIndex(move.substr(2, 2));
+
+    this.movePiece(src, dst, board.getBoard()[dst[0]][dst[1]]->getType() != EMPTY_SQUARE);
+}
+
 void Board::movePiece(int* src, const int* dest, bool toDelete)
 {
   char srcChar = this->_board[src[0]][src[1]]->getType();
@@ -217,9 +226,6 @@ int* Board::convertIndex(std::string strIndex)
   return index;
 }
 
-void Board::undoMove(std::string move)
-{
-}
 
 int Board::isInCheck() const
 {
@@ -282,9 +288,32 @@ int Board::isInCheck() const
 }
 
 int Board::isInMate(bool playerInCheck)
-{
-    // TODO this function.
-    return 0;
+{   
+    int i, j;
+    int *src;
+    int *dst;
+    
+    // Get the position of the king.
+    for(i = 0; i < BOARD_SIDE; i++){
+        for(j = 0; j < BOARD_SIDE; j++){
+            char pieceType = this->_board[i][j]->getType();
+            if(playerInCheck == isupper(pieceType) && std::tolower(pieceType) == 'k'){
+                goto found;
+            }
+        }
+    }
+
+found:
+    std::vector<std::string> enemyMoves = playerInCheck == BLACK ? Evaluate::whiteMoves : Evaluate::blackMoves;
+    int moveCnt = 0;
+    for(std::vector<std::string>::iterator iter = enemyMoves.begin(); iter != enemyMoves.end(); iter++){
+        src = Board::convertIndex(*iter.substr(0, 2));
+	    dst = Board::convertIndex(*iter.substr(2, 2));
+        if(this->_board.getBoard()[i][j]->isValidPieceMove(src, dst, this))){
+            moveCnt++;
+        }
+    }
+    return moveCnt == 8 ? CHECKMATE : CHECK;
 }
 
 int Board::castle(const int* src, const int* dest)
