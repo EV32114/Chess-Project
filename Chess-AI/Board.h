@@ -42,8 +42,11 @@ private:
 	bool castleBlackKing;
 	bool castleBlackQueen;
 	bool nextTurnWhite;
-
+	
 public:
+	std::vector<std::string> blackMoves;
+	std::vector<std::string> whiteMoves;
+	Board();
 	/// <summary>
 	/// This function is the constructor of the class Board.
 	/// </summary>
@@ -93,7 +96,7 @@ public:
 	/// <returns> A position on the code board </returns>
 	static int* convertIndex(std::string strIndex);
 
-	static void undoMove(std::string move);
+	void undoMove(std::string move);
 
 	/// <summary>
 	/// This function checks if one of the players is in check.

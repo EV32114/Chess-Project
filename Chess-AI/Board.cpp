@@ -9,6 +9,12 @@
 #include "EmptySquare.h"
 #include <string>
 
+
+
+Board::Board() {
+    return;
+}
+
 Board::Board(std::string strBoard)
 {
     int segmentCounter = 0;
@@ -190,7 +196,7 @@ void Board::undoMove(std::string move){
     dst = Board::convertIndex(move.substr(0, 2));
 	src = Board::convertIndex(move.substr(2, 2));
 
-    this.movePiece(src, dst, board.getBoard()[dst[0]][dst[1]]->getType() != EMPTY_SQUARE);
+    this->movePiece(src, dst, this->getBoard()[dst[0]][dst[1]]->getType() != EMPTY_SQUARE);
 }
 
 void Board::movePiece(int* src, const int* dest, bool toDelete)
@@ -304,15 +310,19 @@ int Board::isInMate(bool playerInCheck)
     }
 
 found:
-    std::vector<std::string> enemyMoves = playerInCheck == BLACK ? Evaluate::whiteMoves : Evaluate::blackMoves;
+    std::vector<std::string> enemyMoves = playerInCheck == BLACK ? this->whiteMoves : this->blackMoves; // ev has aids.
     int moveCnt = 0;
+
+    // iterate over each of the enemymoves and check if it has all of the valid king moves (meaning the king cannot move).
     for(std::vector<std::string>::iterator iter = enemyMoves.begin(); iter != enemyMoves.end(); iter++){
-        src = Board::convertIndex(*iter.substr(0, 2));
-	    dst = Board::convertIndex(*iter.substr(2, 2));
-        if(this->_board.getBoard()[i][j]->isValidPieceMove(src, dst, this))){
+        src = Board::convertIndex((*iter).substr(0, 2));
+	    dst = Board::convertIndex((*iter).substr(2, 2));
+        auto fml = this;
+        if(this->getBoard()[i][j]->isValidPieceMove(src, dst, *fml)) {
             moveCnt++;
         }
     }
+    int CHECKMATE = 1, CHECK = 0; // TEMP, check header files.
     return moveCnt == 8 ? CHECKMATE : CHECK;
 }
 
