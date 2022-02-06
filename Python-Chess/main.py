@@ -298,7 +298,7 @@ def checkEating(chess, img):
 
     for i, x in enumerate(range(64)):
         if abs(average[i][0] - chess.averageColors[i][0]) > 30 and abs(average[i][1] - chess.averageColors[i][1]) > 30 and abs(average[i][2] - chess.averageColors[i][2]) > 30:
-            if not chess.updatedChess[i % 8, i // 8] == 0:
+            if chess.updatedChess[i % 8, i // 8] != 0:
                 print(i % 8, i // 8)
                 return True
     return False
