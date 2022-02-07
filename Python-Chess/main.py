@@ -227,12 +227,9 @@ def stabilizeMask(prevMasks):
         for mask2 in prevMasks:
             for x in np.arange(8):
                 for y in np.arange(8):
-                    if (mask1[x, y] and not mask2[x, y]) or (not mask1[x, y] and mask2[x, y]) or (
-                            mask2[x, y] and mask1[x, y]):
+                    if not (not mask1[x, y] and not mask2[x, y]):
                         mask[x, y] = True
-                    else:
-                        if not mask[x, y]:
-                            mask[x, y] = False  # EV WTF
+
     return mask
 
 
@@ -246,11 +243,9 @@ def compareMasks(mask1, mask2):
     mask = np.zeros((8, 8), dtype=bool)
     for x in np.arange(8):
         for y in np.arange(8):
-            if mask1[x, y] and not mask2[x, y] or not mask1[x, y] and mask2[x, y] or mask2[x, y] and mask1[x, y]:
+            if not (not mask1[x, y] and not mask2[x, y]):
                 mask[x][y] = True
-            else:
-                if not mask[x][y]:
-                    mask[x][y] = False
+
     return mask
 
 
@@ -297,9 +292,9 @@ def checkEating(chess, img):
     average = getAverageColors(img)
 
     for i, x in enumerate(range(64)):
-        if abs(average[i][0] - chess.averageColors[i][0]) > 30 and abs(average[i][1] - chess.averageColors[i][1]) > 30 and abs(average[i][2] - chess.averageColors[i][2]) > 30:
-            if chess.updatedChess[i % 8, i // 8] != 0:
-                print(i % 8, i // 8)
+        if abs(average[i][0] - chess.averageColors[i][0]) > 50 or abs(average[i][1] - chess.averageColors[i][1]) > 50 or abs(average[i][2] - chess.averageColors[i][2]) > 50:
+            if not chess.boardMask[i % 8, i // 8]:
+                print("Ate the piece at place " + convert(i % 8, i // 8))
                 return True
     return False
 
@@ -364,7 +359,7 @@ def main():
             prevMasks.append(mask)
             if len(prevMasks) == 20:
                 chess.boardMask = stabilizeMask(prevMasks)
-                stabilized = not stabilized
+                stabilized = True
                 chess.averageColors = getAverageColors(first_frame)
 
         if stabilized:
