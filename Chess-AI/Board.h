@@ -2,6 +2,7 @@
 #define __BOARD_H__
 
 #include <iostream>
+#include <vector>
 
 #define BOARD_SIDE 8
 #define BOARD_INDEX 2

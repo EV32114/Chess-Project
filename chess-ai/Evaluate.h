@@ -8,16 +8,16 @@
 #include <vector>
 
 #define MAX_ROW_INDEX 7
-#define MID_PAWN 198
-#define END_PAWN 258
-#define MID_KNIGHT 817
-#define END_KNIGHT 846
-#define MID_BISHOP 836
-#define END_BISHOP 857
-#define MID_ROOK 1270
-#define END_ROOK 1281
-#define MID_QUEEN 2521
-#define END_QUEEN 2558
+//#define MID_PAWN 198
+//#define END_PAWN 258
+//#define MID_KNIGHT 817
+//#define END_KNIGHT 846
+//#define MID_BISHOP 836
+//#define END_BISHOP 857
+//#define MID_ROOK 1270
+//#define END_ROOK 1281
+//#define MID_QUEEN 2521
+//#define END_QUEEN 2558
 
 #define B_KING 'k'
 #define W_KING 'K'
@@ -45,7 +45,7 @@ class Evaluate
 {
 public:
 	static int evalPos(string pos);
-	static int evalPos(Board& board);
+	static int evalPos(Board& board, bool white);
 	static int attackKingZone(Board& board, bool white);
 	static bool isOpenFile(Board& board, bool isWhite, int* src);
 	static int* generateMove(Board& board, bool isWhite);
@@ -100,14 +100,14 @@ private:
 
 	static std::vector<std::string> blackMoves;
 	static std::vector<std::string> whiteMoves;
-	static void countPieces(string pos, int* whitePieces, int* blackPieces);
+	static void countPieces(Board& board, int* whitePieces, int* blackPieces);
 	static void getValidMoves(Board& board);
 	static int evaluatePiecesWhite(int* whitePieces, bool midGame);
 	int* minimaxRoot(int depth, Board& board, bool isMaximisingPlayer);
 	int minimax(int depth, Board& board, int alpha, int beta, bool isMaximisingPlayer);
 	static int evaluatePiecesBlack(int* blackPieces, bool midGame);
 	static int evaluatePiecePositions(Board& board, bool white);
-	static int evaluateKingSafety(Board& board);
+	static int evaluateKingSafety(Board& board, bool white);
 	static bool isUnderAttack(Board& board, int src[]);
 	static int calculateBlackIndex(int row);
 	static int evaluatePawnShield(int src[], Board& board);

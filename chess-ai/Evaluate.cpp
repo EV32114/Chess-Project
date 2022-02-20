@@ -30,23 +30,23 @@ int Evaluate::evalPos(string pos)
 	return 0;
 }
 
-int Evaluate::evalPos(Board& board)
+int Evaluate::evalPos(Board& board, bool white)
 {
-	
-	return 0;
+	return evaluateKingSafety(board, white) + evaluatePiecePositions(board, white);
 }
 
-void Evaluate::countPieces(string pos, int* whitePieces, int* blackPieces){
-	for(unsigned int i = 0; i < pos.length(); i++)
-	{
-		switch (pos[i])
-		{
-			case B_QUEEN: 
+/*void Evaluate::countPieces(Board& board, int* whitePieces, int* blackPieces) {
+	for (int i = 0; i < BOARD_SIDE; i++) {
+		for (int j = 0; j < BOARD_SIDE; j++) {
+
+			switch (board.getBoard()[i][j]->getType())
+			{
+			case B_QUEEN:
 				++blackPieces[QUEEN];
 				break;
 			case B_KING:
 				++blackPieces[KING];
-				break; 
+				break;
 			case B_KNIGHT:
 				++blackPieces[KNIGHT];
 				break;
@@ -58,7 +58,7 @@ void Evaluate::countPieces(string pos, int* whitePieces, int* blackPieces){
 				break;
 			case B_BISHOP:
 				++blackPieces[BISHOP];
-				break; 
+				break;
 			case W_BISHOP:
 				++whitePieces[BISHOP];
 				break;
@@ -79,9 +79,10 @@ void Evaluate::countPieces(string pos, int* whitePieces, int* blackPieces){
 				break;
 			default:
 				break;
+			}
 		}
 	}
-}
+}*/
 
 void Evaluate::getValidMoves(Board& board) {
 	for (int i = 0; i < 8; i++) {
@@ -103,7 +104,7 @@ void Evaluate::getValidMoves(Board& board) {
     }
 }
 
-int Evaluate::evaluatePiecesBlack(int *blackPieces, bool midGame) {
+/*int Evaluate::evaluatePiecesBlack(int* blackPieces, bool midGame) {
 	int posEval = 0;
 
 	for (int i = 0; i < 6; i++) {
@@ -126,7 +127,7 @@ int Evaluate::evaluatePiecesBlack(int *blackPieces, bool midGame) {
 		}
 	}
 	return posEval;
-}
+}*/
 
 int Evaluate::evaluatePiecePositions(Board& board, bool white)
 {
@@ -170,7 +171,6 @@ int Evaluate::evaluatePiecePositions(Board& board, bool white)
 }
 
 int* Evaluate::generateMove(Board& board, bool isWhite) {
-	srand((unsigned)time(0)); // Generate a random seed.
 	
 	/* We find a random white piece. */
 	int srcX = rand() % 8, srcY = rand() % 8; 
@@ -186,9 +186,9 @@ int* Evaluate::generateMove(Board& board, bool isWhite) {
 	return new int[4] {srcX, srcY, move[0] - '0', move[1] - '0'}; // We return the move.
 }
 
-int Evaluate::evaluateKingSafety(Board& board)
+int Evaluate::evaluateKingSafety(Board& board, bool white)
 {
-	return 0;
+	return attackKingZone(board, white) + evaluatePawnShield(white ? board.getWhiteKing()->getPos() : board.getBlackKing()->getPos(), board);
 }
 
 bool Evaluate::isUnderAttack(Board& board, int src[])
@@ -257,8 +257,8 @@ int Evaluate::evaluatePawnShield(int src[], Board& board)
 			pawnCount += 1;
 	}
 
-	// Calculate using adjusted numbers.
-	return pawnCount;
+	// Calculate using adjusted numbers (?).
+	return pawnCount * 10 + penalty;
 }
 
 // TODO: DOCUMENT (EV)
@@ -414,7 +414,7 @@ bool Evaluate::isOpenFile(Board& board, bool isWhite, int* src)
 	This function evaluates the current position of the white pieces.
 	TODO: decide whether we need it still.
 */
-int Evaluate::evaluatePiecesWhite(int* whitePieces, bool midGame) {
+/*int Evaluate::evaluatePiecesWhite(int* whitePieces, bool midGame) {
 	int posEval = 0;
 
 	for (int i = 0; i < 6; i++) {
@@ -437,7 +437,7 @@ int Evaluate::evaluatePiecesWhite(int* whitePieces, bool midGame) {
 		}
 	}
 	return posEval;
-}
+}*/
 
 int* Evaluate::minimaxRoot(int depth, Board& board, bool isMaximizingPlayer) {
 	std::string newMove;
@@ -465,7 +465,7 @@ int* Evaluate::minimaxRoot(int depth, Board& board, bool isMaximizingPlayer) {
 }
 
 int Evaluate::minimax(int depth, Board& board, int alpha, int beta, bool isMaximizingPlayer) {
-	if (depth == 0) return -(Evaluate::evalPos(board));
+	if (depth == 0) return -(Evaluate::evalPos(board, isMaximizingPlayer));
 	int bestMove;
 	std::string newMove;
 	int* src;
