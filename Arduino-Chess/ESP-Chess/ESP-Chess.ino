@@ -1,7 +1,7 @@
 #include <WiFi.h>
 #include <Stepper.h>
 
-#define SQUARE_STEPS 10 // TEMP - CHANGE LATER
+#define SQUARE_STEPS 10 // TEMP -> CHANGE LATER
 #define STEPS_PER_REVOLUTION 2048 // Steps per revolution.
 #define SSID "ESP32-AP" // WiFi name.
 #define PASSWORD "12345678" // WiFi password.
@@ -14,6 +14,10 @@ Stepper step2 = Stepper(STEPS_PER_REVOLUTION, 27, 13, 14, 12); // Creating an ob
  */
 void handleRequest(String userReq); 
 void moveSteppers(int nNumOfSteps, char cDirection);
+void moveUp(int nNumOfSteps);
+void moveDown(int nNumOfSteps);
+void moveLeft(int nNumOfSteps);
+void moveRight(int nNumOfSteps);
 
 WiFiServer wifiServer(1337);
 
@@ -27,7 +31,7 @@ void setup() {
   if (!WiFi.softAP(SSID, PASSWORD)) // If we failed to initiate the Wi-Fi access point, we display an error.
   {
    Serial.println("Failed to init WiFi AP");
-   retrurn;
+   return;
   }
   else // Else, we print the ip address
   {
@@ -70,8 +74,8 @@ void loop() {
  * handles the request for moving, sends it to calculateMove.
  */
 void handleRequest(String userReq){
-  int src[] = {atoi(userReq[0]), atoi(userReq[1])};
-  int target[] = {atoi(userReq[2]), atoi(userReq[3])};
+  int src[] = {(int)userReq[0], (int)userReq[1]};
+  int target[] = {(int)userReq[2], (int)userReq[3]};
   calculateMove(src, target);
 }
 
@@ -97,7 +101,7 @@ void moveStartAndEnd(bool isUnder, bool isLeft) {
  * src: the source location of the magnet.
  * target: the target square on the board.
 */
-void calculateMove(int[] src, int[] target){
+void calculateMove(int* src, int* target){
   // Getting the delta x and y coordinates.
   int dX = src[1] - target[1];
   int dY = src[0] - target[0];
@@ -126,6 +130,7 @@ void calculateMove(int[] src, int[] target){
   }
   moveStartAndEnd(isUnder, isLeft);
 }
+\
 
 /*
  * First of all, we shall decide on which stepper motor is responsible
@@ -162,35 +167,35 @@ void moveSteppers(int nNumOfSteps, char cDirection){
  * Moves the magnet up
  */
 void moveUp(int nNumOfSteps){
-  step1.move(nNumOfSteps);  
+  step1.step(nNumOfSteps);  
 }
 
 /*
  * Moves the magnet down
  */
 void moveDown(int nNumOfSteps){
-  step1.move(-nNumOfSteps);  
+  step1.step(-nNumOfSteps);  
 }
 
 /*
  * Moves the magnet left
  */
 void moveLeft(int nNumOfSteps){
-  step2.move(-nNumOfSteps);
+  step2.step(-nNumOfSteps);
 }
 
 /*
  * Moves the magnet right
  */
 void moveRight(int nNumOfSteps){
-  step2.move(nNumOfSteps);
+  step2.step(nNumOfSteps);
 }
 
 /*
  * Moves the magnet diagonally up and right.
  */
 void moveDiagonalUpRight(int nNumOfSteps){
-  for(int i = 0; i < nNumOfSteps){
+  for(int i = 0; i < nNumOfSteps; i++){
       moveUp(1);
       moveRight(1);
   }  
@@ -200,7 +205,7 @@ void moveDiagonalUpRight(int nNumOfSteps){
  * Moves the magnet diagonally down and right.
  */
 void moveDiagonalDownRight(int nNumOfSteps){
-  for(int i = 0; i < nNumOfSteps){
+  for(int i = 0; i < nNumOfSteps; i++){
       moveDown(1);
       moveRight(1);
   }  
@@ -210,7 +215,7 @@ void moveDiagonalDownRight(int nNumOfSteps){
  * Moves the magnet diagonally down and left.
  */
 void moveDiagonalDownLeft(int nNumOfSteps){
-  for(int i = 0; i < nNumOfSteps){
+  for(int i = 0; i < nNumOfSteps; i++){
       moveDown(1);
       moveLeft(1);
   }  
@@ -220,8 +225,57 @@ void moveDiagonalDownLeft(int nNumOfSteps){
  * Moves the magnet diagonally up and left.
  */
 void moveDiagonalUpLeft(int nNumOfSteps){
-  for(int i = 0; i < nNumOfSteps){
+  for(int i = 0; i < nNumOfSteps; i++){
       moveUp(1);
       moveLeft(1);
   }  
+}
+
+void moveMotorsToIndex(int src1, int src2, int dest1, int dest2) {
+  int row = src1 - src2;
+  int col = src2 - dest2;
+  while (abs(row) > 0 || abs(col) > 0) {
+    if (row == 0) {
+      moveLeft(0.5); // get out of the way of the other pieces
+      if (col < 0) {
+        moveDown(abs(col));
+      }
+      else {
+        moveUp(abs(col));
+      }
+      moveRight(0.5); // move back to the center of the square
+      return;
+    }
+    if (col == 0) {
+      moveUp(0.5); // get out of the way of the other pieces
+      if (row < 0) {
+        moveLeft(abs(row));
+      }
+      else {
+        moveRight(abs(row));
+      }
+      moveDown(0.5); // move back to the center of the square
+      return;
+    }
+    if (row < 0 && col < 0) {
+      moveDiagonalUpLeft(1);
+      row++;
+      col++;
+    }
+    else if (row < 0 && col > 0) {
+      moveDiagonalUpRight(1);
+      row++;
+      col--;
+    }
+    else if (row > 0 && col < 0) {
+      moveDiagonalDownLeft(1);
+      row--;
+      col++;
+    }
+    else if (row > 0 && col < 0) {
+      moveDiagonalDownRight(1);
+      row--;
+      col--;
+    }
+  }
 }
