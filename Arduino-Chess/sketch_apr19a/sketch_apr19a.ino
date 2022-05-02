@@ -16,10 +16,10 @@ void setup() {
 
 void loop() {
   //step2.step(300);
-  step1.step(300);
+  step2.step(300);
   delay(2000);
   //step2.step(-300);
-  step1.step(-300);
+  step2.step(-300);
   delay(2000);
 }
 // black white red orange
