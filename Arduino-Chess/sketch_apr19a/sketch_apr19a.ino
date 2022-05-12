@@ -18,6 +18,7 @@
  
 
 void setup() {
+  /*
   pinMode(19, OUTPUT);
   pinMode(23, OUTPUT);
   pinMode(22, OUTPUT);
@@ -26,12 +27,20 @@ void setup() {
   pinMode(13, OUTPUT);
   pinMode(12, OUTPUT);
   pinMode(4, OUTPUT);
+  */
+  
+  pinMode(12, OUTPUT);
+  pinMode(14, OUTPUT);
+  pinMode(27, OUTPUT);
+  pinMode(26, OUTPUT);
+  
+  /*
   Serial.begin(115200);
-  /*std::vector<int> a;
-  a.push_back(4);
+  std::vector<int> a;
   a.push_back(12);
-  a.push_back(13);
-  a.push_back(18);
+  a.push_back(14);
+  a.push_back(26);
+  a.push_back(27);
   do{ 
     forward(a[0], a[1], a[2], a[3], 300);
     for(int i = 0; i <4; i++){
@@ -39,7 +48,9 @@ void setup() {
     }
     Serial.println();
     delay(1500);
-  } while(std::next_permutation(a.begin(), a.end()));*/
+  } while(std::next_permutation(a.begin(), a.end()));
+  */
+  
   // 5 4 2 18
   // 18 2 5 4
    
@@ -48,7 +59,8 @@ void setup() {
   // 5 18 2 4
   /*int notConnectedCounter = 0;
   Serial.begin(115200); // set the communication frequency to 115200Hz
-  
+  // 16 12 14 27
+  / 26 14 12 27
   step1.setSpeed(10);
   step2.setSpeed(10);
   step1.step(300);
@@ -86,11 +98,9 @@ void setup() {
 // 18 - A, 13 - D, 4 - C, 12 - B
 
 void loop() {
-  // forward(23, 3, 22, 21, 300);
   forward(19, 23, 22, 21, 300); // WORKING
-  //forward(18, 2, 4, 5, 300);
-
-  //forward(4, 12, 18, 13, 300);
+// 26 12 14 27
+  forward(26, 12, 14, 27, 300); // WORKING
   delay(1000);
   /* /// MOTOR CODE 
   step1.step(300);
