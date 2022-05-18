@@ -18,29 +18,24 @@
  
 
 void setup() {
-  /*
+  
   pinMode(19, OUTPUT);
   pinMode(23, OUTPUT);
   pinMode(22, OUTPUT);
   pinMode(21, OUTPUT);
-  pinMode(18, OUTPUT);
-  pinMode(13, OUTPUT);
-  pinMode(12, OUTPUT);
-  pinMode(4, OUTPUT);
-  */
   
   pinMode(12, OUTPUT);
   pinMode(14, OUTPUT);
   pinMode(27, OUTPUT);
   pinMode(26, OUTPUT);
   
-  /*
+  
   Serial.begin(115200);
-  std::vector<int> a;
-  a.push_back(12);
-  a.push_back(14);
-  a.push_back(26);
-  a.push_back(27);
+  /*std::vector<int> a;
+  a.push_back(19);
+  a.push_back(21);
+  a.push_back(22);
+  a.push_back(23);
   do{ 
     forward(a[0], a[1], a[2], a[3], 300);
     for(int i = 0; i <4; i++){
@@ -48,8 +43,8 @@ void setup() {
     }
     Serial.println();
     delay(1500);
-  } while(std::next_permutation(a.begin(), a.end()));
-  */
+  } while(std::next_permutation(a.begin(), a.end()));*/
+  
   
   // 5 4 2 18
   // 18 2 5 4
@@ -57,42 +52,7 @@ void setup() {
   // 5 4 2 18
   // 2 18 5 4
   // 5 18 2 4
-  /*int notConnectedCounter = 0;
-  Serial.begin(115200); // set the communication frequency to 115200Hz
-  // 16 12 14 27
-  / 26 14 12 27
-  step1.setSpeed(10);
-  step2.setSpeed(10);
-  step1.step(300);
-  std::vector<int> a;
- 
-  a.push_back(22);
-  a.push_back(23);
-  a.push_back(1);
-  a.push_back(3);
-  
-  
-  a.push_back(5);
-  a.push_back(21);
-  a.push_back(18);
-  a.push_back(19);
-
-  do{ 
-    Stepper stepperBro = Stepper(STEPS_PER_REVOLUTION, a[0], a[1], a[2], a[3]);
-    stepperBro.setSpeed(2);
-    stepperBro.step(500);
-    for(int i = 0; i <4; i++){
-      Serial.println(a[i]);  
-    }
-    Serial.println();
-    delay(1500);
-  } while(std::next_permutation(a.begin(), a.end()));
-  /*
-  
-  
-  delay(1000);
-  pinMode(ELECTROMAGNET_PIN, OUTPUT); // setting up electromagnet
-  */
+  //pinMode(ELECTROMAGNET_PIN, OUTPUT); // setting up electromagnet
 }
 
 // 18 - A, 13 - D, 4 - C, 12 - B
@@ -100,6 +60,7 @@ void setup() {
 void loop() {
   forward(19, 23, 22, 21, 300); // WORKING
 // 26 12 14 27
+  delay(1000);
   forward(26, 12, 14, 27, 300); // WORKING
   delay(1000);
   /* /// MOTOR CODE 
