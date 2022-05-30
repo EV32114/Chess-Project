@@ -21,7 +21,7 @@ class Chess:
         self.updatedChess = np.zeros((8, 8))  # array consisting of 0's for now, will later be use to hold the
         # current chess board.
         self.sock = socketlib.connect()  # the socket used to communicate with the chess program.
-        self.vid = cv2.VideoCapture(r'Valorant_2021.06.12_-_12.20.20.01.mkv')  # cropping the image to the desired
+        self.vid = cv2.VideoCapture(1)  # cropping the image to the desired
         # frame.
         self.ret, self.frame = self.vid.read()  # take a frame
         self.refPt = crop.crop_image(self.frame)
@@ -308,14 +308,13 @@ def handle_invalid():
 
 def main():
     chess = Chess()
-    port = arduino.connect_to_port()
     flag = 0
     moved = False
     stabilized = False
     chess.vid.set(cv2.CAP_PROP_CONVERT_RGB, 1)  # we enhance the frame.
     prevMasks = []  # will be used to store previous masks (for stabilization).
+    print(chess.refPt)
     centerTaken = False
-    port.reset_input_buffer()
     while flag != 8:
 
         ret_main, frame_main = chess.vid.read()  # we read the frame
@@ -371,9 +370,9 @@ def main():
 
         mark(out=first_frame, mask=mask, wh_t=wh_t)  # we mark the frame.
         cv2.imshow('frame', first_frame)  # we display the frame after it's marked.
-        if port.in_waiting:
-            data = arduino.get_input(port)
-            moved = arduino.check_button_mode(data)
+        # if port.in_waiting:
+        #     data = arduino.get_input(port)
+        #     moved = arduino.check_button_mode(data)
 
         key = cv2.waitKey(1) & 0xFF
 
@@ -418,7 +417,7 @@ def main():
 
             cv2.imshow('frame', frame_main)  # we display the final frame.
             firstCenterArray = centerArray  # we update the center pixel array.
-            port.reset_input_buffer()  # we reset the input buffer
+            # port.reset_input_buffer()  # we reset the input buffer
             moved = False
             chess.averageColors = getAverageColors(frame_main)
 

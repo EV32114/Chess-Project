@@ -55,9 +55,9 @@ int main()
 {
 	WSAInitializer wsaInit;
 	srand(time_t(NULL));
-	// SOCKET m_socket;
-	// SOCKET client_socket = connectEsp(m_socket);
-	std::string sPipeName(PIPENAME);
+	SOCKET m_socket;
+	SOCKET client_socket = connectEsp(m_socket);
+	/*std::string sPipeName(PIPENAME);
 	CPipeServer* pServer = new CPipeServer(sPipeName);
 	std::string pog;
 	pServer->SendData("1");
@@ -66,10 +66,10 @@ int main()
 	pServer->ReceiveData(pog);
 	::WaitForSingleObject(pServer->GetThreadHandle(), INFINITE); // to remove before prod
 	delete pServer;
-	pServer = NULL;
-	// Board* board = new Board(INIT_STR);
+	pServer = NULL; */
+	Board* board = new Board(INIT_STR);
 
-	// HandleGame::startGame(board, &client_socket);
-	// closesocket(m_socket);
+	HandleGame::startGame(board, &client_socket);
+	closesocket(m_socket);
 	return 0;
 }

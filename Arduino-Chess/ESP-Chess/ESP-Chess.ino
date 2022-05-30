@@ -1,14 +1,22 @@
 #include <WiFi.h>
 #include <Stepper.h>
 
-#define SQUARE_STEPS 10 // TEMP -> CHANGE LATER
-#define STEPS_PER_REVOLUTION 2048 // Steps per revolution.
+#define SQUARE_STEPS 37
+// #define STEPS_PER_REVOLUTION 2048 // Steps per revolution.
 #define SSID "ESP32-AP" // WiFi name.
 #define PASSWORD "12345678" // WiFi password.
 
-Stepper step1 = Stepper(STEPS_PER_REVOLUTION, 32, 25, 33, 26); // Creating an object of our stepper motor.
-Stepper step2 = Stepper(STEPS_PER_REVOLUTION, 27, 13, 14, 12); // Creating an object of our stepper motor.
+#define PIN_TOP_A 26
+#define PIN_TOP_B 12
+#define PIN_TOP_C 14
+#define PIN_TOP_D 27
 
+#define PIN_MIDDLE_A 19
+#define PIN_MIDDLE_B 23
+#define PIN_MIDDLE_C 22
+#define PIN_MIDDLE_D 21
+
+#define ELECTROMAGNET_PIN 18
 /*
  * Function Declarations
  */
@@ -18,15 +26,29 @@ void moveUp(int nNumOfSteps);
 void moveDown(int nNumOfSteps);
 void moveLeft(int nNumOfSteps);
 void moveRight(int nNumOfSteps);
+void forward(int A, int B, int C, int D, int numOfSteps);
 
 WiFiServer wifiServer(1337);
 
 void setup() {
-  int notConnectedCounter = 0;
+  pinMode(19, OUTPUT);
+  pinMode(23, OUTPUT);
+  pinMode(22, OUTPUT);
+  pinMode(21, OUTPUT);
+  
+  pinMode(12, OUTPUT);
+  pinMode(14, OUTPUT);
+  pinMode(27, OUTPUT);
+  pinMode(26, OUTPUT);
+
+  pinMode(18, OUTPUT);
+
+  digitalWrite(ELECTROMAGNET_PIN, HIGH);
+  
+  //moveMotorsToIndex(0, 0, 7, 7);
+  
+  /*int notConnectedCounter = 0;
   Serial.begin(115200); // set the communication frequency to 115200Hz
-  step1.setSpeed(10);
-  step2.setSpeed(10); 
-  delay(1000);
   WiFi.mode(WIFI_AP_STA); // set the Wi-Fi mode to Access Point
   if (!WiFi.softAP(SSID, PASSWORD)) // If we failed to initiate the Wi-Fi access point, we display an error.
   {
@@ -42,14 +64,23 @@ void setup() {
   Serial.println("Connected to the WiFi network");
   Serial.println(WiFi.localIP());
  
-  wifiServer.begin(); // we start the Wi-Fi server.
+  wifiServer.begin(); // we start the Wi-Fi server.*/
+  
 }
 
 void loop() {
+  forward(19, 23, 22, 21, 100); // TEMP WORKING
+  //delay(1000);
+  //forward(26, 12, 14, 27, 100); // WORKING
+  delay(1000);
+  forward(19, 23, 22, 21, -100); // WORKING
+  delay(1000);
+  //forward(26, 12, 14, 27, -100); // WORKING
+  //delay(1000);
   /* 
    *  Variable and object initializations
    */
-  WiFiClient client = wifiServer.available();   // Listen for incoming clients
+  /*WiFiClient client = wifiServer.available();   // Listen for incoming clients
   String userReq = "";
   
   if (client) {                             // If a new client connects,
@@ -67,7 +98,7 @@ void loop() {
 
       }
     }
-  }
+  }*/
 }
 
 /*
@@ -76,7 +107,7 @@ void loop() {
 void handleRequest(String userReq){
   int src[] = {(int)userReq[0], (int)userReq[1]};
   int target[] = {(int)userReq[2], (int)userReq[3]};
-  calculateMove(src, target);
+  moveMotorsToIndex(src[0], src[1], target[0], target[1]);
 }
 
 /*
@@ -167,115 +198,194 @@ void moveSteppers(int nNumOfSteps, char cDirection){
  * Moves the magnet up
  */
 void moveUp(int nNumOfSteps){
-  step1.step(nNumOfSteps);  
+  forward(PIN_TOP_A, PIN_TOP_B, PIN_TOP_C, PIN_TOP_D, nNumOfSteps);
 }
 
 /*
  * Moves the magnet down
  */
 void moveDown(int nNumOfSteps){
-  step1.step(-nNumOfSteps);  
+  forward(PIN_TOP_A, PIN_TOP_B, PIN_TOP_C, PIN_TOP_D, -nNumOfSteps);
 }
 
 /*
  * Moves the magnet left
  */
 void moveLeft(int nNumOfSteps){
-  step2.step(-nNumOfSteps);
+  forward(PIN_MIDDLE_A, PIN_MIDDLE_B, PIN_MIDDLE_C, PIN_MIDDLE_D, -nNumOfSteps);
 }
 
 /*
  * Moves the magnet right
  */
 void moveRight(int nNumOfSteps){
-  step2.step(nNumOfSteps);
+  forward(PIN_MIDDLE_A, PIN_MIDDLE_B, PIN_MIDDLE_C, PIN_MIDDLE_D, nNumOfSteps);
 }
 
 /*
  * Moves the magnet diagonally up and right.
  */
 void moveDiagonalUpRight(int nNumOfSteps){
-  for(int i = 0; i < nNumOfSteps; i++){
-      moveUp(1);
-      moveRight(1);
-  }  
+  moveUp(nNumOfSteps);
+  moveRight(nNumOfSteps);  
 }
 
 /*
  * Moves the magnet diagonally down and right.
  */
 void moveDiagonalDownRight(int nNumOfSteps){
-  for(int i = 0; i < nNumOfSteps; i++){
-      moveDown(1);
-      moveRight(1);
-  }  
+  moveDown(nNumOfSteps);
+  moveRight(nNumOfSteps);
 }
 
 /*
  * Moves the magnet diagonally down and left.
  */
 void moveDiagonalDownLeft(int nNumOfSteps){
-  for(int i = 0; i < nNumOfSteps; i++){
-      moveDown(1);
-      moveLeft(1);
-  }  
+  moveDown(nNumOfSteps);
+  moveLeft(nNumOfSteps); 
 }
 
 /*
  * Moves the magnet diagonally up and left.
  */
 void moveDiagonalUpLeft(int nNumOfSteps){
-  for(int i = 0; i < nNumOfSteps; i++){
-      moveUp(1);
-      moveLeft(1);
-  }  
+  moveUp(nNumOfSteps);
+  moveLeft(nNumOfSteps);
 }
 
 void moveMotorsToIndex(int src1, int src2, int dest1, int dest2) {
-  int row = src1 - src2;
-  int col = src2 - dest2;
+  int row = src1 - dest1; // 0 - 1 = -1
+  int col = src2 - dest2; // 1 - 2 = -1
+  digitalWrite(ELECTROMAGNET_PIN, HIGH);
   while (abs(row) > 0 || abs(col) > 0) {
     if (row == 0) {
-      moveLeft(0.5); // get out of the way of the other pieces
+      moveLeft(0.5 * SQUARE_STEPS); // get out of the way of the other pieces
+      delay(500);
       if (col < 0) {
-        moveDown(abs(col));
+        moveDown(abs(col) * SQUARE_STEPS);
+        delay(500);
       }
       else {
-        moveUp(abs(col));
+        moveUp(abs(col) * SQUARE_STEPS);
+        delay(500);
       }
-      moveRight(0.5); // move back to the center of the square
+      moveRight(0.5 * SQUARE_STEPS); // move back to the center of the square
+      delay(500);
+      digitalWrite(ELECTROMAGNET_PIN, LOW);
       return;
     }
     if (col == 0) {
-      moveUp(0.5); // get out of the way of the other pieces
+      moveUp(0.5 * SQUARE_STEPS); // get out of the way of the other pieces
+      delay(500);
       if (row < 0) {
-        moveLeft(abs(row));
+        moveLeft(abs(row) * SQUARE_STEPS);
+        delay(500);
       }
       else {
-        moveRight(abs(row));
+        moveRight(abs(row) * SQUARE_STEPS);
+        delay(500);
       }
-      moveDown(0.5); // move back to the center of the square
+      moveDown(0.5 * SQUARE_STEPS); // move back to the center of the square
+      delay(500);
+      digitalWrite(ELECTROMAGNET_PIN, LOW);
       return;
     }
     if (row < 0 && col < 0) {
-      moveDiagonalUpLeft(1);
+      moveDiagonalDownLeft(SQUARE_STEPS);
+      delay(500);
       row++;
       col++;
     }
     else if (row < 0 && col > 0) {
-      moveDiagonalUpRight(1);
+      moveDiagonalUpLeft(SQUARE_STEPS);
+      
+      delay(500);
       row++;
       col--;
     }
-    else if (row > 0 && col < 0) {
-      moveDiagonalDownLeft(1);
+    else if (row > 0 && col > 0) {
+      moveDiagonalUpRight(SQUARE_STEPS);
+      delay(500);
       row--;
       col++;
     }
     else if (row > 0 && col < 0) {
-      moveDiagonalDownRight(1);
+      moveDiagonalDownRight(SQUARE_STEPS);
+      delay(500);
       row--;
       col--;
     }
+  }
+}
+
+void forward(int A, int B, int C, int D, int numOfSteps){
+  if (numOfSteps > 0) {
+   for(int i = 0; i < numOfSteps; i++){
+    // 5
+    digitalWrite(A, LOW);
+    digitalWrite(D, HIGH);
+    digitalWrite(B, LOW);
+    digitalWrite(C, HIGH);
+    delay(2);
+   
+    // 6
+    digitalWrite(A, LOW);
+    digitalWrite(D, HIGH);
+    digitalWrite(B, HIGH);
+    digitalWrite(C, LOW);
+    delay(2);
+
+    // 10
+    digitalWrite(A, HIGH);
+    digitalWrite(D, LOW);
+    digitalWrite(B, HIGH);
+    digitalWrite(C, LOW);
+    delay(2);
+    // 9
+    digitalWrite(A, HIGH);
+    digitalWrite(D, LOW);
+    digitalWrite(B, LOW);
+    digitalWrite(C, HIGH);
+    if (A == PIN_TOP_A)
+      delay(10);
+    else
+      delay(18);
+   }
+  }
+   else if (numOfSteps < 0) {
+    numOfSteps = numOfSteps * -1;
+    for(int i = 0; i < numOfSteps; i++){
+      // 9
+      digitalWrite(A, HIGH);
+      digitalWrite(D, LOW);
+      digitalWrite(B, LOW);
+      digitalWrite(C, HIGH);
+      delay(2);
+  
+      
+      // 10
+      digitalWrite(A, HIGH);
+      digitalWrite(D, LOW);
+      digitalWrite(B, HIGH);
+      digitalWrite(C, LOW);
+      delay(2);
+  
+      // 6
+      digitalWrite(A, LOW);
+      digitalWrite(D, HIGH);
+      digitalWrite(B, HIGH);
+      digitalWrite(C, LOW);
+      delay(2);
+      // 5
+      digitalWrite(A, LOW);
+      digitalWrite(D, HIGH);
+      digitalWrite(B, LOW);
+      digitalWrite(C, HIGH);
+      if (A == PIN_TOP_A)
+        delay(10);
+      else
+        delay(18);
+   } // 9 10 6 5
   }
 }

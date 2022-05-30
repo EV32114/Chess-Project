@@ -52,16 +52,22 @@ void setup() {
   // 5 4 2 18
   // 2 18 5 4
   // 5 18 2 4
-  //pinMode(ELECTROMAGNET_PIN, OUTPUT); // setting up electromagnet
+  pinMode(ELECTROMAGNET_PIN, OUTPUT); // setting up electromagnet
+  digitalWrite(ELECTROMAGNET_PIN, LOW);
 }
 
 // 18 - A, 13 - D, 4 - C, 12 - B
 
 void loop() {
-  forward(19, 23, 22, 21, 300); // WORKING
-// 26 12 14 27
+  //forward(19, 23, 22, 21, 100); // WORKING
+  //delay(5000);
+  forward(19, 23, 22, 21, 100); // TEMP WORKING
   delay(1000);
-  forward(26, 12, 14, 27, 300); // WORKING
+  forward(26, 12, 14, 27, 100); // WORKING
+  delay(1000);
+  forward(19, 23, 22, 21, -100); // WORKING
+  delay(1000);
+  forward(26, 12, 14, 27, -100); // WORKING
   delay(1000);
   /* /// MOTOR CODE 
   step1.step(300);
@@ -81,7 +87,8 @@ void loop() {
 }
 
 void forward(int A, int B, int C, int D, int numOfSteps){
-  for(int i = 0; i < numOfSteps; i++){
+  if (numOfSteps > 0) {
+   for(int i = 0; i < numOfSteps; i++){
     // 5
     digitalWrite(A, LOW);
     digitalWrite(D, HIGH);
@@ -108,5 +115,38 @@ void forward(int A, int B, int C, int D, int numOfSteps){
     digitalWrite(B, LOW);
     digitalWrite(C, HIGH);
     delay(5);
-  } 
+   }
+  }
+   else if (numOfSteps < 0) {
+    numOfSteps = numOfSteps * -1;
+    for(int i = 0; i < numOfSteps; i++){
+      // 9
+      digitalWrite(A, HIGH);
+      digitalWrite(D, LOW);
+      digitalWrite(B, LOW);
+      digitalWrite(C, HIGH);
+      delay(2);
+  
+      
+      // 10
+      digitalWrite(A, HIGH);
+      digitalWrite(D, LOW);
+      digitalWrite(B, HIGH);
+      digitalWrite(C, LOW);
+      delay(2);
+  
+      // 6
+      digitalWrite(A, LOW);
+      digitalWrite(D, HIGH);
+      digitalWrite(B, HIGH);
+      digitalWrite(C, LOW);
+      delay(2);
+      // 5
+      digitalWrite(A, LOW);
+      digitalWrite(D, HIGH);
+      digitalWrite(B, LOW);
+      digitalWrite(C, HIGH);
+      delay(5);
+   } // 9 10 6 5
+  }
 }
