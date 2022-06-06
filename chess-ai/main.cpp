@@ -1,10 +1,20 @@
+#pragma comment(lib, "Ws2_32.lib")
+
 #include "Evaluate.h"
-#include "CPipeClient.h"
+#include "Client.h"
 
 int main()
 {
-	Board board("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1");
-	cout << Evaluate::evalPos(board, true) << endl;
+	Client client;
+	client.connectToServer("127.0.0.1", 3000);
+	std::string boardMsg;
+	std::string bestMove;
+	while (true) {
+		boardMsg = client.recvMsg(client._clientSocket);
+		Board board(boardMsg);
+		// GET BEST MOVE
+		client.sendMsg(client._clientSocket, bestMove);
+	}
 	/*
 	// Board board("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1");
 	// cout << Evaluate::attackKingZone(board, true) << endl;

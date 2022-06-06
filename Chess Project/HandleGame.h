@@ -36,7 +36,7 @@ public:
 	/// </summary>
 	/// <param name="board"> The game board </param>
 	/// <param name="pipe"> A connection between the backend and the frontend </param>
-	static void startGame(Board* board, SOCKET* pipe);
+	static void startGame(Board* board, SOCKET* imageSocket, SOCKET* AISocket, SOCKET* ESPSocket);
 
 	/// <summary>
 	/// This function handles a player's turn:
@@ -53,7 +53,4 @@ public:
 	/// <param name="code"> A code that was sent to the graphics at the end of a turn </param>
 	/// <param name="roundCounter"> A pointer to the amount of rounds that have been played </param>
 	static void changeCurrentPlayer(const int code, int* roundCounter);
-
-	static std::string receiveMsg(SOCKET sock, int len, int offset);
-	static void sendMsg(SOCKET sock, const char** buffer, int len);
 };

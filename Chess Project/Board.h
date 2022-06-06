@@ -130,6 +130,8 @@ public:
 	/// <param name="isWhite"> If white is the attacker or not </param>
 	/// <returns> If the position is under attack </returns>
 	bool isUnderAttack(const int* pos, bool isWhite);
+
+	std::string getBoardStr(bool isWhiteTurn);
 };
 
 #endif // !__BOARD_H__

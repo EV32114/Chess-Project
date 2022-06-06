@@ -142,16 +142,15 @@
   <ItemGroup>
     <ClInclude Include="Bishop.h" />
     <ClInclude Include="Board.h" />
-    <ClInclude Include="CPipeServer.h" />
     <ClInclude Include="EmptySquare.h" />
     <ClInclude Include="HandleGame.h" />
     <ClInclude Include="King.h" />
     <ClInclude Include="Knight.h" />
     <ClInclude Include="Pawn.h" />
     <ClInclude Include="Piece.h" />
-    <ClInclude Include="PipeConst.h" />
     <ClInclude Include="Queen.h" />
     <ClInclude Include="Rook.h" />
+    <ClInclude Include="Server.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="WSAInitializer.h" />
@@ -159,7 +158,6 @@
   <ItemGroup>
     <ClCompile Include="Bishop.cpp" />
     <ClCompile Include="Board.cpp" />
-    <ClCompile Include="CPipeServer.cpp" />
     <ClCompile Include="EmptySquare.cpp" />
     <ClCompile Include="HandleGame.cpp" />
     <ClCompile Include="King.cpp" />
@@ -168,6 +166,7 @@
     <ClCompile Include="Piece.cpp" />
     <ClCompile Include="Queen.cpp" />
     <ClCompile Include="Rook.cpp" />
+    <ClCompile Include="Server.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="WSAInitializer.cpp" />

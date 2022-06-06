@@ -415,6 +415,33 @@ bool Board::isUnderAttack(const int* pos, bool isWhite)
   return false;
 }
 
+std::string Board::getBoardStr(bool isWhiteTurn)
+{
+    std::string fen = "";
+    int count = 0;
+    for (size_t i = 0; i < 8; i++)
+    {
+        for (size_t j = 0; j < 8; j++)
+        {
+            if (this->_board[i][j]->getType() != EMPTY_SQUARE) {
+                if (count) {
+                    fen += static_cast<char>(count + '0');
+                    count = 0;
+                }
+                fen += this->_board[i][j]->getType();
+            }
+            else
+                count++;
+        }
+        fen += '/';
+    }
+    if (isWhiteTurn)
+        fen += " w KQkq - 0 1";
+    else
+        fen += " b KQkq - 0 1";
+    return fen;
+}
+
 bool Board::canMove(Piece& piece, int srcX, int srcY)
 {
   int i = 0, j = 0;

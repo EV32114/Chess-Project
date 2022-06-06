@@ -6,6 +6,7 @@
 #include "Bishop.h"
 #include "Knight.h"
 #include "Piece.h"
+#include "Server.h"
 
 const std::string castleCodes[4] = { "e1g1", "e1c1", "e8g8", "e8c8" };
 bool HandleGame::_currentPlayer;
@@ -20,7 +21,9 @@ void HandleGame::setCurrentPlayer(int color)
     HandleGame::_currentPlayer = color;
 }
 
-void HandleGame::startGame(Board* board, SOCKET* pipe)
+// image recognition -> logic -> AI -> logic -> ESP
+// recv(IMG) -> send(AI) -> recv(AI) -> send(ESP)
+void HandleGame::startGame(Board* board, SOCKET* imageSocket, SOCKET* AISocket, SOCKET* ESPSocket)
 {
     int roundCounter = 0;
     int code = 0;
@@ -28,26 +31,14 @@ void HandleGame::startGame(Board* board, SOCKET* pipe)
     std::string msgToGraphics = INIT_STR;
     const char* pStr = msgToGraphics.c_str();
     std::string msgFromGraphics = "";
+    std::string moveFromAI = "";
 
     HandleGame::setCurrentPlayer(WHITE);
     board->printBoard();
 
     while (msgFromGraphics != "quit")
     {
-        if (msgFromGraphics == "reset")
-        {
-            roundCounter = 0;
-            delete board;
-            board = new Board(INIT_STR);
-            HandleGame::setCurrentPlayer(WHITE);
-            board->printBoard();
-            msgToGraphics = INIT_STR;
-            pStr = msgToGraphics.c_str();
-            sendMsg(*pipe, &pStr, msgToGraphics.length());
-            msgFromGraphics = receiveMsg(*pipe, 4, 0);
-            continue;
-        }
-        msgFromGraphics = receiveMsg(*pipe, 4, 0);
+        msgFromGraphics = Server::recvMsg(*imageSocket);
         code = HandleGame::handleTurn(msgFromGraphics, *board);
 
         strCode[0] = code + '0';
@@ -55,9 +46,15 @@ void HandleGame::startGame(Board* board, SOCKET* pipe)
 
         msgToGraphics = strCode;
         pStr = msgToGraphics.c_str();
-        sendMsg(*pipe, &pStr, msgToGraphics.length());
-
-        HandleGame::changeCurrentPlayer(code, &roundCounter);
+        Server::sendMsg(*imageSocket, msgToGraphics);
+        if (code == VALID || code == CHECK || code == CASTLE || code == CHECKMATE) {
+            HandleGame::changeCurrentPlayer(code, &roundCounter);
+            Server::sendMsg(*AISocket, board->getBoardStr(getCurrentPlayer()));  // SEND AI NEW BOARD POSITION
+            moveFromAI = Server::recvMsg(*AISocket);  // RECV MOVE FROM AI
+            HandleGame::handleTurn(msgFromGraphics, *board);  // UPDATE BOARD
+            HandleGame::changeCurrentPlayer(code, &roundCounter);
+            Server::sendMsg(*ESPSocket, moveFromAI);  // SEND MOVE TO ESP
+        }
     }
 }
 
@@ -120,7 +117,7 @@ void HandleGame::changeCurrentPlayer(const int code, int* roundCounter)
         HandleGame::setCurrentPlayer(BLACK);
     }
 }
-
+/*
 std::string HandleGame::receiveMsg(SOCKET sock, int len, int offset)
 {
     if (len == 0)
@@ -149,3 +146,4 @@ void HandleGame::sendMsg(SOCKET sock, const char** buffer, int len)
         throw std::exception("Error while sending message to client");
     }
 }
+*/
