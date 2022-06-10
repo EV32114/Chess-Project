@@ -439,7 +439,7 @@ bool Evaluate::isOpenFile(Board& board, bool isWhite, int* src)
 	return posEval;
 }*/
 
-int* Evaluate::minimaxRoot(int depth, Board& board, bool isMaximizingPlayer) {
+int*  Evaluate::minimaxRoot(int depth, Board& board, bool isMaximizingPlayer) {
 	std::string newMove;
 	int* src;
 	int* dst;
@@ -464,7 +464,7 @@ int* Evaluate::minimaxRoot(int depth, Board& board, bool isMaximizingPlayer) {
 	return bestMove;
 }
 
-int Evaluate::minimax(int depth, Board& board, int alpha, int beta, bool isMaximizingPlayer) {
+ int Evaluate::minimax(int depth, Board& board, int alpha, int beta, bool isMaximizingPlayer) {
 	if (depth == 0) return -(Evaluate::evalPos(board, isMaximizingPlayer));
 	int bestMove;
 	std::string newMove;

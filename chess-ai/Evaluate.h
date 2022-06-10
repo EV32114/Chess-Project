@@ -49,6 +49,8 @@ public:
 	static int attackKingZone(Board& board, bool white);
 	static bool isOpenFile(Board& board, bool isWhite, int* src);
 	static int* generateMove(Board& board, bool isWhite);
+	static int* minimaxRoot(int depth, Board& board, bool isMaximisingPlayer);
+	static int minimax(int depth, Board& board, int alpha, int beta, bool isMaximisingPlayer);
 
 
 private:
@@ -103,8 +105,6 @@ private:
 	static void countPieces(Board& board, int* whitePieces, int* blackPieces);
 	static void getValidMoves(Board& board);
 	static int evaluatePiecesWhite(int* whitePieces, bool midGame);
-	int* minimaxRoot(int depth, Board& board, bool isMaximisingPlayer);
-	int minimax(int depth, Board& board, int alpha, int beta, bool isMaximisingPlayer);
 	static int evaluatePiecesBlack(int* blackPieces, bool midGame);
 	static int evaluatePiecePositions(Board& board, bool white);
 	static int evaluateKingSafety(Board& board, bool white);

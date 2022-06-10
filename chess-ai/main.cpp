@@ -13,7 +13,14 @@ int main()
 		boardMsg = client.recvMsg(client._clientSocket);
 		Board board(boardMsg);
 		// GET BEST MOVE
-		client.sendMsg(client._clientSocket, bestMove);
+		// Minimax probably doesn't work (we need to look at it), but either way it should be made this way:
+		int* bestMove = Evaluate::minimaxRoot(7, board, true);
+		std::string move = "";
+		char firstLetter = (97 + bestMove[0]);
+		char secondLetter = (97 + bestMove[2]);
+
+		move += firstLetter + std::to_string(bestMove[1]) + secondLetter + std::to_string(bestMove[3]);
+		client.sendMsg(client._clientSocket, move);
 	}
 	/*
 	// Board board("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1");
