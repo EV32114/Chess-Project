@@ -2,9 +2,11 @@
 
 #include "Evaluate.h"
 #include "Client.h"
+#include "WSAInitializer.h"
 
 int main()
 {
+	WSAInitializer wsaInit;
 	Client client;
 	client.connectToServer("127.0.0.1", 3000);
 	std::string boardMsg;

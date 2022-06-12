@@ -18,9 +18,9 @@ int main()
 	srand(time_t(NULL));
 	Server server;
 	server.serve(PORT_ADDRESS);
+	SOCKET ESPSocket = server.acceptClient();
 	SOCKET imageSocket = server.acceptClient();
 	SOCKET AISocket = server.acceptClient();
-	SOCKET ESPSocket = server.acceptClient();
 	Board* board = new Board(INIT_STR);
 
 	HandleGame::startGame(board, &imageSocket, &AISocket, &ESPSocket);

@@ -10,8 +10,10 @@ Client::Client()
 	// we connect to server that uses TCP. thats why SOCK_STREAM & IPPROTO_TCP
 	_clientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-	if (_clientSocket == INVALID_SOCKET)
+	if (_clientSocket == INVALID_SOCKET) {
+		std::cout << WSAGetLastError() << std::endl;
 		throw std::exception(__FUNCTION__ " - socket");
+	}
 
 }
 

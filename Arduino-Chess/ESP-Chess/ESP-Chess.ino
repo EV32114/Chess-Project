@@ -17,6 +17,9 @@
 #define PIN_MIDDLE_D 21
 
 #define ELECTROMAGNET_PIN 18
+
+const int port = 3000;
+const char * ip = "127.0.0.1"
 /*
  * Function Declarations
  */
@@ -27,8 +30,6 @@ void moveDown(int nNumOfSteps);
 void moveLeft(int nNumOfSteps);
 void moveRight(int nNumOfSteps);
 void forward(int A, int B, int C, int D, int numOfSteps);
-
-WiFiServer wifiServer(1337);
 
 void setup() {
   pinMode(19, OUTPUT);
@@ -47,7 +48,7 @@ void setup() {
   
   //moveMotorsToIndex(0, 0, 7, 7);
   
-  /*int notConnectedCounter = 0;
+  int notConnectedCounter = 0;
   Serial.begin(115200); // set the communication frequency to 115200Hz
   WiFi.mode(WIFI_AP_STA); // set the Wi-Fi mode to Access Point
   if (!WiFi.softAP(SSID, PASSWORD)) // If we failed to initiate the Wi-Fi access point, we display an error.
@@ -63,23 +64,42 @@ void setup() {
  
   Serial.println("Connected to the WiFi network");
   Serial.println(WiFi.localIP());
- 
-  wifiServer.begin(); // we start the Wi-Fi server.*/
+  
+  WiFiClient client;
+  if (!client.connect(ip, port)) {
+
+   Serial.println("Connection to host failed");
+
+   delay(1000);
+   return;
+  }
+  
+
+  
+  // wifiServer.begin(); // we start the Wi-Fi server.
   
 }
 
 void loop() {
-  forward(19, 23, 22, 21, 100); // TEMP WORKING
-  //delay(1000);
-  //forward(26, 12, 14, 27, 100); // WORKING
+  /*forward(19, 23, 22, 21, 100); // TEMP WORKING
+  delay(1000);
+  forward(26, 12, 14, 27, 100); // WORKING
   delay(1000);
   forward(19, 23, 22, 21, -100); // WORKING
   delay(1000);
-  //forward(26, 12, 14, 27, -100); // WORKING
-  //delay(1000);
+  forward(26, 12, 14, 27, -100); // WORKING
+  delay(1000);*/
   /* 
    *  Variable and object initializations
    */
+  String c;
+   while (client.available()) {
+    c += client.read();
+    if (length(c) == 4) {
+      moveMotorsToIndex(c[0] - '0', c[1] - '0', c[2] - '0', c[3] - '0');
+      c = "";
+    }
+   }
   /*WiFiClient client = wifiServer.available();   // Listen for incoming clients
   String userReq = "";
   
