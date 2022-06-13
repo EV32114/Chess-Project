@@ -14,9 +14,11 @@ int main()
 	while (true) {
 		boardMsg = client.recvMsg(client._clientSocket);
 		Board board(boardMsg);
+		Evaluate eval;
+		eval.getValidMoves(board);
 		// GET BEST MOVE
 		// Minimax probably doesn't work (we need to look at it), but either way it should be made this way:
-		int* bestMove = Evaluate::minimaxRoot(7, board, true);
+		int* bestMove = eval.minimaxRoot(7, board, true);
 		std::string move = "";
 		char firstLetter = (97 + bestMove[0]);
 		char secondLetter = (97 + bestMove[2]);

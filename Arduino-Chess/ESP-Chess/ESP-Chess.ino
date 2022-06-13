@@ -19,7 +19,7 @@
 #define ELECTROMAGNET_PIN 18
 
 const int port = 3000;
-const char * ip = "192.168.109.121";
+const char * ip = "192.168.133.121";
 
 WiFiClient client;
 int status = WL_IDLE_STATUS;
@@ -93,7 +93,7 @@ void setup() {
 
   
   // wifiServer.begin(); // we start the Wi-Fi server.
-  
+  Serial.println("connected to server");
 }
 
 void loop() {

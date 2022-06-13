@@ -44,13 +44,14 @@ using std::endl;
 class Evaluate
 {
 public:
-	static int evalPos(string pos);
-	static int evalPos(Board& board, bool white);
-	static int attackKingZone(Board& board, bool white);
-	static bool isOpenFile(Board& board, bool isWhite, int* src);
-	static int* generateMove(Board& board, bool isWhite);
-	static int* minimaxRoot(int depth, Board& board, bool isMaximisingPlayer);
-	static int minimax(int depth, Board& board, int alpha, int beta, bool isMaximisingPlayer);
+	int evalPos(string pos);
+	int evalPos(Board& board, bool white);
+	int attackKingZone(Board& board, bool white);
+	bool isOpenFile(Board& board, bool isWhite, int* src);
+	int* generateMove(Board& board, bool isWhite);
+	int* minimaxRoot(int depth, Board& board, bool isMaximisingPlayer);
+	int minimax(int depth, Board& board, int alpha, int beta, bool isMaximisingPlayer);
+	void getValidMoves(Board& board);
 
 
 private:
@@ -102,16 +103,15 @@ private:
 
 	static std::vector<std::string> blackMoves;
 	static std::vector<std::string> whiteMoves;
-	static void countPieces(Board& board, int* whitePieces, int* blackPieces);
-	static void getValidMoves(Board& board);
-	static int evaluatePiecesWhite(int* whitePieces, bool midGame);
-	static int evaluatePiecesBlack(int* blackPieces, bool midGame);
-	static int evaluatePiecePositions(Board& board, bool white);
-	static int evaluateKingSafety(Board& board, bool white);
-	static bool isUnderAttack(Board& board, int src[]);
-	static int calculateBlackIndex(int row);
-	static int evaluatePawnShield(int src[], Board& board);
-	static std::vector<Piece*> calcKingZone(Board& board, int src[], bool white);
+	void countPieces(Board& board, int* whitePieces, int* blackPieces);
+	int evaluatePiecesWhite(int* whitePieces, bool midGame);
+	int evaluatePiecesBlack(int* blackPieces, bool midGame);
+	int evaluatePiecePositions(Board& board, bool white);
+	int evaluateKingSafety(Board& board, bool white);
+	bool isUnderAttack(Board& board, int src[]);
+	int calculateBlackIndex(int row);
+	int evaluatePawnShield(int src[], Board& board);
+	std::vector<Piece*> calcKingZone(Board& board, int src[], bool white);
 	
 };
  

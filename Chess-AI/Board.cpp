@@ -152,14 +152,6 @@ Board::Board(std::string strBoard)
 
 Board::~Board()
 {
-  for (int i = 0; i < BOARD_SIDE; i++)
-  {
-    for (int j = 0; j < BOARD_SIDE; j++)
-    {
-      delete this->_board[i][j];
-    }
-    delete[] this->_board[i];
-  }
 }
 
 void Board::printBoard() const

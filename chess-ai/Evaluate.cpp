@@ -20,7 +20,7 @@ int Evaluate::evalPos(string pos)
 
 	Board board(pos);
 	
-	getValidMoves(board);
+	this->getValidMoves(board);
 	for (std::vector<std::string>::iterator i = blackMoves.begin(); i != blackMoves.end(); i++) {
 		cout << *i << endl;
 	}
@@ -179,7 +179,7 @@ int* Evaluate::generateMove(Board& board, bool isWhite) {
 		srcY = rand() % 8;
 	}
 
-	getValidMoves(board); // TEMP
+	this->getValidMoves(board); // TEMP
 	int numOfValidMoves = isWhite ? whiteMoves.size() : blackMoves.size(); // we get the number of valid moves.
 	std::string move = isWhite ? whiteMoves.at(rand() % numOfValidMoves) : blackMoves.at(rand() % numOfValidMoves); // we get a random move from the valid moves.
 
@@ -188,7 +188,7 @@ int* Evaluate::generateMove(Board& board, bool isWhite) {
 
 int Evaluate::evaluateKingSafety(Board& board, bool white)
 {
-	return attackKingZone(board, white) + evaluatePawnShield(white ? board.getWhiteKing()->getPos() : board.getBlackKing()->getPos(), board);
+	return this->attackKingZone(board, white) + evaluatePawnShield(white ? board.getWhiteKing()->getPos() : board.getBlackKing()->getPos(), board);
 }
 
 bool Evaluate::isUnderAttack(Board& board, int src[])
@@ -244,7 +244,7 @@ int Evaluate::evaluatePawnShield(int src[], Board& board)
 	}
 
 	// We check whether there's an open file
-	bool openFile = Evaluate::isOpenFile(board, isWhite, src);
+	bool openFile = this->isOpenFile(board, isWhite, src);
 
 	penalty += openFile ? OPEN_FILE_PENALTY : 0; 
 
@@ -264,7 +264,7 @@ int Evaluate::evaluatePawnShield(int src[], Board& board)
 // TODO: DOCUMENT (EV)
 int Evaluate::attackKingZone(Board& board, bool white)
 {
-	getValidMoves(board); // TEMP
+	this->getValidMoves(board); // TEMP
 	int attackingPiecesCount = 0, valueOfAttack = 0;
 	const int KNIGHT_VAL = 20, BISHOP_VAL = 20, ROOK_VAL = 40, QUEEN_VAL = 80;
 	const int attackWeight[7] = { 0, 50, 75, 88, 94, 97, 99 };
@@ -465,7 +465,7 @@ int*  Evaluate::minimaxRoot(int depth, Board& board, bool isMaximizingPlayer) {
 }
 
  int Evaluate::minimax(int depth, Board& board, int alpha, int beta, bool isMaximizingPlayer) {
-	if (depth == 0) return -(Evaluate::evalPos(board, isMaximizingPlayer));
+	if (depth == 0) return -(this->evalPos(board, isMaximizingPlayer));
 	int bestMove;
 	std::string newMove;
 	int* src;
