@@ -3,8 +3,8 @@
 
 #define SQUARE_STEPS 37
 // #define STEPS_PER_REVOLUTION 2048 // Steps per revolution.
-#define SSID "ESP32-AP" // WiFi name.
-#define PASSWORD "12345678" // WiFi password.
+#define ssid "AndroidA" // WiFi name. ESP32-AP
+#define pass "dasMe123" // WiFi password.
 
 #define PIN_TOP_A 26
 #define PIN_TOP_B 12
@@ -19,7 +19,13 @@
 #define ELECTROMAGNET_PIN 18
 
 const int port = 3000;
-const char * ip = "127.0.0.1"
+const char * ip = "192.168.109.121";
+
+WiFiClient client;
+int status = WL_IDLE_STATUS;
+
+
+
 /*
  * Function Declarations
  */
@@ -46,11 +52,10 @@ void setup() {
 
   digitalWrite(ELECTROMAGNET_PIN, HIGH);
   
-  //moveMotorsToIndex(0, 0, 7, 7);
   
   int notConnectedCounter = 0;
   Serial.begin(115200); // set the communication frequency to 115200Hz
-  WiFi.mode(WIFI_AP_STA); // set the Wi-Fi mode to Access Point
+  /*WiFi.mode(WIFI_AP_STA); // set the Wi-Fi mode to Access Point
   if (!WiFi.softAP(SSID, PASSWORD)) // If we failed to initiate the Wi-Fi access point, we display an error.
   {
    Serial.println("Failed to init WiFi AP");
@@ -64,8 +69,19 @@ void setup() {
  
   Serial.println("Connected to the WiFi network");
   Serial.println(WiFi.localIP());
+  */
+  WiFi.disconnect();
+  delay(1);
+  WiFi.begin(ssid, pass);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.println("...");
+  }
+
+  Serial.print("WiFi connected with IP: ");
+  Serial.println(WiFi.localIP());
   
-  WiFiClient client;
+  Serial.println("Waiting for server...");
   if (!client.connect(ip, port)) {
 
    Serial.println("Connection to host failed");
@@ -95,7 +111,7 @@ void loop() {
   String c;
    while (client.available()) {
     c += client.read();
-    if (length(c) == 4) {
+    if (c.length() == 4) {
       moveMotorsToIndex(c[0] - '0', c[1] - '0', c[2] - '0', c[3] - '0');
       c = "";
     }
