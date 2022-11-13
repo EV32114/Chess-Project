@@ -47,13 +47,15 @@ void HandleGame::startGame(Board* board, SOCKET* imageSocket, SOCKET* AISocket, 
         msgToGraphics = strCode;
         pStr = msgToGraphics.c_str();
         Server::sendMsg(*imageSocket, msgToGraphics);
-        if (code == VALID || code == CHECK || code == CASTLE || code == CHECKMATE) {
+        if (code == VALID || code == CHECK || code == CASTLE || code == CHECKMATE || true) {
             HandleGame::changeCurrentPlayer(code, &roundCounter);
             Server::sendMsg(*AISocket, board->getBoardStr(getCurrentPlayer()));  // SEND AI NEW BOARD POSITION
+            std::cout << "sent to AI: " << board->getBoardStr(getCurrentPlayer()) << std::endl;
             moveFromAI = Server::recvMsg(*AISocket);  // RECV MOVE FROM AI
             HandleGame::handleTurn(msgFromGraphics, *board);  // UPDATE BOARD
             HandleGame::changeCurrentPlayer(code, &roundCounter);
             Server::sendMsg(*ESPSocket, moveFromAI);  // SEND MOVE TO ESP
+            std::cout << "sent to ESP: " << moveFromAI << std::endl;
         }
     }
 }

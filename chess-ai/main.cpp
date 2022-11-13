@@ -11,19 +11,28 @@ int main()
 	client.connectToServer("127.0.0.1", 3000);
 	std::string boardMsg;
 	std::string bestMove;
+	int cnt = 0;
+	std::string move = "";
 	while (true) {
 		boardMsg = client.recvMsg(client._clientSocket);
-		Board board(boardMsg);
-		Evaluate eval;
-		eval.getValidMoves(board);
+		// Board board(boardMsg);
+		// Evaluate eval;
+		// eval.getValidMoves(board);
 		// GET BEST MOVE
 		// Minimax probably doesn't work (we need to look at it), but either way it should be made this way:
-		int* bestMove = eval.minimaxRoot(7, board, true);
-		std::string move = "";
-		char firstLetter = (97 + bestMove[0]);
-		char secondLetter = (97 + bestMove[2]);
+		// int* bestMove = eval.minimaxRoot(7, board, true);
+		//std::string move = "";
+		//char firstLetter = (97 + bestMove[0]);
+		// char secondLetter = (97 + bestMove[2]);
 
-		move += firstLetter + std::to_string(bestMove[1]) + secondLetter + std::to_string(bestMove[3]);
+		//move += firstLetter + std::to_string(bestMove[1]) + secondLetter + std::to_string(bestMove[3]);
+		switch (cnt++) {
+		case 0: 
+			move = "6444"; 
+			break;
+		case 1:
+			move = "6343";
+		}
 		client.sendMsg(client._clientSocket, move);
 	}
 	/*

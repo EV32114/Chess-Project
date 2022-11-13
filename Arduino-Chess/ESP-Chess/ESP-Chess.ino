@@ -19,7 +19,7 @@
 #define ELECTROMAGNET_PIN 18
 
 const int port = 3000;
-const char * ip = "192.168.133.121";
+const char * ip = "192.168.91.121";
 
 WiFiClient client;
 int status = WL_IDLE_STATUS;
@@ -49,12 +49,12 @@ void setup() {
   pinMode(26, OUTPUT);
 
   pinMode(18, OUTPUT);
-
-  digitalWrite(ELECTROMAGNET_PIN, HIGH);
   
   
   int notConnectedCounter = 0;
+  //digitalWrite(ELECTROMAGNET_PIN, HIGH);
   Serial.begin(115200); // set the communication frequency to 115200Hz
+  // moveMotorsToIndex(0, 0, 1, 1);
   /*WiFi.mode(WIFI_AP_STA); // set the Wi-Fi mode to Access Point
   if (!WiFi.softAP(SSID, PASSWORD)) // If we failed to initiate the Wi-Fi access point, we display an error.
   {
@@ -89,30 +89,31 @@ void setup() {
    delay(1000);
    return;
   }
-  
-
-  
-  // wifiServer.begin(); // we start the Wi-Fi server.
   Serial.println("connected to server");
 }
 
 void loop() {
-  /*forward(19, 23, 22, 21, 100); // TEMP WORKING
-  delay(1000);
-  forward(26, 12, 14, 27, 100); // WORKING
-  delay(1000);
-  forward(19, 23, 22, 21, -100); // WORKING
-  delay(1000);
-  forward(26, 12, 14, 27, -100); // WORKING
-  delay(1000);*/
+  //forward(19, 23, 22, 21, 100); // TEMP WORKING
+  //delay(1000);
+  //forward(26, 12, 14, 27, 120); // WORKING
+  //delay(1000);
+  //forward(19, 23, 22, 21, -100); // WORKING
+  //delay(1000);
+  //forward(26, 12, 14, 27, -120); // WORKING
+  //delay(1000);
   /* 
    *  Variable and object initializations
    */
   String c;
    while (client.available()) {
+    Serial.println("started reading from socket");
     c += client.read();
     if (c.length() == 4) {
-      moveMotorsToIndex(c[0] - '0', c[1] - '0', c[2] - '0', c[3] - '0');
+      Serial.println(c);
+      // moveMotorsToIndex(c[0] - '0', c[1] - '0', c[2] - '0', c[3] - '0');
+      digitalWrite(ELECTROMAGNET_PIN, HIGH);
+      forward(26, 12, 14, 27, 35); // WORKING
+      digitalWrite(ELECTROMAGNET_PIN, LOW);
       c = "";
     }
    }
